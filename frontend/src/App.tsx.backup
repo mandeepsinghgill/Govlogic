@@ -1,0 +1,84 @@
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState } from 'react';
+import './App.css';
+import Dashboard from './pages/Dashboard';
+import Opportunities from './pages/Opportunities';
+import Proposals from './pages/Proposals';
+import Capture from './pages/Capture';
+import Knowledge from './pages/Knowledge';
+import Programs from './pages/Programs';
+import { Menu, X, Target, FileText, Briefcase, Database, FolderKanban } from 'lucide-react';
+
+function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-blue-900 text-white shadow-lg">
+          <div className="px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 rounded hover:bg-blue-800"
+              >
+                {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+              <h1 className="text-2xl font-bold">GovLogic GovConAI</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm">v1.0.0</span>
+              <div className="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center">
+                <span className="text-sm font-semibold">JD</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="flex">
+          {/* Sidebar */}
+          {sidebarOpen && (
+            <aside className="w-64 bg-white shadow-md min-h-screen">
+              <nav className="p-4 space-y-2">
+                <NavLink to="/" icon={<FolderKanban size={20} />} text="Dashboard" />
+                <NavLink to="/opportunities" icon={<Target size={20} />} text="Opportunities" />
+                <NavLink to="/proposals" icon={<FileText size={20} />} text="Proposals" />
+                <NavLink to="/capture" icon={<Briefcase size={20} />} text="Capture" />
+                <NavLink to="/knowledge" icon={<Database size={20} />} text="Knowledge Base" />
+                <NavLink to="/programs" icon={<FolderKanban size={20} />} text="Programs" />
+              </nav>
+            </aside>
+          )}
+
+          {/* Main Content */}
+          <main className="flex-1 p-6">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/opportunities" element={<Opportunities />} />
+              <Route path="/proposals" element={<Proposals />} />
+              <Route path="/capture" element={<Capture />} />
+              <Route path="/knowledge" element={<Knowledge />} />
+              <Route path="/programs" element={<Programs />} />
+            </Routes>
+          </main>
+        </div>
+      </div>
+    </Router>
+  );
+}
+
+function NavLink({ to, icon, text }) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-900 transition-colors"
+    >
+      {icon}
+      <span className="font-medium">{text}</span>
+    </Link>
+  );
+}
+
+export default App;
+

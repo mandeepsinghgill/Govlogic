@@ -1,0 +1,430 @@
+# Enterprise-Grade Kubernetes Deployment
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: govlogic-enterprise
+  labels:
+    name: govlogic-enterprise
+    security-level: high
+    compliance: fedramp
+
+---
+# Enterprise ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: govlogic-enterprise-config
+  namespace: govlogic-enterprise
+data:
+  # Application Configuration
+  APP_NAME: "GovLogic Enterprise"
+  APP_VERSION: "1.0.0"
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  
+  # Enterprise Security
+  ENTERPRISE_MODE: "true"
+  SECURITY_LEVEL: "high"
+  COMPLIANCE_MODE: "fedramp"
+  AUDIT_ENABLED: "true"
+  
+  # Database Configuration
+  DATABASE_POOL_SIZE: "50"
+  DATABASE_MAX_OVERFLOW: "100"
+  DATABASE_TIMEOUT: "30"
+  
+  # Redis Configuration
+  REDIS_POOL_SIZE: "100"
+  REDIS_TIMEOUT: "10"
+  
+  # AI Configuration
+  AI_MODEL_CACHE_SIZE: "1000"
+  AI_REQUEST_TIMEOUT: "30"
+  AI_RATE_LIMIT: "1000"
+  
+  # Monitoring Configuration
+  METRICS_ENABLED: "true"
+  HEALTH_CHECK_INTERVAL: "30"
+  ALERT_THRESHOLD_ERROR_RATE: "0.01"
+
+---
+# Enterprise Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: govlogic-enterprise-secrets
+  namespace: govlogic-enterprise
+type: Opaque
+data:
+  # Base64 encoded secrets (in production, use external secret management)
+  DATABASE_URL: <base64-encoded-database-url>
+  REDIS_URL: <base64-encoded-redis-url>
+  JWT_SECRET: <base64-encoded-jwt-secret>
+  ENCRYPTION_KEY: <base64-encoded-encryption-key>
+  OPENAI_API_KEY: <base64-encoded-openai-key>
+  SENTRY_DSN: <base64-encoded-sentry-dsn>
+
+---
+# Enterprise Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: govlogic-backend-enterprise
+  namespace: govlogic-enterprise
+  labels:
+    app: govlogic-backend
+    tier: enterprise
+    security-level: high
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: govlogic-backend
+      tier: enterprise
+  template:
+    metadata:
+      labels:
+        app: govlogic-backend
+        tier: enterprise
+        security-level: high
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+      - name: govlogic-backend
+        image: govlogic/backend:enterprise-latest
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: govlogic-enterprise-secrets
+              key: DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: govlogic-enterprise-secrets
+              key: REDIS_URL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: govlogic-enterprise-secrets
+              key: JWT_SECRET
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: govlogic-enterprise-secrets
+              key: OPENAI_API_KEY
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: var-cache
+          mountPath: /var/cache
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: var-cache
+        emptyDir: {}
+
+---
+# Enterprise Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: govlogic-frontend-enterprise
+  namespace: govlogic-enterprise
+  labels:
+    app: govlogic-frontend
+    tier: enterprise
+    security-level: high
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: govlogic-frontend
+      tier: enterprise
+  template:
+    metadata:
+      labels:
+        app: govlogic-frontend
+        tier: enterprise
+        security-level: high
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+      - name: govlogic-frontend
+        image: govlogic/frontend:enterprise-latest
+        ports:
+        - containerPort: 3000
+          name: http
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+---
+# Enterprise Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: govlogic-enterprise-service
+  namespace: govlogic-enterprise
+  labels:
+    app: govlogic
+    tier: enterprise
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: metrics
+  selector:
+    app: govlogic-backend
+    tier: enterprise
+
+---
+# Enterprise Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: govlogic-enterprise-ingress
+  namespace: govlogic-enterprise
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - govlogic-enterprise.yourdomain.com
+    secretName: govlogic-enterprise-tls
+  rules:
+  - host: govlogic-enterprise.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: govlogic-enterprise-service
+            port:
+              number: 80
+
+---
+# Enterprise Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: govlogic-backend-hpa
+  namespace: govlogic-enterprise
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: govlogic-backend-enterprise
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Enterprise Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: govlogic-backend-pdb
+  namespace: govlogic-enterprise
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: govlogic-backend
+      tier: enterprise
+
+---
+# Enterprise Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: govlogic-enterprise-netpol
+  namespace: govlogic-enterprise
+spec:
+  podSelector:
+    matchLabels:
+      app: govlogic-backend
+      tier: enterprise
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: govlogic-enterprise
+    - podSelector:
+        matchLabels:
+          app: govlogic-frontend
+          tier: enterprise
+    ports:
+    - protocol: TCP
+      port: 8000
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: govlogic-enterprise
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443   # HTTPS
+    - protocol: TCP
+      port: 80    # HTTP
+
+---
+# Enterprise Resource Quotas
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: govlogic-enterprise-quota
+  namespace: govlogic-enterprise
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    pods: "50"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+    persistentvolumeclaims: "10"
+
+---
+# Enterprise Limit Range
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: govlogic-enterprise-limits
+  namespace: govlogic-enterprise
+spec:
+  limits:
+  - default:
+      cpu: "1"
+      memory: "2Gi"
+    defaultRequest:
+      cpu: "500m"
+      memory: "1Gi"
+    type: Container
+  - max:
+      cpu: "2"
+      memory: "4Gi"
+    min:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Container

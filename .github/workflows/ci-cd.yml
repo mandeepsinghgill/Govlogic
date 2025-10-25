@@ -1,0 +1,262 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Backend Tests
+  backend-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_govlogic
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        cd govlogic/backend
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio httpx
+    
+    - name: Run linting
+      run: |
+        cd govlogic/backend
+        pip install flake8 black isort
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        black --check app/
+        isort --check-only app/
+    
+    - name: Run tests
+      run: |
+        cd govlogic/backend
+        pytest tests/ -v --cov=app --cov-report=xml --cov-report=html
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./govlogic/backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+
+  # Frontend Tests
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: govlogic/frontend/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd govlogic/frontend
+        npm ci
+    
+    - name: Run linting
+      run: |
+        cd govlogic/frontend
+        npm run lint
+    
+    - name: Run type checking
+      run: |
+        cd govlogic/frontend
+        npm run type-check
+    
+    - name: Run tests
+      run: |
+        cd govlogic/frontend
+        npm test -- --coverage --watchAll=false
+    
+    - name: Build application
+      run: |
+        cd govlogic/frontend
+        npm run build
+
+  # Security Scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Docker Build and Test
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./govlogic
+        file: ./govlogic/docker/Dockerfile.backend
+        push: false
+        tags: govlogic-backend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./govlogic
+        file: ./govlogic/docker/Dockerfile.frontend
+        push: false
+        tags: govlogic-frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Integration Tests
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Start services with Docker Compose
+      run: |
+        cd govlogic
+        docker-compose up -d postgres redis
+        sleep 10
+    
+    - name: Run integration tests
+      run: |
+        cd govlogic/backend
+        pytest tests/integration/ -v
+    
+    - name: Stop services
+      run: |
+        cd govlogic
+        docker-compose down
+
+  # Performance Tests
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Start application
+      run: |
+        cd govlogic
+        docker-compose up -d
+        sleep 30
+    
+    - name: Run load tests
+      run: |
+        pip install locust
+        locust -f tests/load/locustfile.py --host=http://localhost:8000 --users=100 --spawn-rate=10 --run-time=5m --headless
+    
+    - name: Stop application
+      run: |
+        cd govlogic
+        docker-compose down
+
+  # Deploy to Staging
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: [integration-tests, security-scan]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to staging environment"
+        # Add actual deployment commands here
+        # kubectl apply -f k8s/staging/
+        # helm upgrade govlogic-staging ./helm --namespace staging
+
+  # Deploy to Production
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [integration-tests, security-scan, performance-tests]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production environment"
+        # Add actual deployment commands here
+        # kubectl apply -f k8s/production/
+        # helm upgrade govlogic-prod ./helm --namespace production
+    
+    - name: Run smoke tests
+      run: |
+        # Add smoke tests to verify deployment
+        curl -f http://production-url/health || exit 1
