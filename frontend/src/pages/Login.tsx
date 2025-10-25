@@ -21,7 +21,7 @@ export default function Login() {
     try {
       // OAuth2PasswordRequestForm expects form data, not JSON
       const formBody = new URLSearchParams();
-      formBody.append('username', formData.username);
+      formBody.append('email', formData.username);
       formBody.append('password', formData.password);
 
       const response = await fetch(`${API_URL}/api/v1/auth/login`, {
