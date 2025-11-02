@@ -540,7 +540,7 @@ npm run dev
 ```bash
 cd backend
 alembic upgrade head
-# Check: psql -d govlogic -c "\dt" # Should show 11 new tables
+# Check: psql -d GovSure -c "\dt" # Should show 11 new tables
 ```
 
 ---
@@ -648,7 +648,7 @@ alembic upgrade head
 
 ### **Step 1: Backend Setup**
 ```bash
-cd govlogic/backend
+cd GovSure/backend
 
 # Install dependencies
 pip install -r requirements.txt
@@ -669,7 +669,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ### **Step 2: Frontend Setup**
 ```bash
-cd govlogic/frontend
+cd GovSure/frontend
 
 # Install dependencies
 npm install
@@ -729,7 +729,7 @@ API Docs: http://localhost:8000/docs
 **Backend not starting:**
 ```bash
 # Check database connection
-psql -d govlogic -c "SELECT 1"
+psql -d GovSure -c "SELECT 1"
 
 # Check migration status
 alembic current

@@ -58,12 +58,16 @@ async def add_process_time_header(request: Request, call_next):
 async def startup():
     """Create database tables on startup"""
     try:
+        # Import all models to ensure they're registered
+        from app.models import pipeline  # noqa
+        
         Base.metadata.create_all(bind=engine)
         print(f"✅ {settings.APP_NAME} v{settings.APP_VERSION} started")
         db_url_safe = settings.DATABASE_URL.split('@')[-1] if '@' in settings.DATABASE_URL else 'configured'
         print(f"📊 Database: {db_url_safe}")
         print(f"🤖 AI Provider: {settings.DEFAULT_LLM_PROVIDER}")
         print(f"🔧 Debug Mode: {settings.DEBUG}")
+        print(f"✅ Pipeline tables created/verified")
     except Exception as e:
         print(f"⚠️  Warning during startup: {str(e)}")
         print(f"✅ {settings.APP_NAME} v{settings.APP_VERSION} started (with warnings)")
@@ -113,9 +117,10 @@ from app.api.opportunities import router as opportunities_router
 from app.api.proposals import router as proposals_router
 from app.api.capture import router as capture_router
 from app.api.grants import router as grants_router
-from app.api.knowledge import router as knowledge_router
+from app.api import knowledge  # Import the new knowledge API
 from app.api.competitors import router as competitors_router
 from app.api.programs import router as programs_router
+from app.api.ai_assistant import router as ai_assistant_router
 from app.api.compliance import router as compliance_router
 from app.api.pricing import router as pricing_router
 from app.api.awards import router as awards_router
@@ -137,6 +142,7 @@ from app.api.continuous_learning import router as continuous_learning_router
 from app.api.rich_editor import router as rich_editor_router
 from app.api.enhanced_export import router as enhanced_export_router
 from app.api.briefs import router as briefs_router
+from app.api.pipeline import router as pipeline_router
 
 # Auth routes (no prefix, already in router)
 app.include_router(auth_router)
@@ -174,9 +180,16 @@ if settings.GRANTS_MODE:
     )
 
 app.include_router(
-    knowledge_router,
+    knowledge.router,
     prefix=f"{settings.API_V1_PREFIX}/knowledge",
     tags=["knowledge"]
+)
+
+# AI Assistant routes
+app.include_router(
+    ai_assistant_router,
+    prefix=f"{settings.API_V1_PREFIX}/ai",
+    tags=["ai"]
 )
 
 app.include_router(
@@ -298,6 +311,12 @@ app.include_router(
     briefs_router,
     prefix=f"{settings.API_V1_PREFIX}/briefs",
     tags=["briefs"]
+)
+
+# Pipeline API
+app.include_router(
+    pipeline_router,
+    tags=["pipeline"]
 )
 
 

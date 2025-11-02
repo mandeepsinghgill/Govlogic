@@ -74,7 +74,7 @@ Go to: http://localhost:3000
 
 ## 🚀 Test Account
 
-**Email:** `testuser@govlogic.com`  
+**Email:** `testuser@GovSure.com`  
 **Password:** `TestPass123!`
 
 **Login at:** `http://localhost:3000/login`
@@ -83,16 +83,16 @@ Go to: http://localhost:3000
 
 ## 📁 New Files Created
 
-1. `govlogic/frontend/src/pages/LandingNew.tsx` - Beautiful new landing page
-2. `govlogic/frontend/src/pages/DashboardModern.tsx` - Modern dashboard
-3. `govlogic/frontend/src/pages/Features.tsx` - Features page
-4. `govlogic/frontend/src/pages/HowItWorks.tsx` - How it works page
-5. `govlogic/frontend/src/pages/CaseStudies.tsx` - Case studies page
-6. `govlogic/frontend/src/pages/Pricing.tsx` - Pricing page
-7. `govlogic/frontend/src/components/Navigation.tsx` - Professional nav bar
-8. `govlogic/frontend/src/components/ChatWidget.tsx` - Live chat widget
-9. `govlogic/backend/app/models/subscription.py` - Updated with FREE tier
-10. `govlogic/create_test_account.py` - Script to create test accounts
+1. `GovSure/frontend/src/pages/LandingNew.tsx` - Beautiful new landing page
+2. `GovSure/frontend/src/pages/DashboardModern.tsx` - Modern dashboard
+3. `GovSure/frontend/src/pages/Features.tsx` - Features page
+4. `GovSure/frontend/src/pages/HowItWorks.tsx` - How it works page
+5. `GovSure/frontend/src/pages/CaseStudies.tsx` - Case studies page
+6. `GovSure/frontend/src/pages/Pricing.tsx` - Pricing page
+7. `GovSure/frontend/src/components/Navigation.tsx` - Professional nav bar
+8. `GovSure/frontend/src/components/ChatWidget.tsx` - Live chat widget
+9. `GovSure/backend/app/models/subscription.py` - Updated with FREE tier
+10. `GovSure/create_test_account.py` - Script to create test accounts
 
 ---
 

@@ -108,7 +108,7 @@ celerybeat-schedule
 # Text and documentation files (temporary/generated)
 *.txt
 pasted_content*.txt
-govlogic_full_text.txt
+GovSure_full_text.txt
 
 # Word documents (temporary)
 *.docx

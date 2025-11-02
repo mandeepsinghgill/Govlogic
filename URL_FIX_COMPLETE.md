@@ -110,7 +110,7 @@ No more errors like:
 
 ## Test Credentials
 ```
-Username: test@govlogic.com
+Username: test@GovSure.com
 Password: Test123!@#
 ```
 

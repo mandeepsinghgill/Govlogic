@@ -16,17 +16,17 @@ class OAuthService:
         # Google OAuth
         self.google_client_id = os.getenv('GOOGLE_CLIENT_ID')
         self.google_client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
-        self.google_redirect_uri = os.getenv('GOOGLE_REDIRECT_URI', 'https://app.govlogic.ai/auth/google/callback')
+        self.google_redirect_uri = os.getenv('GOOGLE_REDIRECT_URI', 'https://app.GovSure.ai/auth/google/callback')
         
         # GitHub OAuth
         self.github_client_id = os.getenv('GITHUB_CLIENT_ID')
         self.github_client_secret = os.getenv('GITHUB_CLIENT_SECRET')
-        self.github_redirect_uri = os.getenv('GITHUB_REDIRECT_URI', 'https://app.govlogic.ai/auth/github/callback')
+        self.github_redirect_uri = os.getenv('GITHUB_REDIRECT_URI', 'https://app.GovSure.ai/auth/github/callback')
         
         # Microsoft OAuth
         self.microsoft_client_id = os.getenv('MICROSOFT_CLIENT_ID')
         self.microsoft_client_secret = os.getenv('MICROSOFT_CLIENT_SECRET')
-        self.microsoft_redirect_uri = os.getenv('MICROSOFT_REDIRECT_URI', 'https://app.govlogic.ai/auth/microsoft/callback')
+        self.microsoft_redirect_uri = os.getenv('MICROSOFT_REDIRECT_URI', 'https://app.GovSure.ai/auth/microsoft/callback')
         self.microsoft_tenant = os.getenv('MICROSOFT_TENANT', 'common')
     
     def get_google_auth_url(self, state: str) -> str:

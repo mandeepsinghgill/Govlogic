@@ -9,7 +9,7 @@ You have the complete GovLogic platform locally with all enterprise-grade featur
 ## 🗂️ **DIRECTORY STRUCTURE**
 
 ```
-govlogic/
+GovSure/
 ├── 🐳 docker-compose.yml          # Complete multi-service setup
 ├── ⚙️ .env                        # Environment configuration (API keys configured)
 ├── 📋 README.md                   # Complete setup instructions

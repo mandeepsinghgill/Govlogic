@@ -13,6 +13,7 @@ class SAMgovAPI:
     
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("SAM_GOV_API_KEY")
+        # Using v2 API endpoint as per user requirement
         self.base_url = "https://api.sam.gov/opportunities/v2/search"
         
     def search_opportunities(
@@ -162,7 +163,7 @@ class SendGridService:
         to_email: str,
         subject: str,
         html_content: str,
-        from_email: str = "noreply@govlogic.ai",
+        from_email: str = "noreply@GovSure.ai",
         from_name: str = "GovLogic"
     ) -> bool:
         """
@@ -221,7 +222,7 @@ class SendGridService:
         to_email: str,
         template_id: str,
         dynamic_data: Dict,
-        from_email: str = "noreply@govlogic.ai"
+        from_email: str = "noreply@GovSure.ai"
     ) -> bool:
         """Send email using SendGrid template"""
         if not self.api_key:

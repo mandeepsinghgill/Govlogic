@@ -30,7 +30,7 @@ class ProposalLearningService:
     - Generate proposals that match past successful formats
     """
     
-    def __init__(self, training_data_dir: str = "/home/ubuntu/govlogic/backend/training_data/past_proposals"):
+    def __init__(self, training_data_dir: str = "/home/ubuntu/GovSure/backend/training_data/past_proposals"):
         self.training_data_dir = training_data_dir
         self.knowledge_base: Dict[str, Any] = {
             'writing_patterns': {},

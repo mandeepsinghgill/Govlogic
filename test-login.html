@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - GovLogic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+        button:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            background: #D1FAE5;
+            border: 1px solid #10B981;
+            color: #065F46;
+        }
+        .error {
+            background: #FEE2E2;
+            border: 1px solid #EF4444;
+            color: #991B1B;
+        }
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .preset-btn {
+            flex: 1;
+            padding: 8px;
+            background: #E5E7EB;
+            color: #374151;
+            border: 1px solid #D1D5DB;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .preset-btn:hover {
+            background: #D1D5DB;
+        }
+        .info {
+            background: #DBEAFE;
+            border: 1px solid #3B82F6;
+            color: #1E40AF;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Login Test Page</h1>
+        
+        <div class="info">
+            <strong>Test Accounts:</strong><br>
+            1. admin@test.com / password123<br>
+            2. testuser@govsure.com / TestPass123!
+        </div>
+
+        <div class="preset-buttons">
+            <button class="preset-btn" onclick="setAccount1()">Use Account 1</button>
+            <button class="preset-btn" onclick="setAccount2()">Use Account 2</button>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Enter email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+            
+            <button type="submit" id="submitBtn">Login</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        function setAccount1() {
+            document.getElementById('email').value = 'admin@test.com';
+            document.getElementById('password').value = 'password123';
+        }
+
+        function setAccount2() {
+            document.getElementById('email').value = 'testuser@govsure.com';
+            document.getElementById('password').value = 'TestPass123!';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+            resultDiv.innerHTML = '';
+            
+            try {
+                // Create form data
+                const formData = new URLSearchParams();
+                formData.append('username', email);
+                formData.append('password', password);
+                
+                console.log('Sending login request...');
+                console.log('Email:', email);
+                console.log('Password length:', password.length);
+                
+                const response = await fetch(`${API_URL}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString(),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+✅ Login Successful!
+
+User: ${data.user.full_name} (${data.user.email})
+Role: ${data.user.role}
+Organization: ${data.organization.name}
+Subscription: ${data.organization.subscription_tier}
+
+Access Token: ${data.access_token.substring(0, 50)}...
+
+You can now use this account in the main app at:
+http://localhost:3000/login
+                    `;
+                } else {
+                    throw new Error(data.detail || 'Login failed');
+                }
+            } catch (err) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+❌ Login Failed!
+
+Error: ${err.message}
+
+Troubleshooting:
+1. Check if backend is running: ${API_URL}/health
+2. Verify credentials are correct (case-sensitive)
+3. Check browser console for more details
+                `;
+                console.error('Login error:', err);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        });
+        
+        // Auto-fill account 1 on page load
+        window.onload = () => {
+            setAccount1();
+        };
+    </script>
+</body>
+</html>
+

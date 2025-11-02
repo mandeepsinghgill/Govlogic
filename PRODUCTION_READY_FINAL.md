@@ -271,7 +271,7 @@ All code now meets enterprise standards:
 ## 📁 FILE STRUCTURE
 
 ```
-govlogic/
+GovSure/
 ├── backend/
 │   ├── app/
 │   │   ├── api/                    # 20+ API routers
@@ -415,7 +415,7 @@ kubectl apply -f k8s/enterprise-deployment.yaml
 
 - 📖 **Documentation**: `/docs` endpoints (OpenAPI/Swagger)
 - 💬 **Help Center**: Built-in chat widget
-- 📧 **Email**: support@govlogicai.com
+- 📧 **Email**: support@GovSureai.com
 - 🎓 **Training**: Onboarding tour + video tutorials
 - 🔧 **API Docs**: Interactive Swagger UI at `/docs`
 

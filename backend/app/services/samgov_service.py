@@ -3,12 +3,14 @@ SAM.gov API Integration Service
 Fetches opportunities from SAM.gov API with caching and error handling
 """
 import os
-import httpx
 import json
 from typing import List, Dict, Optional, Any
 from datetime import datetime, timedelta
 from app.config import settings
 import logging
+
+import requests
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +20,20 @@ class SAMGovService:
     
     def __init__(self):
         self.api_key = os.getenv("SAM_GOV_API_KEY", settings.SAM_GOV_API_KEY)
+        # SAM.gov Opportunities API v2 (Updated endpoint as per user requirement)
+        # Use GET with query params; API key provided via 'api_key' parameter
         self.base_url = "https://api.sam.gov/opportunities/v2/search"
+        self.base_url_v1 = "https://api.sam.gov/prod/opp/v1/opportunities/search"  # Fallback
         self.cache = {}
-        self.cache_ttl = 3600  # 1 hour cache
-        
-        if not self.api_key:
-            logger.warning("⚠️  SAM_GOV_API_KEY not configured. API calls will fail.")
+        self.cache_ttl = 300  # 5 minutes cache for search results
+
+        if not self.api_key or self.api_key in ['demo_api_key_12345', 'your_sam_gov_api_key_here', '3wLjNRkUoBtpPEymw0LphKvRmAayb3Lk8byG0b4J']:
+            logger.warning("⚠️  SAM_GOV_API_KEY not configured or using demo key. API calls will fail.")
+            logger.warning("📝 Get a real API key from: https://open.gsa.gov/api/opportunities-api/")
+        else:
+            logger.info(f"✅ SAM.gov API key configured: {self.api_key[:8]}...")
     
-    async def get_top_opportunities(
+    def get_top_opportunities(
         self,
         limit: int = 10,
         min_pwin: Optional[int] = 60,
@@ -53,15 +61,15 @@ class SAMGovService:
         
         # Fetch from API
         try:
-            opportunities = await self._fetch_from_api(limit=limit)
-            
+            opportunities = self._fetch_from_api(limit=limit)
+
             # Transform and score opportunities
             items = []
             for opp in opportunities:
                 transformed = self._transform_opportunity(opp)
                 # Simple scoring based on contract value and set-aside type
                 transformed['pwin_score'] = self._calculate_simple_pwin(opp)
-                
+
                 if min_pwin is None or transformed['pwin_score'] >= min_pwin:
                     items.append(transformed)
             
@@ -83,7 +91,7 @@ class SAMGovService:
             # Return mock data as fallback
             return self._get_fallback_opportunities(limit)
     
-    async def search_opportunities(
+    def search_opportunities(
         self,
         page: int = 1,
         limit: int = 20,
@@ -100,7 +108,7 @@ class SAMGovService:
         """
         try:
             offset = (page - 1) * limit
-            opportunities = await self._fetch_from_api(
+            opportunities = self._fetch_from_api(
                 limit=limit,
                 offset=offset,
                 naics_code=naics_code,
@@ -108,7 +116,7 @@ class SAMGovService:
                 posted_from=posted_from,
                 posted_to=posted_to
             )
-            
+
             items = [self._transform_opportunity(opp) for opp in opportunities]
             
             return {
@@ -121,9 +129,16 @@ class SAMGovService:
             
         except Exception as e:
             logger.error(f"❌ SAM.gov search error: {str(e)}")
-            return self._get_fallback_opportunities(limit)
+            # Only return mock data if API key is not configured
+            if not self.api_key:
+                logger.warning("⚠️  No SAM.gov API key configured, returning mock data")
+                return self._get_fallback_opportunities(limit)
+            else:
+                # API key is configured but call failed - raise error
+                logger.error(f"❌ SAM.gov API call failed despite having API key: {str(e)}")
+                raise e
     
-    async def get_opportunity_by_id(self, notice_id: str) -> Optional[Dict[str, Any]]:
+    def get_opportunity_by_id(self, notice_id: str) -> Optional[Dict[str, Any]]:
         """
         Fetch a single opportunity with FULL details by notice ID
         Includes description, attachments, clauses, and all contract sections
@@ -133,32 +148,38 @@ class SAMGovService:
             return self._get_mock_opportunity_detail(notice_id)
             
         try:
-            # Use the search endpoint with noticeId filter
-            url = f"https://api.sam.gov/opportunities/v2/search"
-            params = {
-                'api_key': self.api_key,
-                'noticeId': notice_id,
-                'limit': 1
-            }
-            
+            # Use the opportunities search endpoint with noticeId filter
+            url = self.base_url
             logger.info(f"🔄 Fetching full opportunity details for {notice_id}")
-            
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(url, params=params)
-                response.raise_for_status()
-                data = response.json()
-                
-                if data.get('opportunitiesData') and len(data['opportunitiesData']) > 0:
-                    opp_data = data['opportunitiesData'][0]
-                    
-                    # Transform with full details
-                    transformed = self._transform_opportunity_detail(opp_data)
-                    
-                    logger.info(f"✅ Retrieved full details for opportunity {notice_id}")
-                    return transformed
-                    
-                logger.warning(f"No opportunity found with ID {notice_id}")
-                return None
+
+            # Use POST with JSON, and provide API key via header 'apikey'
+            response = requests.post(
+                url,
+                json={
+                    'noticeId': notice_id,
+                    'limit': 1
+                },
+                headers={
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'apikey': self.api_key
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get('opportunitiesData') and len(data['opportunitiesData']) > 0:
+                opp_data = data['opportunitiesData'][0]
+
+                # Transform with full details
+                transformed = self._transform_opportunity_detail(opp_data)
+
+                logger.info(f"✅ Retrieved full details for opportunity {notice_id}")
+                return transformed
+
+            logger.warning(f"No opportunity found with ID {notice_id}")
+            return None
                 
         except Exception as e:
             logger.error(f"❌ Error fetching opportunity {notice_id}: {str(e)}")
@@ -357,7 +378,7 @@ Proposals will be evaluated based on: (1) Technical Approach (40%), (2) Past Per
             'note': 'This is mock data. Configure SAM_GOV_API_KEY for real opportunity details.'
         }
     
-    async def _fetch_from_api(
+    def _fetch_from_api(
         self,
         limit: int = 20,
         offset: int = 0,
@@ -367,46 +388,62 @@ Proposals will be evaluated based on: (1) Technical Approach (40%), (2) Past Per
         posted_to: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
-        Internal method to fetch from SAM.gov API
+        Internal method to fetch from SAM.gov API v2
+        Now uses GET with query parameters instead of POST
         """
         if not self.api_key:
             raise ValueError("SAM_GOV_API_KEY is required")
         
-        # Build query parameters
+        # Build query parameters for SAM.gov API v2 (uses GET)
         params = {
             'api_key': self.api_key,
             'limit': limit,
             'offset': offset,
+            'postedFrom': posted_from or (datetime.now() - timedelta(days=30)).strftime('%m/%d/%Y'),
+            'postedTo': posted_to or datetime.now().strftime('%m/%d/%Y'),
             'ptype': 'o',  # Opportunities only
         }
-        
+
         if naics_code:
             params['ncode'] = naics_code
-        
+
         if keyword:
             params['q'] = keyword
-        
-        # Date filters (MM/dd/yyyy format)
-        if not posted_from:
-            # Default to last 30 days
-            posted_from = (datetime.now() - timedelta(days=30)).strftime('%m/%d/%Y')
-        if not posted_to:
-            posted_to = datetime.now().strftime('%m/%d/%Y')
-            
-        params['postedFrom'] = posted_from
-        params['postedTo'] = posted_to
-        
-        logger.info(f"🔄 Fetching from SAM.gov: limit={limit}, offset={offset}")
-        
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(self.base_url, params=params)
+
+        logger.info(f"🔄 Fetching from SAM.gov v2: {params}")
+
+        try:
+            # v2 API uses GET with query parameters (not POST)
+            response = requests.get(
+                self.base_url,
+                params=params,
+                headers={
+                    'Accept': 'application/json'
+                },
+                timeout=30
+            )
+
+            # Log the response status for debugging
+            logger.info(f"📡 SAM.gov API v2 response status: {response.status_code}")
+
+            if response.status_code == 401 or response.status_code == 403:
+                logger.error("❌ SAM.gov API key is invalid or unauthorized")
+                logger.error("📝 Get a new API key from: https://open.gsa.gov/api/opportunities-api/")
+                raise ValueError("SAM.gov API key is invalid. Please check your API key.")
+
             response.raise_for_status()
-            
             data = response.json()
+
+            # SAM.gov API v2 returns opportunitiesData array
             opportunities = data.get('opportunitiesData', [])
-            
-            logger.info(f"✅ SAM.gov returned {len(opportunities)} opportunities")
-            return opportunities
+            logger.info(f"✅ SAM.gov v2 returned {len(opportunities)} opportunities")
+
+            # Transform opportunities to our format
+            return [self._transform_opportunity(opp) for opp in opportunities]
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ HTTP request failed: {str(e)}")
+            raise e
     
     def _transform_opportunity(self, opp: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -432,6 +469,7 @@ Proposals will be evaluated based on: (1) Technical Approach (40%), (2) Past Per
             'active': opp.get('active', True),
             'pointOfContact': opp.get('pointOfContact', []),
             'placeOfPerformance': opp.get('placeOfPerformance', {}),
+            'pwin_score': self._calculate_simple_pwin(opp),  # Add PWin calculation
         }
     
     def _extract_value(self, opp: Dict[str, Any]) -> Optional[float]:
@@ -461,11 +499,12 @@ Proposals will be evaluated based on: (1) Technical Approach (40%), (2) Past Per
         """
         score = 50  # Base score
         
-        # Set-aside increases chances
-        set_aside = opp.get('typeOfSetAsideDescription', '').lower()
-        if 'small business' in set_aside:
+        # Set-aside increases chances (handle None values)
+        set_aside = opp.get('typeOfSetAsideDescription') or ''
+        set_aside_lower = set_aside.lower() if set_aside else ''
+        if 'small business' in set_aside_lower:
             score += 20
-        elif 'woman' in set_aside or 'veteran' in set_aside:
+        elif 'woman' in set_aside_lower or 'veteran' in set_aside_lower:
             score += 15
         
         # Recent postings are better

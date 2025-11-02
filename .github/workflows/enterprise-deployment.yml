@@ -59,7 +59,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_govlogic
+          POSTGRES_DB: test_GovSure
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -107,7 +107,7 @@ jobs:
         cd backend
         pytest tests/ -v --cov=app --cov-report=xml --cov-report=html
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_govlogic
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_GovSure
         REDIS_URL: redis://localhost:6379/0
     
     - name: Upload coverage reports
@@ -183,7 +183,7 @@ jobs:
         cd backend
         locust -f tests/load_tests.py --headless -u 100 -r 10 -t 300s --host http://localhost:8000
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_govlogic
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_GovSure
         REDIS_URL: redis://localhost:6379/0
 
   # Build and Push Images
@@ -266,21 +266,21 @@ jobs:
     
     - name: Deploy to staging
       run: |
-        helm upgrade --install govlogic-staging ./helm/govlogic \
-          --namespace govlogic-staging \
+        helm upgrade --install GovSure-staging ./helm/GovSure \
+          --namespace GovSure-staging \
           --create-namespace \
           --set image.tag=${{ github.sha }} \
           --set environment=staging \
-          --set ingress.host=staging.govlogic.yourdomain.com
+          --set ingress.host=staging.GovSure.yourdomain.com
     
     - name: Run smoke tests
       run: |
-        kubectl wait --for=condition=ready pod -l app=govlogic-backend -n govlogic-staging --timeout=300s
-        kubectl wait --for=condition=ready pod -l app=govlogic-frontend -n govlogic-staging --timeout=300s
+        kubectl wait --for=condition=ready pod -l app=GovSure-backend -n GovSure-staging --timeout=300s
+        kubectl wait --for=condition=ready pod -l app=GovSure-frontend -n GovSure-staging --timeout=300s
         
         # Run smoke tests
-        curl -f https://staging.govlogic.yourdomain.com/health || exit 1
-        curl -f https://staging.govlogic.yourdomain.com/metrics || exit 1
+        curl -f https://staging.GovSure.yourdomain.com/health || exit 1
+        curl -f https://staging.GovSure.yourdomain.com/metrics || exit 1
 
   # Deploy to Production
   deploy-production:
@@ -305,12 +305,12 @@ jobs:
     
     - name: Deploy to production
       run: |
-        helm upgrade --install govlogic-production ./helm/govlogic \
-          --namespace govlogic-production \
+        helm upgrade --install GovSure-production ./helm/GovSure \
+          --namespace GovSure-production \
           --create-namespace \
           --set image.tag=${{ github.ref_name }} \
           --set environment=production \
-          --set ingress.host=govlogic.yourdomain.com \
+          --set ingress.host=GovSure.yourdomain.com \
           --set resources.requests.memory=1Gi \
           --set resources.requests.cpu=500m \
           --set resources.limits.memory=2Gi \
@@ -320,15 +320,15 @@ jobs:
     
     - name: Run production health checks
       run: |
-        kubectl wait --for=condition=ready pod -l app=govlogic-backend -n govlogic-production --timeout=600s
-        kubectl wait --for=condition=ready pod -l app=govlogic-frontend -n govlogic-production --timeout=600s
+        kubectl wait --for=condition=ready pod -l app=GovSure-backend -n GovSure-production --timeout=600s
+        kubectl wait --for=condition=ready pod -l app=GovSure-frontend -n GovSure-production --timeout=600s
         
         # Run comprehensive health checks
-        curl -f https://govlogic.yourdomain.com/health || exit 1
-        curl -f https://govlogic.yourdomain.com/metrics || exit 1
+        curl -f https://GovSure.yourdomain.com/health || exit 1
+        curl -f https://GovSure.yourdomain.com/metrics || exit 1
         
         # Run API endpoint tests
-        curl -f https://govlogic.yourdomain.com/api/v1/health || exit 1
+        curl -f https://GovSure.yourdomain.com/api/v1/health || exit 1
     
     # Slack notifications - Set SLACK_WEBHOOK_URL secret to enable
     - name: Notify deployment success
@@ -358,12 +358,12 @@ jobs:
     
     - name: Rollback deployment
       run: |
-        kubectl rollout undo deployment/govlogic-backend-production -n govlogic-production
-        kubectl rollout undo deployment/govlogic-frontend-production -n govlogic-production
+        kubectl rollout undo deployment/GovSure-backend-production -n GovSure-production
+        kubectl rollout undo deployment/GovSure-frontend-production -n GovSure-production
         
         # Wait for rollback to complete
-        kubectl rollout status deployment/govlogic-backend-production -n govlogic-production
-        kubectl rollout status deployment/govlogic-frontend-production -n govlogic-production
+        kubectl rollout status deployment/GovSure-backend-production -n GovSure-production
+        kubectl rollout status deployment/GovSure-frontend-production -n GovSure-production
     
     # Slack notifications - Set SLACK_WEBHOOK_URL secret to enable
     - name: Notify rollback

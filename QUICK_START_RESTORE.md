@@ -13,7 +13,7 @@
 ## Step 1: Clone & Setup Environment
 
 ```bash
-cd /Users/mandeepgill/Downloads/govlogic
+cd /Users/mandeepgill/Downloads/GovSure
 
 # Backend setup
 cd backend
@@ -58,7 +58,7 @@ npm run dev
 
 1. Open browser: `http://localhost:3000`
 2. Login with test credentials:
-   - Email: `testuser@govlogic.com`
+   - Email: `testuser@GovSure.com`
    - Password: `TestPass123!`
 
 3. Verify features:
@@ -158,7 +158,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 ## 📂 Project Structure
 
 ```
-govlogic/
+GovSure/
 ├── backend/
 │   ├── app/
 │   │   ├── api/
@@ -197,7 +197,7 @@ python --version  # Should be 3.9+
 pip install -r requirements.txt
 
 # Check database connection
-psql -U govlogic -d govlogic
+psql -U GovSure -d GovSure
 ```
 
 ### Frontend won't start?
@@ -221,7 +221,7 @@ npm install
 - Add `OPENAI_API_KEY` to `.env` for real AI
 
 ### "Authentication failed"?
-- Use test credentials: `testuser@govlogic.com` / `TestPass123!`
+- Use test credentials: `testuser@GovSure.com` / `TestPass123!`
 - Check backend is running on port 8000
 - Verify CORS settings in backend config
 

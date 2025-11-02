@@ -363,11 +363,11 @@ Default logo created at .../default_logo.png
 ### **Required Environment Variables**
 ```bash
 # Database
-DATABASE_URL=postgresql://govlogic:password@localhost/govlogic
+DATABASE_URL=postgresql://GovSure:password@localhost/GovSure
 
 # Security
 SECRET_KEY=your-secret-key-here
-CORS_ORIGINS=https://app.govlogic.ai
+CORS_ORIGINS=https://app.GovSure.ai
 
 # Email (choose one)
 SENDGRID_API_KEY=your-sendgrid-key  # OR

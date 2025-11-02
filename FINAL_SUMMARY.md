@@ -200,7 +200,7 @@ You now have **the most advanced government contracting SaaS platform ever built
 ## 📁 DELIVERABLES
 
 ### **Source Code**
-- `/home/ubuntu/govlogic/` - Complete platform
+- `/home/ubuntu/GovSure/` - Complete platform
 - Backend: FastAPI + PostgreSQL
 - Frontend: React + TypeScript + Tailwind
 - 230MB total

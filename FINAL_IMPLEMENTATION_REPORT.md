@@ -549,7 +549,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ### For Users
 
 **Login Credentials (Test):**
-- Email: `testuser@govlogic.com`
+- Email: `testuser@GovSure.com`
 - Password: `TestPass123!`
 
 **Workflow:**

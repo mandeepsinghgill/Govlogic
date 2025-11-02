@@ -24,66 +24,76 @@ interface Grant {
   last_updated: string;
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const Grants: React.FC = () => {
   const [grants, setGrants] = useState<Grant[]>([]);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data (replace with API call)
+  // Fetch grants from API
   useEffect(() => {
-    const mockGrants: Grant[] = [
-      {
-        id: 1,
-        title: 'Healthcare Innovation Research Grant',
-        agency: 'NIH',
-        funding_opportunity_number: 'NIH-2024-001',
-        award_ceiling: 2500000,
-        deadline: '2024-03-15',
-        status: 'Draft',
-        probability: 75,
-        last_updated: '2024-01-15'
-      },
-      {
-        id: 2,
-        title: 'Clean Energy Technology Development',
-        agency: 'DOE',
-        funding_opportunity_number: 'DOE-EERE-2024-002',
-        award_ceiling: 5000000,
-        deadline: '2024-04-01',
-        status: 'Submitted',
-        probability: 68,
-        last_updated: '2024-01-10'
-      },
-      {
-        id: 3,
-        title: 'Community Development Block Grant',
-        agency: 'HUD',
-        funding_opportunity_number: 'HUD-CDBG-2024-003',
-        award_ceiling: 1000000,
-        deadline: '2024-02-28',
-        status: 'Under Review',
-        probability: 82,
-        last_updated: '2024-01-08'
-      },
-      {
-        id: 4,
-        title: 'STEM Education Advancement Program',
-        agency: 'NSF',
-        funding_opportunity_number: 'NSF-EDU-2024-004',
-        award_ceiling: 750000,
-        deadline: '2024-05-20',
-        status: 'Draft',
-        probability: 60,
-        last_updated: '2024-01-12'
-      }
-    ];
-
-    setTimeout(() => {
-      setGrants(mockGrants);
-      setLoading(false);
-    }, 500);
+    fetchGrants();
   }, []);
+
+  const fetchGrants = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Get token from localStorage or sessionStorage
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      
+      if (!token) {
+        setError('Please login to view grants');
+        setGrants([]);
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/v1/grants/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401) {
+        setError('Session expired. Please login again.');
+        setGrants([]);
+        setLoading(false);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch grants');
+      }
+
+      const data = await response.json();
+      
+      // Transform API data to match our interface
+      const transformedGrants = data.map((grant: any) => ({
+        id: grant.id,
+        title: grant.title,
+        agency: grant.agency || 'Unknown Agency',
+        funding_opportunity_number: grant.funding_opportunity_number,
+        award_ceiling: grant.award_ceiling || 0,
+        deadline: grant.deadline || grant.close_date,
+        status: grant.status || 'Draft',
+        probability: 75, // Default, can be calculated later
+        last_updated: grant.updated_at || grant.created_at
+      }));
+      
+      setGrants(transformedGrants);
+    } catch (err) {
+      console.error('Error fetching grants:', err);
+      setError('Failed to load grants');
+      setGrants([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredGrants = grants.filter(grant => {
     const matchesStatus = filterStatus === 'all' || grant.status === filterStatus;
@@ -96,9 +106,9 @@ const Grants: React.FC = () => {
 
   const stats = {
     total: grants.length,
-    draft: grants.filter(g => g.status === 'Draft').length,
-    submitted: grants.filter(g => g.status === 'Submitted').length,
-    awarded: grants.filter(g => g.status === 'Awarded').length,
+    draft: grants.filter(g => g.status.toLowerCase() === 'draft').length,
+    submitted: grants.filter(g => g.status.toLowerCase() === 'submitted').length,
+    awarded: grants.filter(g => g.status.toLowerCase() === 'awarded').length,
     total_value: grants.reduce((sum, g) => sum + g.award_ceiling, 0)
   };
 

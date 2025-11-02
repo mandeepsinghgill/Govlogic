@@ -420,7 +420,7 @@ npm run dev
 ```
 
 ### 5. Test Login
-- Email: `testuser@govlogic.com`
+- Email: `testuser@GovSure.com`
 - Password: `TestPass123!`
 
 ### 6. Verify Features
@@ -609,7 +609,7 @@ docs(implementation): add comprehensive implementation summary
    - Create a proposal via /proposals/new
 
 4. **Authentication issues?**
-   - Use test credentials: testuser@govlogic.com / TestPass123!
+   - Use test credentials: testuser@GovSure.com / TestPass123!
    - Check JWT token in localStorage
    - Verify backend is running on port 8000
 

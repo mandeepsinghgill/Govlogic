@@ -517,7 +517,7 @@ docker-compose up -d
 
 ### Option 2: Kubernetes (Production/Scale)
 ```bash
-helm install govlogic ./helm/govlogic
+helm install GovSure ./helm/GovSure
 ```
 - Auto-scaling
 - High availability

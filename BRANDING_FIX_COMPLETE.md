@@ -161,13 +161,13 @@ Powered by InZTan Gov Supreme Engine
 
 ```bash
 # Check for GovLogic GovConAI usage
-grep -r "GovLogic GovConAI" govlogic/frontend/src/pages/
+grep -r "GovLogic GovConAI" GovSure/frontend/src/pages/
 
 # Check InZTan is only used as technology attribution
-grep -r "InZTan" govlogic/frontend/src/pages/
+grep -r "InZTan" GovSure/frontend/src/pages/
 
 # Verify no standalone "GovCon" as platform name
-grep -r "GovCon Platform" govlogic/frontend/src/pages/
+grep -r "GovCon Platform" GovSure/frontend/src/pages/
 ```
 
 ---

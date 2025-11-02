@@ -252,8 +252,8 @@ Your complete SaaS application is now live and accessible!
 ## 🗄️ Database Setup
 
 ### PostgreSQL
-✅ Database created: `govlogic_db`
-✅ User created: `govlogic`
+✅ Database created: `GovSure_db`
+✅ User created: `GovSure`
 ✅ Permissions granted
 ✅ Connection pooling
 ✅ Indexes configured

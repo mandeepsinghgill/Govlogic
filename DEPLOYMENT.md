@@ -32,7 +32,7 @@ Environment variables are crucial for configuring the application, especially fo
 
 ```dotenv
 # Database
-DATABASE_URL="postgresql://govlogic:govlogic@localhost:5432/govlogic_db"
+DATABASE_URL="postgresql://GovSure:GovSure@localhost:5432/GovSure_db"
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -66,7 +66,7 @@ STRIPE_WEBHOOK_SECRET="your_stripe_webhook_secret_here"
 DOCUSIGN_INTEGRATION_KEY=
 
 # File Storage
-UPLOAD_DIR=/tmp/govlogic/uploads
+UPLOAD_DIR=/tmp/GovSure/uploads
 MAX_UPLOAD_SIZE=52428800
 
 # CORS
@@ -82,12 +82,12 @@ CORS_ORIGINS=["http://localhost:3000","http://localhost:5173", "https://your-fro
 
     ```bash
     sudo -u postgres psql
-    CREATE USER govlogic WITH PASSWORD 'govlogic';
-    CREATE DATABASE govlogic_db OWNER govlogic;
+    CREATE USER GovSure WITH PASSWORD 'GovSure';
+    CREATE DATABASE GovSure_db OWNER GovSure;
     \q
     ```
 
-    **Note**: For production, use a strong, unique password for the `govlogic` user.
+    **Note**: For production, use a strong, unique password for the `GovSure` user.
 
 3.  **Run Migrations**: The backend uses Alembic for database migrations. Navigate to the backend directory and apply migrations:
 
@@ -217,9 +217,9 @@ services:
     image: postgres:14-alpine
     restart: always
     environment:
-      POSTGRES_DB: govlogic_db
-      POSTGRES_USER: govlogic
-      POSTGRES_PASSWORD: govlogic
+      POSTGRES_DB: GovSure_db
+      POSTGRES_USER: GovSure
+      POSTGRES_PASSWORD: GovSure
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -239,7 +239,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://govlogic:govlogic@db:5432/govlogic_db
+      DATABASE_URL: postgresql://GovSure:GovSure@db:5432/GovSure_db
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
@@ -279,7 +279,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      DATABASE_URL: postgresql://govlogic:govlogic@db:5432/govlogic_db
+      DATABASE_URL: postgresql://GovSure:GovSure@db:5432/GovSure_db
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
@@ -376,7 +376,7 @@ sentry_sdk.init(
 
 ```bash
 # Increase replicas in Kubernetes
-kubectl scale deployment govlogic-backend --replicas=5
+kubectl scale deployment GovSure-backend --replicas=5
 
 # Or in docker-compose
 docker-compose up -d --scale backend=3
@@ -401,7 +401,7 @@ docker-compose up -d --scale backend=3
 
 ```bash
 # Database backups
-pg_dump govlogic > backup.sql
+pg_dump GovSure > backup.sql
 
 # Automated backups
 # - AWS RDS automated backups
@@ -430,13 +430,13 @@ npm update
 
 ```bash
 # Check application health
-curl https://api.govlogic.com/health
+curl https://api.GovSure.com/health
 
 # Monitor logs
-tail -f /var/log/govlogic/app.log
+tail -f /var/log/GovSure/app.log
 
 # Check database
-psql govlogic -c "SELECT version();"
+psql GovSure -c "SELECT version();"
 ```
 
 ---

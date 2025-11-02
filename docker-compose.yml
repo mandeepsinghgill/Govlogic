@@ -3,15 +3,15 @@ services:
   postgres:
     image: ankane/pgvector:latest
     environment:
-      POSTGRES_USER: govlogic
-      POSTGRES_PASSWORD: govlogic
-      POSTGRES_DB: govlogic
+      POSTGRES_USER: GovSure
+      POSTGRES_PASSWORD: GovSure
+      POSTGRES_DB: GovSure
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U govlogic"]
+      test: ["CMD-SHELL", "pg_isready -U GovSure"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -37,7 +37,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://govlogic:govlogic@postgres:5432/govlogic
+      DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
@@ -46,8 +46,8 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
       - ./backend:/app
-      - uploads:/tmp/govlogic/uploads
-      - exports:/tmp/govlogic/exports
+      - uploads:/tmp/GovSure/uploads
+      - exports:/tmp/GovSure/exports
     depends_on:
       postgres:
         condition: service_healthy
@@ -61,7 +61,7 @@ services:
       context: ./backend
       dockerfile: ../docker/Dockerfile.backend
     environment:
-      DATABASE_URL: postgresql://govlogic:govlogic@postgres:5432/govlogic
+      DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
@@ -69,7 +69,7 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
       - ./backend:/app
-      - uploads:/tmp/govlogic/uploads
+      - uploads:/tmp/GovSure/uploads
     depends_on:
       - postgres
       - redis

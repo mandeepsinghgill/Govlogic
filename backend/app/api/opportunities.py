@@ -63,7 +63,7 @@ async def get_top_opportunities(
     Returns top opportunities with PWin scoring
     """
     try:
-        result = await samgov_service.get_top_opportunities(limit=limit, min_pwin=min_pwin)
+        result = samgov_service.get_top_opportunities(limit=limit, min_pwin=min_pwin)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching opportunities: {str(e)}")
@@ -82,7 +82,8 @@ async def search_opportunities(
     Search SAM.gov opportunities with filters and pagination
     """
     try:
-        result = await samgov_service.search_opportunities(
+        # Note: samgov_service methods are synchronous, not async
+        result = samgov_service.search_opportunities(
             page=page,
             limit=limit,
             naics_code=naics_code,
@@ -91,8 +92,74 @@ async def search_opportunities(
             posted_to=posted_to
         )
         return result
+    except ValueError as ve:
+        # Surface API key errors as 401 to the client
+        raise HTTPException(status_code=401, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error searching opportunities: {str(e)}")
+
+
+class SAMSearchRequest(BaseModel):
+    keyword: str
+    page: int = 1
+    limit: int = 20
+    naics_code: Optional[str] = None
+    posted_from: Optional[str] = None
+    posted_to: Optional[str] = None
+
+
+@router.post("/sam-search")
+async def sam_gov_search(
+    request: SAMSearchRequest
+):
+    """
+    Search SAM.gov opportunities directly with keyword
+    This endpoint specifically searches SAM.gov with the provided keyword
+    Minimum 4 characters required for keyword search
+    """
+    try:
+        # Validate keyword length
+        if len(request.keyword.strip()) < 4:
+            raise HTTPException(
+                status_code=400,
+                detail="Keyword must be at least 4 characters long"
+            )
+
+        # Search SAM.gov via service
+        result = samgov_service.search_opportunities(
+            page=request.page,
+            limit=request.limit,
+            naics_code=request.naics_code,
+            keyword=request.keyword.strip(),
+            posted_from=request.posted_from,
+            posted_to=request.posted_to
+        )
+
+        # Add search metadata
+        result['search_info'] = {
+            'keyword': request.keyword.strip(),
+            'page': request.page,
+            'limit': request.limit,
+            'source': 'SAM.gov'
+        }
+
+        return result
+
+    except HTTPException as he:
+        raise he
+    except ValueError as ve:
+        # Handle API key validation errors
+        raise HTTPException(
+            status_code=401,
+            detail=str(ve)
+        )
+    except Exception as e:
+        # Log error for debugging
+        print(f"SAM.gov search error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error searching SAM.gov: {str(e)}. Please check your SAM.gov API key configuration."
+        )
 
 
 @router.get("/", response_model=List[OpportunityResponse])
@@ -159,7 +226,7 @@ async def get_opportunity_details(
     Includes description, contract sections (H-L), attachments, point of contact
     """
     # Try to fetch from SAM.gov by ID
-    opportunity_data = await samgov_service.get_opportunity_by_id(opportunity_id)
+    opportunity_data = samgov_service.get_opportunity_by_id(opportunity_id)
     
     if opportunity_data:
         return opportunity_data

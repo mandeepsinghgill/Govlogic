@@ -68,7 +68,7 @@ GovLogic GovConAI is a comprehensive, end-to-end platform that automates the ent
 ### 1. Clone and Setup
 
 ```bash
-cd govlogic
+cd GovSure
 ```
 
 ### 2. Configure Environment
@@ -302,9 +302,9 @@ pnpm run lint
 ## Support
 
 For questions, issues, or feature requests:
-- **Documentation:** https://docs.govlogic.ai
-- **Email:** support@govlogic.ai
-- **GitHub Issues:** https://github.com/govlogic/govconai/issues
+- **Documentation:** https://docs.GovSure.ai
+- **Email:** support@GovSure.ai
+- **GitHub Issues:** https://github.com/GovSure/govconai/issues
 
 ## License
 

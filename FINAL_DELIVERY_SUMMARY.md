@@ -301,11 +301,11 @@ GovLogic Sidebar:
 ### **Step 1: Start Application**
 ```bash
 # Terminal 1 - Backend
-cd govlogic/backend
+cd GovSure/backend
 uvicorn app.main:app --reload
 
 # Terminal 2 - Frontend
-cd govlogic/frontend
+cd GovSure/frontend
 npm run dev
 ```
 

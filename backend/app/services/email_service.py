@@ -25,8 +25,8 @@ class EmailService:
     
     def __init__(self):
         self.sendgrid_api_key = os.getenv('SENDGRID_API_KEY')
-        self.from_email = os.getenv('FROM_EMAIL', 'noreply@govlogic.ai')
-        self.from_name = os.getenv('FROM_NAME', 'GovLogic')
+        self.from_email = os.getenv('FROM_EMAIL', 'noreply@GovSure.ai')
+        self.from_name = os.getenv('FROM_NAME', 'GovSureAI')
         
         # SMTP fallback settings
         self.smtp_host = os.getenv('SMTP_HOST', 'smtp.gmail.com')
@@ -131,7 +131,7 @@ class EmailService:
         """
         Send email verification link
         """
-        verification_url = f"https://app.govlogic.ai/verify-email?token={verification_token}"
+        verification_url = f"https://app.GovSure.ai/verify-email?token={verification_token}"
         
         html_content = f"""
         <!DOCTYPE html>
@@ -149,11 +149,11 @@ class EmailService:
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>Welcome to GovLogic!</h1>
+                    <h1>Welcome to GovSureAI!</h1>
                 </div>
                 <div class="content">
                     <p>Hi {user_name},</p>
-                    <p>Thank you for signing up for GovLogic. Please verify your email address to get started.</p>
+                    <p>Thank you for signing up for GovSureAI. Please verify your email address to get started.</p>
                     <p style="text-align: center;">
                         <a href="{verification_url}" class="button">Verify Email Address</a>
                     </p>
@@ -163,8 +163,8 @@ class EmailService:
                     <p>If you didn't create an account, you can safely ignore this email.</p>
                 </div>
                 <div class="footer">
-                    <p>&copy; {datetime.now().year} GovLogic. All rights reserved.</p>
-                    <p>You're receiving this email because you signed up for GovLogic.</p>
+                    <p>&copy; {datetime.now().year} GovSureAI. All rights reserved.</p>
+                    <p>You're receiving this email because you signed up for GovSureAI.</p>
                 </div>
             </div>
         </body>
@@ -172,11 +172,11 @@ class EmailService:
         """
         
         text_content = f"""
-        Welcome to GovLogic!
+        Welcome to GovSureAI!
         
         Hi {user_name},
         
-        Thank you for signing up for GovLogic. Please verify your email address to get started.
+        Thank you for signing up for GovSureAI. Please verify your email address to get started.
         
         Verification link: {verification_url}
         
@@ -184,16 +184,16 @@ class EmailService:
         
         If you didn't create an account, you can safely ignore this email.
         
-        © {datetime.now().year} GovLogic. All rights reserved.
+        © {datetime.now().year} GovSureAI. All rights reserved.
         """
         
-        return self.send_email(to_email, "Verify your GovLogic email address", html_content, text_content)
+        return self.send_email(to_email, "Verify your GovSureAI email address", html_content, text_content)
     
     def send_password_reset_email(self, to_email: str, reset_token: str, user_name: str) -> bool:
         """
         Send password reset link
         """
-        reset_url = f"https://app.govlogic.ai/reset-password?token={reset_token}"
+        reset_url = f"https://app.GovSure.ai/reset-password?token={reset_token}"
         
         html_content = f"""
         <!DOCTYPE html>
@@ -216,7 +216,7 @@ class EmailService:
                 </div>
                 <div class="content">
                     <p>Hi {user_name},</p>
-                    <p>We received a request to reset your password for your GovLogic account.</p>
+                    <p>We received a request to reset your password for your GovSureAI account.</p>
                     <p style="text-align: center;">
                         <a href="{reset_url}" class="button">Reset Password</a>
                     </p>
@@ -228,7 +228,7 @@ class EmailService:
                     </div>
                 </div>
                 <div class="footer">
-                    <p>&copy; {datetime.now().year} GovLogic. All rights reserved.</p>
+                    <p>&copy; {datetime.now().year} GovSureAI. All rights reserved.</p>
                 </div>
             </div>
         </body>
@@ -240,7 +240,7 @@ class EmailService:
         
         Hi {user_name},
         
-        We received a request to reset your password for your GovLogic account.
+        We received a request to reset your password for your GovSureAI account.
         
         Reset link: {reset_url}
         
@@ -248,16 +248,16 @@ class EmailService:
         
         ⚠️ Security Notice: If you didn't request a password reset, please ignore this email and your password will remain unchanged.
         
-        © {datetime.now().year} GovLogic. All rights reserved.
+        © {datetime.now().year} GovSureAI. All rights reserved.
         """
         
-        return self.send_email(to_email, "Reset your GovLogic password", html_content, text_content)
+        return self.send_email(to_email, "Reset your GovSureAI password", html_content, text_content)
     
     def send_welcome_email(self, to_email: str, user_name: str) -> bool:
         """
         Send welcome email after verification
         """
-        dashboard_url = "https://app.govlogic.ai/dashboard"
+        dashboard_url = "https://app.GovSure.ai/dashboard"
         
         html_content = f"""
         <!DOCTYPE html>
@@ -276,7 +276,7 @@ class EmailService:
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🎉 Welcome to GovLogic!</h1>
+                    <h1>🎉 Welcome to GovSureAI!</h1>
                 </div>
                 <div class="content">
                     <p>Hi {user_name},</p>
@@ -301,10 +301,10 @@ class EmailService:
                         <strong>🤝 Collaborate</strong><br>
                         Work with your team in real-time on proposals and capture plans
                     </div>
-                    <p>Need help getting started? Check out our <a href="https://help.govlogic.ai">Help Center</a> or reply to this email.</p>
+                    <p>Need help getting started? Check out our <a href="https://help.GovSure.ai">Help Center</a> or reply to this email.</p>
                 </div>
                 <div class="footer">
-                    <p>&copy; {datetime.now().year} GovLogic. All rights reserved.</p>
+                    <p>&copy; {datetime.now().year} GovSureAI. All rights reserved.</p>
                 </div>
             </div>
         </body>
@@ -312,7 +312,7 @@ class EmailService:
         """
         
         text_content = f"""
-        Welcome to GovLogic!
+        Welcome to GovSureAI!
         
         Hi {user_name},
         
@@ -334,12 +334,12 @@ class EmailService:
         🤝 Collaborate
         Work with your team in real-time on proposals and capture plans
         
-        Need help getting started? Check out our Help Center at https://help.govlogic.ai or reply to this email.
+        Need help getting started? Check out our Help Center at https://help.GovSure.ai or reply to this email.
         
-        © {datetime.now().year} GovLogic. All rights reserved.
+        © {datetime.now().year} GovSureAI. All rights reserved.
         """
         
-        return self.send_email(to_email, "Welcome to GovLogic - You're all set!", html_content, text_content)
+        return self.send_email(to_email, "Welcome to GovSureAI - You're all set!", html_content, text_content)
 
 
 # Global instance

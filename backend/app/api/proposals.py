@@ -239,8 +239,36 @@ Please include:
 5. Cost Proposal Overview
 """
         
-        # Check if AI key is available
+        # Check for AI services: Ollama (local), OpenAI, or Anthropic
+        use_ollama = os.getenv("USE_OLLAMA", "true").lower() == "true"
         ai_key = os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+        
+        # Try Ollama first (local AI)
+        if use_ollama:
+            try:
+                import requests
+                ollama_response = requests.post(
+                    "http://localhost:11434/api/generate",
+                    json={
+                        "model": "llama2",  # or mistral, codellama, etc.
+                        "prompt": prompt,
+                        "stream": False
+                    },
+                    timeout=120
+                )
+                
+                if ollama_response.status_code == 200:
+                    ollama_data = ollama_response.json()
+                    generated_content = ollama_data.get("response", "")
+                    
+                    return {
+                        "content": generated_content,
+                        "mockGenerated": False,
+                        "source": "Ollama (Local AI)"
+                    }
+            except Exception as e:
+                print(f"Ollama error: {e}")
+                # Fall through to other methods
         
         if not ai_key:
             # Return mock generated content
@@ -367,7 +395,7 @@ async def upload_rfp(
         raise HTTPException(status_code=404, detail="Proposal not found")
     
     # Save file
-    upload_dir = "/tmp/govlogic/uploads"
+    upload_dir = "/tmp/GovSure/uploads"
     os.makedirs(upload_dir, exist_ok=True)
     
     file_path = os.path.join(upload_dir, f"{proposal_id}_{file.filename}")
@@ -614,7 +642,7 @@ async def export_proposal(
         for s in sections
     ]
     
-    output_dir = "/tmp/govlogic/exports"
+    output_dir = "/tmp/GovSure/exports"
     os.makedirs(output_dir, exist_ok=True)
     
     if format == "docx":

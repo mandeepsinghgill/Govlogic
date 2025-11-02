@@ -370,10 +370,10 @@ OVERALL:               100% ✅ COMPLETE!
 
 ```bash
 # Start it up
-cd govlogic/backend
+cd GovSure/backend
 uvicorn app.main:app --reload
 
-cd govlogic/frontend
+cd GovSure/frontend
 npm run dev
 
 # Access

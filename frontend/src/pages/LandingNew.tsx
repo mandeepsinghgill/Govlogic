@@ -19,7 +19,7 @@ export default function LandingNew() {
                 <span className="text-white font-bold text-xl">G</span>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                GovLogicAI
+                GovSureAI
               </span>
             </div>
             
@@ -116,15 +116,14 @@ export default function LandingNew() {
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                   <div className="flex-1 text-center text-sm text-gray-500 font-mono">Dashboard Overview</div>
                 </div>
-                <div className="grid grid-cols-4 gap-4 mb-4">
-                  <div className="col-span-1 h-24 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg"></div>
-                  <div className="col-span-1 h-24 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg"></div>
-                  <div className="col-span-1 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg"></div>
-                  <div className="col-span-1 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg"></div>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="col-span-2 h-48 bg-white rounded-lg shadow-sm"></div>
-                  <div className="col-span-1 h-48 bg-white rounded-lg shadow-sm"></div>
+                <div className="w-full rounded-lg overflow-hidden bg-white">
+                  {/* Replace placeholder UI with real dashboard screenshot */}
+                  <img
+                    src="/dashboard-hero.png"
+                    alt="GovSureAI Dashboard"
+                    className="w-full h-auto object-cover"
+                    loading="eager"
+                  />
                 </div>
               </div>
             </div>
@@ -206,7 +205,7 @@ export default function LandingNew() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <TestimonialCard
-              quote="GovLogicAI cut our proposal time from 3 weeks to 2 days. The ROI is incredible."
+              quote="GovSureAI cut our proposal time from 3 weeks to 2 days. The ROI is incredible."
               author="Sarah Chen"
               role="Capture Manager"
               company="TechForce Solutions"
@@ -308,7 +307,7 @@ export default function LandingNew() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg"></div>
-                <span className="text-white font-bold text-lg">GovLogicAI</span>
+                <span className="text-white font-bold text-lg">GovSureAI</span>
               </div>
               <p className="text-sm">AI-powered government contracting platform</p>
             </div>
@@ -338,7 +337,7 @@ export default function LandingNew() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2024 GovLogicAI. All rights reserved.</p>
+            <p>&copy; 2024 GovSureAI. All rights reserved.</p>
           </div>
         </div>
       </footer>

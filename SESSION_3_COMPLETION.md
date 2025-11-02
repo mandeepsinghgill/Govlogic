@@ -268,12 +268,12 @@ InZTan Gov Supreme
 ### **Step 1: Setup (One-Time)**
 ```bash
 # Backend
-cd govlogic/backend
+cd GovSure/backend
 alembic upgrade head
 uvicorn app.main:app --reload
 
 # Frontend
-cd govlogic/frontend
+cd GovSure/frontend
 npm install
 npm run dev
 ```

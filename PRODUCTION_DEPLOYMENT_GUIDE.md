@@ -12,7 +12,7 @@ This guide provides step-by-step instructions for deploying GovLogic AI to produ
 
 ### 1. Prepare Environment
 ```bash
-cd /home/ubuntu/govlogic
+cd /home/ubuntu/GovSure
 cp .env.example .env
 # Edit .env with production values
 ```
@@ -73,7 +73,7 @@ docker-compose logs -f backend
 
 ## Monitoring & Logging
 
-- Application logs: `/var/log/govlogic/`
+- Application logs: `/var/log/GovSure/`
 - Database logs: PostgreSQL logs
 - Cache logs: Redis logs
 - Use ELK stack or Datadog for centralized logging
@@ -98,11 +98,11 @@ docker-compose logs -f backend
 
 ```bash
 # Tag current version
-docker tag govlogic:latest govlogic:v3.0.0
+docker tag GovSure:latest GovSure:v3.0.0
 
 # Rollback to previous version
 docker-compose down
-docker-compose pull govlogic:v2.9.9
+docker-compose pull GovSure:v2.9.9
 docker-compose up -d
 ```
 

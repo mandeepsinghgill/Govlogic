@@ -34,10 +34,10 @@ pip install -r requirements.txt
 
 # Start PostgreSQL (with pgvector)
 # Option A: Docker
-docker run -d --name govlogic-postgres \
-  -e POSTGRES_USER=govlogic \
-  -e POSTGRES_PASSWORD=govlogic \
-  -e POSTGRES_DB=govlogic \
+docker run -d --name GovSure-postgres \
+  -e POSTGRES_USER=GovSure \
+  -e POSTGRES_PASSWORD=GovSure \
+  -e POSTGRES_DB=GovSure \
   -p 5432:5432 \
   ankane/pgvector:latest
 
@@ -46,7 +46,7 @@ docker run -d --name govlogic-postgres \
 # CREATE EXTENSION vector;
 
 # Start Redis
-docker run -d --name govlogic-redis -p 6379:6379 redis:7-alpine
+docker run -d --name GovSure-redis -p 6379:6379 redis:7-alpine
 
 # Configure environment
 cp .env.example .env
@@ -97,14 +97,14 @@ pnpm run dev
 # Option B: Self-hosted
 # Deploy PostgreSQL with pgvector using Helm
 helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install govlogic-postgres bitnami/postgresql \
-  --set auth.username=govlogic \
+helm install GovSure-postgres bitnami/postgresql \
+  --set auth.username=GovSure \
   --set auth.password=<strong-password> \
-  --set auth.database=govlogic \
+  --set auth.database=GovSure \
   --set primary.persistence.size=100Gi
 
 # Install pgvector extension
-kubectl exec -it govlogic-postgres-0 -- psql -U govlogic -d govlogic -c "CREATE EXTENSION vector;"
+kubectl exec -it GovSure-postgres-0 -- psql -U GovSure -d GovSure -c "CREATE EXTENSION vector;"
 ```
 
 ### 2. Redis Setup
@@ -117,7 +117,7 @@ kubectl exec -it govlogic-postgres-0 -- psql -U govlogic -d govlogic -c "CREATE 
 # - Upstash Redis (serverless)
 
 # Option B: Self-hosted
-helm install govlogic-redis bitnami/redis \
+helm install GovSure-redis bitnami/redis \
   --set auth.password=<strong-password> \
   --set master.persistence.size=20Gi
 ```
@@ -127,15 +127,15 @@ helm install govlogic-redis bitnami/redis \
 ```bash
 # Build Docker image
 cd backend
-docker build -t govlogic/backend:latest -f ../docker/Dockerfile.backend .
+docker build -t GovSure/backend:latest -f ../docker/Dockerfile.backend .
 
 # Push to registry
-docker tag govlogic/backend:latest <your-registry>/govlogic/backend:latest
-docker push <your-registry>/govlogic/backend:latest
+docker tag GovSure/backend:latest <your-registry>/GovSure/backend:latest
+docker push <your-registry>/GovSure/backend:latest
 
 # Create Kubernetes secrets
-kubectl create secret generic govlogic-secrets \
-  --from-literal=database-url=postgresql://user:pass@host:5432/govlogic \
+kubectl create secret generic GovSure-secrets \
+  --from-literal=database-url=postgresql://user:pass@host:5432/GovSure \
   --from-literal=redis-url=redis://:pass@host:6379/0 \
   --from-literal=secret-key=$(openssl rand -hex 32) \
   --from-literal=openai-api-key=<your-key> \
@@ -157,10 +157,10 @@ cd frontend
 pnpm run build
 
 # Build Docker image
-docker build -t govlogic/frontend:latest -f ../docker/Dockerfile.frontend .
+docker build -t GovSure/frontend:latest -f ../docker/Dockerfile.frontend .
 
 # Push to registry
-docker push <your-registry>/govlogic/frontend:latest
+docker push <your-registry>/GovSure/frontend:latest
 
 # Deploy frontend
 kubectl apply -f k8s/frontend-deployment.yaml
@@ -201,7 +201,7 @@ helm install filebeat elastic/filebeat
 
 ```bash
 # Required
-DATABASE_URL=postgresql://user:pass@host:5432/govlogic
+DATABASE_URL=postgresql://user:pass@host:5432/GovSure
 REDIS_URL=redis://:pass@host:6379/0
 SECRET_KEY=<generated-with-openssl-rand-hex-32>
 OPENAI_API_KEY=sk-...
@@ -222,8 +222,8 @@ DEBUG=false
 ### Frontend (.env)
 
 ```bash
-REACT_APP_API_URL=https://api.govlogic.ai
-REACT_APP_WS_URL=wss://api.govlogic.ai
+REACT_APP_API_URL=https://api.GovSure.ai
+REACT_APP_WS_URL=wss://api.GovSure.ai
 ```
 
 ## Scaling
@@ -235,12 +235,12 @@ REACT_APP_WS_URL=wss://api.govlogic.ai
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: govlogic-backend
+  name: GovSure-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: govlogic-backend
+    name: GovSure-backend
   minReplicas: 3
   maxReplicas: 20
   metrics:
@@ -256,7 +256,7 @@ spec:
 
 ```bash
 # Scale based on queue length
-kubectl autoscale deployment govlogic-celery \
+kubectl autoscale deployment GovSure-celery \
   --min=2 --max=10 \
   --cpu-percent=80
 ```
@@ -267,10 +267,10 @@ kubectl autoscale deployment govlogic-celery \
 
 ```bash
 # Automated daily backups
-kubectl create cronjob govlogic-backup \
+kubectl create cronjob GovSure-backup \
   --image=postgres:14 \
   --schedule="0 2 * * *" \
-  -- pg_dump -h postgres-host -U govlogic govlogic > /backups/$(date +%Y%m%d).sql
+  -- pg_dump -h postgres-host -U GovSure GovSure > /backups/$(date +%Y%m%d).sql
 ```
 
 ### Redis Backups
@@ -363,7 +363,7 @@ ALTER SYSTEM SET effective_cache_size = '12GB';
 
 ```bash
 # Check logs
-kubectl logs -f deployment/govlogic-backend
+kubectl logs -f deployment/GovSure-backend
 
 # Common issues:
 # 1. Database connection failed - check DATABASE_URL
@@ -375,13 +375,13 @@ kubectl logs -f deployment/govlogic-backend
 
 ```bash
 # Check Celery worker logs
-kubectl logs -f deployment/govlogic-celery
+kubectl logs -f deployment/GovSure-celery
 
 # Check Redis connection
 redis-cli -h <redis-host> ping
 
 # Restart workers
-kubectl rollout restart deployment/govlogic-celery
+kubectl rollout restart deployment/GovSure-celery
 ```
 
 ### Frontend 404 errors
@@ -390,7 +390,7 @@ kubectl rollout restart deployment/govlogic-celery
 # Ensure API_URL is correct
 # Check CORS settings in backend
 # Verify ingress routing
-kubectl describe ingress govlogic-ingress
+kubectl describe ingress GovSure-ingress
 ```
 
 ## Cost Optimization
@@ -414,7 +414,7 @@ kubectl describe ingress govlogic-ingress
 ## Support
 
 For deployment assistance:
-- Email: devops@govlogic.ai
-- Slack: #govlogic-deployment
-- Documentation: https://docs.govlogic.ai/deployment
+- Email: devops@GovSure.ai
+- Slack: #GovSure-deployment
+- Documentation: https://docs.GovSure.ai/deployment
 

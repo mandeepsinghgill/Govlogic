@@ -31,7 +31,7 @@ Open in browser: **http://localhost:3000**
 ### 4. Test Login
 1. Go to: **http://localhost:3000/login**
 2. Enter credentials:
-   - **Username**: `test@govlogic.com`
+   - **Username**: `test@GovSure.com`
    - **Password**: `Test123!@#`
 3. Click Login
 

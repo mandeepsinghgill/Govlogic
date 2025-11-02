@@ -26,17 +26,35 @@ export default function Signup() {
     setError('');
 
     try {
+      // Build payload, omitting empty optional fields to satisfy backend validation
+      const payload: any = { ...formData };
+      if (!payload.organization_email) delete payload.organization_email;
+      if (!payload.phone) delete payload.phone;
+      if (!payload.website) delete payload.website;
+
       const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || 'Signup failed');
+        let data: any = null;
+        try {
+          data = await response.json();
+        } catch {}
+        const detail = data?.detail;
+        if (Array.isArray(detail)) {
+          const msg = detail
+            .map((d: any) => d?.msg || d?.message || JSON.stringify(d))
+            .join(', ');
+          throw new Error(msg || 'Signup failed');
+        }
+        throw new Error(
+          (typeof detail === 'string' && detail) || data?.message || 'Signup failed'
+        );
       }
 
       const data = await response.json();
@@ -66,7 +84,7 @@ export default function Signup() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-900">GovLogic</h1>
+          <h1 className="text-4xl font-bold text-blue-900">GovSureAI</h1>
           <p className="mt-2 text-gray-600">Create your account</p>
         </div>
 

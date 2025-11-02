@@ -215,7 +215,7 @@ Time: ~2-5 seconds
 
 ### **Step 1: Run Database Migration**
 ```bash
-cd govlogic/backend
+cd GovSure/backend
 alembic upgrade head
 ```
 

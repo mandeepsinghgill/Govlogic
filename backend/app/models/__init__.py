@@ -10,4 +10,5 @@ from .compliance import *
 from .pricing import *
 from .awards import *
 from .subscription import *
+from .pipeline import *
 

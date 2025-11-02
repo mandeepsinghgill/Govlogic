@@ -38,11 +38,11 @@
 ### **Step 1: Start the Application**
 ```bash
 # Terminal 1 - Backend
-cd govlogic/backend
+cd GovSure/backend
 uvicorn app.main:app --reload
 
 # Terminal 2 - Frontend
-cd govlogic/frontend
+cd GovSure/frontend
 npm run dev
 ```
 
@@ -241,7 +241,7 @@ INZTAN_INTEGRATION_AUDIT.md
 **Backend not starting?**
 ```bash
 # Check database connection
-psql -d govlogic -c "SELECT 1"
+psql -d GovSure -c "SELECT 1"
 
 # Run migration
 cd backend
@@ -286,8 +286,8 @@ npm install
 
 ```bash
 # Start it up
-cd govlogic/backend && uvicorn app.main:app --reload &
-cd govlogic/frontend && npm run dev &
+cd GovSure/backend && uvicorn app.main:app --reload &
+cd GovSure/frontend && npm run dev &
 
 # Go to http://localhost:3000
 # Login

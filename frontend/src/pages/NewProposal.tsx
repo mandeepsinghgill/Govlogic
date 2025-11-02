@@ -37,12 +37,21 @@ export default function NewProposal() {
     try {
       setGenerating(true);
       setError('');
+      setSuccess('');
+      
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      
+      if (!token) {
+        setError('Please login to generate AI content');
+        navigate('/login');
+        return;
+      }
       
       const response = await fetch('http://localhost:8000/api/v1/proposals/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           contract_id: formData.contract_id || null,
@@ -50,21 +59,30 @@ export default function NewProposal() {
         }),
       });
 
+      if (response.status === 401) {
+        setError('Session expired. Please login again.');
+        navigate('/login');
+        return;
+      }
+
       if (!response.ok) {
-        throw new Error('Failed to generate content');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Failed to generate content');
       }
 
       const data = await response.json();
       setGeneratedContent(data.content);
       
-      if (data.mockGenerated) {
-        setSuccess('AI content generated (using mock mode - configure AI_KEY for real generation)');
+      if (data.source) {
+        setSuccess(`✅ Content generated using ${data.source}`);
+      } else if (data.mockGenerated) {
+        setSuccess('⚠️ Content generated using mock mode (Ollama not available - using sample content)');
       } else {
-        setSuccess('AI content generated successfully!');
+        setSuccess('✅ AI content generated successfully!');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error generating content:', err);
-      setError('Failed to generate content. Please try again.');
+      setError(err.message || 'Failed to generate content. Make sure Ollama is running on http://localhost:11434');
     } finally {
       setGenerating(false);
     }
@@ -80,34 +98,49 @@ export default function NewProposal() {
       setLoading(true);
       setError('');
 
-      const response = await fetch('http://localhost:8000/api/v1/proposals', {
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      
+      if (!token) {
+        setError('Please login to create a proposal');
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch('http://localhost:8000/api/v1/proposals/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           title: formData.title,
           solicitation_number: formData.solicitation_number || null,
           opportunity_id: formData.contract_id || null,
-          organization_id: formData.organization_id || 'default-org-id', // Should be from auth context
+          organization_id: 'default-org-id', // Will be overridden by backend with user's org
         }),
       });
 
+      if (response.status === 401) {
+        setError('Session expired. Please login again.');
+        navigate('/login');
+        return;
+      }
+
       if (!response.ok) {
-        throw new Error('Failed to create proposal');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Failed to create proposal');
       }
 
       const data = await response.json();
-      setSuccess('Proposal created successfully!');
+      setSuccess('Proposal created successfully! Redirecting...');
       
-      // Redirect to proposal view after 1 second
+      // Redirect to proposals list after 1 second
       setTimeout(() => {
-        navigate(`/proposals/${data.id}`);
+        navigate('/proposals');
       }, 1000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating proposal:', err);
-      setError('Failed to create proposal. Please try again.');
+      setError(err.message || 'Failed to create proposal. Please try again.');
     } finally {
       setLoading(false);
     }

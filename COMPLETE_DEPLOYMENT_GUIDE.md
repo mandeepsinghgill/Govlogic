@@ -70,9 +70,9 @@ cp ../.env.example .env
 sudo service postgresql start
 
 # Create database
-sudo -u postgres psql -c "CREATE DATABASE govlogic_db;"
-sudo -u postgres psql -c "CREATE USER govlogic WITH PASSWORD 'govlogic';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE govlogic_db TO govlogic;"
+sudo -u postgres psql -c "CREATE DATABASE GovSure_db;"
+sudo -u postgres psql -c "CREATE USER GovSure WITH PASSWORD 'GovSure';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE GovSure_db TO GovSure;"
 
 # Start backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

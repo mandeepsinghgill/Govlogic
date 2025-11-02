@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create necessary directories
-RUN mkdir -p /tmp/govlogic/uploads /tmp/govlogic/exports
+RUN mkdir -p /tmp/GovSure/uploads /tmp/GovSure/exports
 
 # Expose port
 EXPOSE 8000

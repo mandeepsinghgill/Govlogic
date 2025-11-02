@@ -230,7 +230,7 @@ Required environment variables (see `.env.example`):
 ### Test Accounts
 
 Default test credentials (see START_HERE.md):
-- **Email:** testuser@govlogic.com
+- **Email:** testuser@GovSure.com
 - **Password:** TestPass123!
 
 ## Testing
@@ -332,11 +332,11 @@ docker-compose logs -f backend
 kubectl apply -f k8s/enterprise-deployment.yaml
 
 # Check deployment status
-kubectl get pods -n govlogic
-kubectl logs -f deployment/govlogic-backend -n govlogic
+kubectl get pods -n GovSure
+kubectl logs -f deployment/GovSure-backend -n GovSure
 
 # Scale services
-kubectl scale deployment govlogic-backend --replicas=5
+kubectl scale deployment GovSure-backend --replicas=5
 ```
 
 ### CI/CD

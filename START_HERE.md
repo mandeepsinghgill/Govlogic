@@ -63,7 +63,7 @@ Your browser is showing an old cached version. Choose ONE method below:
 
 ## 🔑 Test Account
 
-**Email:** `testuser@govlogic.com`  
+**Email:** `testuser@GovSure.com`  
 **Password:** `TestPass123!`
 
 **Login:** `http://localhost:3000/login`
@@ -96,7 +96,7 @@ Your browser is showing an old cached version. Choose ONE method below:
 ## 🔧 If Server Not Running
 
 ```bash
-cd govlogic/frontend
+cd GovSure/frontend
 npm run dev
 ```
 

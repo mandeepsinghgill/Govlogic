@@ -11,8 +11,8 @@ Get the complete AI-powered government contracting platform running in **5 minut
 ## Step 1: Extract Project (if from archive)
 
 ```bash
-tar -xzf govlogic-complete.tar.gz
-cd govlogic
+tar -xzf GovSure-complete.tar.gz
+cd GovSure
 ```
 
 ## Step 2: Configure API Keys
@@ -234,9 +234,9 @@ pip install -r requirements.txt
 
 # Start PostgreSQL (separate terminal)
 docker run -d --name postgres \
-  -e POSTGRES_USER=govlogic \
-  -e POSTGRES_PASSWORD=govlogic \
-  -e POSTGRES_DB=govlogic \
+  -e POSTGRES_USER=GovSure \
+  -e POSTGRES_PASSWORD=GovSure \
+  -e POSTGRES_DB=GovSure \
   -p 5432:5432 \
   ankane/pgvector:latest
 

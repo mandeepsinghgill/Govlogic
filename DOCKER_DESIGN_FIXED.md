@@ -102,7 +102,7 @@ http://localhost:3000/login
 Styled login form
 
 **Test Credentials:**
-- Email: `testuser@govlogic.com`
+- Email: `testuser@GovSure.com`
 - Password: `TestPass123!`
 
 ---

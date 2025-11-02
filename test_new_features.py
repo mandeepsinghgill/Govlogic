@@ -4,7 +4,7 @@ Quick test script for new features
 """
 import sys
 import asyncio
-sys.path.insert(0, '/home/ubuntu/govlogic/backend')
+sys.path.insert(0, '/home/ubuntu/GovSure/backend')
 
 from app.services.continuous_learning_service import continuous_learning_service
 from app.services.rich_editor_service import rich_editor_service
@@ -100,7 +100,7 @@ async def test_enhanced_export():
             'state': 'DC',
             'zip': '20001',
             'phone': '(202) 555-0100',
-            'email': 'contact@govlogicai.com'
+            'email': 'contact@GovSureai.com'
         },
         'executive_summary': 'This proposal demonstrates our innovative approach to cloud infrastructure services.',
         'sections': [

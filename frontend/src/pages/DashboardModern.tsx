@@ -5,6 +5,7 @@ import {
   ArrowUpRight, Activity
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import TopOpportunities from '../components/TopOpportunities';
 
 export default function DashboardModern() {
   const [timeRange, setTimeRange] = useState('30d');
@@ -124,41 +125,8 @@ export default function DashboardModern() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Opportunities */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Top Opportunities</h2>
-              <Link to="/opportunities" className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center">
-                View All <ChevronRight size={16} />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              <OpportunityCard
-                title="IT Infrastructure Modernization"
-                agency="DOD"
-                value="$2.4M"
-                score={92}
-                deadline="15 days"
-                status="hot"
-              />
-              <OpportunityCard
-                title="Cybersecurity Services IDIQ"
-                agency="DHS"
-                value="$5.8M"
-                score={87}
-                deadline="22 days"
-                status="warm"
-              />
-              <OpportunityCard
-                title="Cloud Migration Services"
-                agency="VA"
-                value="$1.2M"
-                score={78}
-                deadline="8 days"
-                status="hot"
-              />
-            </div>
-          </div>
+          {/* Top Opportunities - Now using real data from SAM.gov */}
+          <TopOpportunities />
 
           {/* Active Proposals */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
@@ -329,42 +297,6 @@ function QuickAction({
   );
 }
 
-function OpportunityCard({ 
-  title, 
-  agency, 
-  value, 
-  score, 
-  deadline, 
-  status 
-}: { 
-  title: string; 
-  agency: string; 
-  value: string; 
-  score: number; 
-  deadline: string; 
-  status: 'hot' | 'warm';
-}) {
-  return (
-    <div className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
-          <p className="text-sm text-gray-600">{agency}</p>
-        </div>
-        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${status === 'hot' ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-600'}`}>
-          {status === 'hot' ? '🔥 Hot' : '⭐ Warm'}
-        </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4 text-sm">
-          <span className="font-bold text-gray-900">{value}</span>
-          <span className="text-gray-600">Score: <span className="font-semibold text-green-600">{score}</span></span>
-        </div>
-        <span className="text-sm text-gray-600">Due in {deadline}</span>
-      </div>
-    </div>
-  );
-}
 
 function ProposalCard({ 
   title, 

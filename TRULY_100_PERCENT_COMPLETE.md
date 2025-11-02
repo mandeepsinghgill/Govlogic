@@ -215,11 +215,11 @@ InZTan Gov Supreme:
 
 ```bash
 # Terminal 1
-cd govlogic/backend
+cd GovSure/backend
 uvicorn app.main:app --reload
 
 # Terminal 2
-cd govlogic/frontend
+cd GovSure/frontend
 npm run dev
 
 # Browser

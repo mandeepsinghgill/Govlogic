@@ -9,7 +9,7 @@ BACKEND_URL = "http://localhost:8000"  # Change if your backend is running elsew
 
 # Test account credentials
 TEST_ACCOUNT = {
-    "email": "testuser@govlogic.com",
+    "email": "testuser@GovSure.com",
     "password": "TestPass123!",
     "full_name": "Test User",
     "organization_name": "Test Organization",
@@ -85,7 +85,7 @@ def create_test_account():
         print("❌ ERROR: Could not connect to backend!")
         print(f"   Make sure your backend is running at: {BACKEND_URL}")
         print("\n💡 To start the backend:")
-        print("   cd govlogic/backend")
+        print("   cd GovSure/backend")
         print("   uvicorn app.main:app --reload --port 8000")
         return False
     except Exception as e:

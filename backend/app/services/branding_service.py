@@ -97,7 +97,7 @@ class BrandingService:
             except:
                 font = ImageFont.load_default()
             
-            text = "GovLogic"
+            text = "GovSureAI"
             # Get text bbox
             bbox = draw.textbbox((0, 0), text, font=font)
             text_width = bbox[2] - bbox[0]

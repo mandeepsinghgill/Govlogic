@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import NewProgramModal from '../components/NewProgramModal';
 import { 
   Plus, CheckCircle, Clock, AlertTriangle, TrendingUp, 
   Calendar, Users, DollarSign, FileText, Download, BarChart3 
@@ -34,11 +35,55 @@ const ProgramsEnhanced: React.FC = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load programs from backend
   useEffect(() => {
     loadPrograms();
   }, []);
+
+  const handleNewProgram = async (programData: any) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (token) {
+        try {
+          const response = await fetch('/api/v1/programs', {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(programData)
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            // Reload programs after successful creation
+            loadPrograms();
+            return;
+          }
+        } catch (apiError) {
+          console.warn('API not available, adding to local data:', apiError);
+        }
+      }
+
+      // Add to local programs array for demo
+      const newProgram: Program = {
+        id: programs.length + 1,
+        ...programData,
+        health: 100,
+        milestones: 0,
+        completed: 0,
+        next_milestone: 'TBD',
+        deliverables_due: 0
+      };
+      
+      setPrograms([...programs, newProgram]);
+    } catch (err) {
+      console.error('Error creating program:', err);
+    }
+  };
 
   const loadPrograms = async () => {
     try {
@@ -194,15 +239,24 @@ const ProgramsEnhanced: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <NewProgramModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleNewProgram}
+      />
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Program Management</h1>
           <p className="text-gray-600 mt-1">Track contracts, milestones, and deliverables</p>
         </div>
-        <Button className="bg-blue-900 hover:bg-blue-800 flex items-center gap-2">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+        >
           <Plus size={20} />
           New Program
-        </Button>
+        </button>
       </div>
 
       {/* Stats Row */}
@@ -362,10 +416,13 @@ const ProgramsEnhanced: React.FC = () => {
           <p className="text-gray-600 mb-6">
             Start by adding your first program or contract to track
           </p>
-          <Button className="bg-blue-900 hover:bg-blue-800">
-            <Plus size={20} className="mr-2" />
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors inline-flex items-center gap-2"
+          >
+            <Plus size={20} />
             Add Program
-          </Button>
+          </button>
         </Card>
       )}
     </div>

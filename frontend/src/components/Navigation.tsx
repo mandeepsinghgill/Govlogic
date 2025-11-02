@@ -12,7 +12,7 @@ export default function Navigation() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="text-2xl font-bold text-blue-900">
-              GovLogic
+              GovSureAI
             </div>
           </Link>
 

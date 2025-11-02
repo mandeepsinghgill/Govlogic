@@ -1,5 +1,5 @@
 {
-  "name": "govlogic-frontend",
+  "name": "GovSure-frontend",
   "version": "1.0.0",
   "description": "GovLogic GovConAI - AI-powered government contracting platform",
   "type": "module",
@@ -28,6 +28,7 @@
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "latest",
     "recharts": "latest",
     "shadcn-ui": "latest",
@@ -35,6 +36,9 @@
     "zustand": "latest"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.5.0",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
@@ -43,15 +47,12 @@
     "@vitejs/plugin-react": "latest",
     "autoprefixer": "^10.4.21",
     "eslint": "latest",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.1",
-    "typescript": "latest",
-    "vite": "latest",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/jest-dom": "^6.1.0",
-    "@testing-library/user-event": "^14.5.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "ts-jest": "^29.1.0"
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.1.0",
+    "typescript": "latest",
+    "vite": "latest"
   }
 }

@@ -10,6 +10,7 @@ export default function Login() {
     username: '', // OAuth2PasswordRequestForm uses 'username' field
     password: '',
   });
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,7 +22,7 @@ export default function Login() {
     try {
       // OAuth2PasswordRequestForm expects form data, not JSON
       const formBody = new URLSearchParams();
-      formBody.append('email', formData.username);
+      formBody.append('username', formData.username);
       formBody.append('password', formData.password);
 
       const response = await fetch(`${API_URL}/api/v1/auth/login`, {
@@ -39,12 +40,13 @@ export default function Login() {
       }
 
       const data = await response.json();
-      
-      // Store tokens
-      localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('refresh_token', data.refresh_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('organization', JSON.stringify(data.organization));
+
+      // Store tokens: persistent if rememberMe, session-only otherwise
+      const storage = rememberMe ? window.localStorage : window.sessionStorage;
+      storage.setItem('access_token', data.access_token);
+      storage.setItem('refresh_token', data.refresh_token);
+      storage.setItem('user', JSON.stringify(data.user));
+      storage.setItem('organization', JSON.stringify(data.organization));
 
       // Redirect to dashboard
       navigate('/dashboard');
@@ -67,7 +69,7 @@ export default function Login() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-900">GovLogicAI</h1>
+          <h1 className="text-4xl font-bold text-blue-900">GovSureAI</h1>
           <p className="mt-2 text-gray-600">Welcome back</p>
         </div>
 
@@ -154,7 +156,12 @@ export default function Login() {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center">
-                <input type="checkbox" className="rounded border-gray-300 text-blue-900 focus:ring-blue-500" />
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-900 focus:ring-blue-500"
+                />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
               <Link to="/forgot-password" className="text-sm text-blue-900 hover:underline">

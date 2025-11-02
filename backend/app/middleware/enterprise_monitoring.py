@@ -341,7 +341,7 @@ ENTERPRISE_LOGGING_CONFIG = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
             "formatter": "json",
-            "filename": "/var/log/govlogic/enterprise.log",
+            "filename": "/var/log/GovSure/enterprise.log",
             "maxBytes": 10485760,  # 10MB
             "backupCount": 5
         },
@@ -349,18 +349,18 @@ ENTERPRISE_LOGGING_CONFIG = {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "WARNING",
             "formatter": "json",
-            "filename": "/var/log/govlogic/security.log",
+            "filename": "/var/log/GovSure/security.log",
             "maxBytes": 10485760,  # 10MB
             "backupCount": 10
         }
     },
     "loggers": {
-        "govlogic": {
+        "GovSure": {
             "level": "DEBUG",
             "handlers": ["console", "file"],
             "propagate": False
         },
-        "govlogic.security": {
+        "GovSure.security": {
             "level": "WARNING",
             "handlers": ["console", "security"],
             "propagate": False

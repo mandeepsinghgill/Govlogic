@@ -20,7 +20,7 @@ class SAMGovDocumentService:
         self.db = db
         self.api_key = os.getenv("SAM_GOV_API_KEY")
         self.base_url = "https://api.sam.gov/opportunities/v2"
-        self.download_dir = Path("/home/ubuntu/govlogic/data/rfp_documents")
+        self.download_dir = Path("/home/ubuntu/GovSure/data/rfp_documents")
         self.download_dir.mkdir(parents=True, exist_ok=True)
     
     def fetch_opportunity_documents(

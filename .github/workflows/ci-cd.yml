@@ -20,7 +20,7 @@ jobs:
         image: postgres:14
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_govlogic
+          POSTGRES_DB: test_GovSure
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -57,14 +57,14 @@ jobs:
     
     - name: Install dependencies
       run: |
-        cd govlogic/backend
+        cd GovSure/backend
         pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-asyncio httpx
     
     - name: Run linting
       run: |
-        cd govlogic/backend
+        cd GovSure/backend
         pip install flake8 black isort
         flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
         black --check app/
@@ -72,13 +72,13 @@ jobs:
     
     - name: Run tests
       run: |
-        cd govlogic/backend
+        cd GovSure/backend
         pytest tests/ -v --cov=app --cov-report=xml --cov-report=html
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./govlogic/backend/coverage.xml
+        file: ./GovSure/backend/coverage.xml
         flags: backend
         name: backend-coverage
 
@@ -94,31 +94,31 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        cache-dependency-path: govlogic/frontend/package-lock.json
+        cache-dependency-path: GovSure/frontend/package-lock.json
     
     - name: Install dependencies
       run: |
-        cd govlogic/frontend
+        cd GovSure/frontend
         npm ci
     
     - name: Run linting
       run: |
-        cd govlogic/frontend
+        cd GovSure/frontend
         npm run lint
     
     - name: Run type checking
       run: |
-        cd govlogic/frontend
+        cd GovSure/frontend
         npm run type-check
     
     - name: Run tests
       run: |
-        cd govlogic/frontend
+        cd GovSure/frontend
         npm test -- --coverage --watchAll=false
     
     - name: Build application
       run: |
-        cd govlogic/frontend
+        cd GovSure/frontend
         npm run build
 
   # Security Scanning
@@ -156,20 +156,20 @@ jobs:
     - name: Build backend image
       uses: docker/build-push-action@v5
       with:
-        context: ./govlogic
-        file: ./govlogic/docker/Dockerfile.backend
+        context: ./GovSure
+        file: ./GovSure/docker/Dockerfile.backend
         push: false
-        tags: govlogic-backend:latest
+        tags: GovSure-backend:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
     - name: Build frontend image
       uses: docker/build-push-action@v5
       with:
-        context: ./govlogic
-        file: ./govlogic/docker/Dockerfile.frontend
+        context: ./GovSure
+        file: ./GovSure/docker/Dockerfile.frontend
         push: false
-        tags: govlogic-frontend:latest
+        tags: GovSure-frontend:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -183,18 +183,18 @@ jobs:
     
     - name: Start services with Docker Compose
       run: |
-        cd govlogic
+        cd GovSure
         docker-compose up -d postgres redis
         sleep 10
     
     - name: Run integration tests
       run: |
-        cd govlogic/backend
+        cd GovSure/backend
         pytest tests/integration/ -v
     
     - name: Stop services
       run: |
-        cd govlogic
+        cd GovSure
         docker-compose down
 
   # Performance Tests
@@ -208,7 +208,7 @@ jobs:
     
     - name: Start application
       run: |
-        cd govlogic
+        cd GovSure
         docker-compose up -d
         sleep 30
     
@@ -219,7 +219,7 @@ jobs:
     
     - name: Stop application
       run: |
-        cd govlogic
+        cd GovSure
         docker-compose down
 
   # Deploy to Staging
@@ -237,7 +237,7 @@ jobs:
         echo "Deploying to staging environment"
         # Add actual deployment commands here
         # kubectl apply -f k8s/staging/
-        # helm upgrade govlogic-staging ./helm --namespace staging
+        # helm upgrade GovSure-staging ./helm --namespace staging
 
   # Deploy to Production
   deploy-production:
@@ -254,7 +254,7 @@ jobs:
         echo "Deploying to production environment"
         # Add actual deployment commands here
         # kubectl apply -f k8s/production/
-        # helm upgrade govlogic-prod ./helm --namespace production
+        # helm upgrade GovSure-prod ./helm --namespace production
     
     - name: Run smoke tests
       run: |

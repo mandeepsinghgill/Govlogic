@@ -78,12 +78,12 @@ allow_headers=["*"]                    # Allow all headers
 ```bash
 docker-compose ps
 ```
-Expected: `govlogic-backend-1` is "Up"
+Expected: `GovSure-backend-1` is "Up"
 
 ### 2. Test Login from Frontend ✅
 1. Open: http://localhost:3000/login
 2. Enter credentials:
-   - Username: `test@govlogic.com`
+   - Username: `test@GovSure.com`
    - Password: `Test123!@#`
 3. Click Login
 

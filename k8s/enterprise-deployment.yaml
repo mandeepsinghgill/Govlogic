@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: govlogic-enterprise
+  name: GovSure-enterprise
   labels:
-    name: govlogic-enterprise
+    name: GovSure-enterprise
     security-level: high
     compliance: fedramp
 
@@ -13,8 +13,8 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: govlogic-enterprise-config
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-config
+  namespace: GovSure-enterprise
 data:
   # Application Configuration
   APP_NAME: "GovLogic Enterprise"
@@ -52,8 +52,8 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: govlogic-enterprise-secrets
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-secrets
+  namespace: GovSure-enterprise
 type: Opaque
 data:
   # Base64 encoded secrets (in production, use external secret management)
@@ -69,10 +69,10 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: govlogic-backend-enterprise
-  namespace: govlogic-enterprise
+  name: GovSure-backend-enterprise
+  namespace: GovSure-enterprise
   labels:
-    app: govlogic-backend
+    app: GovSure-backend
     tier: enterprise
     security-level: high
 spec:
@@ -84,12 +84,12 @@ spec:
       maxSurge: 2
   selector:
     matchLabels:
-      app: govlogic-backend
+      app: GovSure-backend
       tier: enterprise
   template:
     metadata:
       labels:
-        app: govlogic-backend
+        app: GovSure-backend
         tier: enterprise
         security-level: high
     spec:
@@ -98,8 +98,8 @@ spec:
         runAsUser: 1000
         fsGroup: 2000
       containers:
-      - name: govlogic-backend
-        image: govlogic/backend:enterprise-latest
+      - name: GovSure-backend
+        image: GovSure/backend:enterprise-latest
         ports:
         - containerPort: 8000
           name: http
@@ -109,22 +109,22 @@ spec:
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:
-              name: govlogic-enterprise-secrets
+              name: GovSure-enterprise-secrets
               key: DATABASE_URL
         - name: REDIS_URL
           valueFrom:
             secretKeyRef:
-              name: govlogic-enterprise-secrets
+              name: GovSure-enterprise-secrets
               key: REDIS_URL
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
-              name: govlogic-enterprise-secrets
+              name: GovSure-enterprise-secrets
               key: JWT_SECRET
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
-              name: govlogic-enterprise-secrets
+              name: GovSure-enterprise-secrets
               key: OPENAI_API_KEY
         resources:
           requests:
@@ -171,10 +171,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: govlogic-frontend-enterprise
-  namespace: govlogic-enterprise
+  name: GovSure-frontend-enterprise
+  namespace: GovSure-enterprise
   labels:
-    app: govlogic-frontend
+    app: GovSure-frontend
     tier: enterprise
     security-level: high
 spec:
@@ -186,12 +186,12 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: govlogic-frontend
+      app: GovSure-frontend
       tier: enterprise
   template:
     metadata:
       labels:
-        app: govlogic-frontend
+        app: GovSure-frontend
         tier: enterprise
         security-level: high
     spec:
@@ -200,8 +200,8 @@ spec:
         runAsUser: 1000
         fsGroup: 2000
       containers:
-      - name: govlogic-frontend
-        image: govlogic/frontend:enterprise-latest
+      - name: GovSure-frontend
+        image: GovSure/frontend:enterprise-latest
         ports:
         - containerPort: 3000
           name: http
@@ -240,10 +240,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: govlogic-enterprise-service
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-service
+  namespace: GovSure-enterprise
   labels:
-    app: govlogic
+    app: GovSure
     tier: enterprise
 spec:
   type: ClusterIP
@@ -257,7 +257,7 @@ spec:
     protocol: TCP
     name: metrics
   selector:
-    app: govlogic-backend
+    app: GovSure-backend
     tier: enterprise
 
 ---
@@ -265,8 +265,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: govlogic-enterprise-ingress
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-ingress
+  namespace: GovSure-enterprise
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -279,17 +279,17 @@ metadata:
 spec:
   tls:
   - hosts:
-    - govlogic-enterprise.yourdomain.com
-    secretName: govlogic-enterprise-tls
+    - GovSure-enterprise.yourdomain.com
+    secretName: GovSure-enterprise-tls
   rules:
-  - host: govlogic-enterprise.yourdomain.com
+  - host: GovSure-enterprise.yourdomain.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: govlogic-enterprise-service
+            name: GovSure-enterprise-service
             port:
               number: 80
 
@@ -298,13 +298,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: govlogic-backend-hpa
-  namespace: govlogic-enterprise
+  name: GovSure-backend-hpa
+  namespace: GovSure-enterprise
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: govlogic-backend-enterprise
+    name: GovSure-backend-enterprise
   minReplicas: 3
   maxReplicas: 20
   metrics:
@@ -326,13 +326,13 @@ spec:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: govlogic-backend-pdb
-  namespace: govlogic-enterprise
+  name: GovSure-backend-pdb
+  namespace: GovSure-enterprise
 spec:
   minAvailable: 2
   selector:
     matchLabels:
-      app: govlogic-backend
+      app: GovSure-backend
       tier: enterprise
 
 ---
@@ -340,12 +340,12 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: govlogic-enterprise-netpol
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-netpol
+  namespace: GovSure-enterprise
 spec:
   podSelector:
     matchLabels:
-      app: govlogic-backend
+      app: GovSure-backend
       tier: enterprise
   policyTypes:
   - Ingress
@@ -354,10 +354,10 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: govlogic-enterprise
+          name: GovSure-enterprise
     - podSelector:
         matchLabels:
-          app: govlogic-frontend
+          app: GovSure-frontend
           tier: enterprise
     ports:
     - protocol: TCP
@@ -373,7 +373,7 @@ spec:
   - to:
     - namespaceSelector:
         matchLabels:
-          name: govlogic-enterprise
+          name: GovSure-enterprise
     ports:
     - protocol: TCP
       port: 5432  # PostgreSQL
@@ -391,8 +391,8 @@ spec:
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: govlogic-enterprise-quota
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-quota
+  namespace: GovSure-enterprise
 spec:
   hard:
     requests.cpu: "10"
@@ -410,8 +410,8 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: govlogic-enterprise-limits
-  namespace: govlogic-enterprise
+  name: GovSure-enterprise-limits
+  namespace: GovSure-enterprise
 spec:
   limits:
   - default:

@@ -24,10 +24,10 @@ export default function ChatWidget() {
           <div className="bg-blue-900 text-white p-4 rounded-t-2xl flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center font-bold">
-                GL
+                GS
               </div>
               <div>
-                <p className="font-semibold">GovLogic Support</p>
+                <p className="font-semibold">GovSureAI Support</p>
                 <p className="text-xs text-blue-200">Online • Usually replies instantly</p>
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function ChatWidget() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Powered by GovLogic AI
+              Powered by GovSureAI
             </p>
           </div>
         </div>

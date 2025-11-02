@@ -57,7 +57,7 @@ echo -e "${GREEN}✅ Tests completed${NC}"
 # Step 6: Create deployment package
 echo -e "${YELLOW}📦 Creating deployment package...${NC}"
 cd ..
-tar -czf govlogic-deployment-$(date +%Y%m%d-%H%M%S).tar.gz \
+tar -czf GovSure-deployment-$(date +%Y%m%d-%H%M%S).tar.gz \
     backend/ frontend/dist/ docker-compose.yml .env
 echo -e "${GREEN}✅ Deployment package created${NC}"
 
@@ -66,7 +66,7 @@ echo -e "${GREEN}🎉 Deployment preparation complete!${NC}"
 echo ""
 echo "Next steps:"
 echo "1. Upload the deployment package to your server"
-echo "2. Extract the package: tar -xzf govlogic-deployment-*.tar.gz"
+echo "2. Extract the package: tar -xzf GovSure-deployment-*.tar.gz"
 echo "3. Start the application: docker-compose up -d"
 echo "4. Verify deployment: curl http://localhost:8000/health"
 echo ""

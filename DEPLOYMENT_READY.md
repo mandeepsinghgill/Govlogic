@@ -12,7 +12,7 @@
 ### Package Contents
 
 ```
-govlogic/
+GovSure/
 ├── backend/                          # Python FastAPI backend
 │   ├── app/
 │   │   ├── main.py                  # Application entry point
@@ -81,7 +81,7 @@ govlogic/
 
 #### Option 1: Docker Compose (Recommended for Quick Start)
 ```bash
-cd /home/ubuntu/govlogic
+cd /home/ubuntu/GovSure
 docker-compose up -d
 ```
 
@@ -116,17 +116,17 @@ cd frontend && npm run start-prod
 
 1. **API Health Check**
    ```bash
-   curl https://api.govlogic.com/health
+   curl https://api.GovSure.com/health
    ```
 
 2. **Frontend Accessibility**
    ```bash
-   curl https://govlogic.com
+   curl https://GovSure.com
    ```
 
 3. **Database Connection**
    ```bash
-   psql postgresql://govlogic:password@db:5432/govlogic_db
+   psql postgresql://GovSure:password@db:5432/GovSure_db
    ```
 
 4. **Redis Connection**
@@ -162,7 +162,7 @@ cd frontend && npm run start-prod
 
 ### Support & Monitoring
 
-- **Application Logs**: `/var/log/govlogic/app.log`
+- **Application Logs**: `/var/log/GovSure/app.log`
 - **Database Logs**: PostgreSQL logs
 - **Cache Logs**: Redis logs
 - **Error Tracking**: Sentry integration ready
@@ -175,7 +175,7 @@ If issues occur after deployment:
 ```bash
 # Revert to previous version
 docker-compose down
-docker pull govlogic:v2.9.9
+docker pull GovSure:v2.9.9
 docker-compose up -d
 ```
 

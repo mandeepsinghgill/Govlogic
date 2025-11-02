@@ -47,6 +47,7 @@ class Organization(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     users = relationship("User", back_populates="organization")
     opportunities = relationship("Opportunity", back_populates="organization")
     proposals = relationship("Proposal", back_populates="organization")
+    pipeline_items = relationship("PipelineItem", back_populates="organization")
 
 
 class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
@@ -75,4 +76,7 @@ class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     # MFA
     mfa_enabled = Column(Boolean, default=False)
     mfa_secret = Column(String(255), nullable=True)
+    
+    # Relationships
+    pipeline_items = relationship("PipelineItem", back_populates="user")
 

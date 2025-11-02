@@ -294,7 +294,7 @@ export default function Landing() {
             <div>
               <h3 className="text-white font-bold text-lg mb-4">GovLogicAI</h3>
               <p className="text-sm">AI-powered government contracting platform</p>
-              <p className="text-sm mt-2">info@govlogic.ai</p>
+              <p className="text-sm mt-2">info@GovSure.ai</p>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Features</h4>

@@ -91,25 +91,25 @@ docker-compose exec backend curl http://localhost:8000/health
 ### Kubernetes Deployment
 ```bash
 # Create namespace
-kubectl create namespace govlogic
+kubectl create namespace GovSure
 
 # Create secrets
-kubectl create secret generic govlogic-secrets \
+kubectl create secret generic GovSure-secrets \
   --from-literal=openai-api-key=<key> \
   --from-literal=secret-key=<key> \
-  -n govlogic
+  -n GovSure
 
 # Deploy
-kubectl apply -f k8s/backend-deployment.yaml -n govlogic
-kubectl apply -f k8s/frontend-deployment.yaml -n govlogic
-kubectl apply -f k8s/services.yaml -n govlogic
+kubectl apply -f k8s/backend-deployment.yaml -n GovSure
+kubectl apply -f k8s/frontend-deployment.yaml -n GovSure
+kubectl apply -f k8s/services.yaml -n GovSure
 
 # Check deployment
-kubectl get pods -n govlogic
+kubectl get pods -n GovSure
 ```
 
 ### Verification
-- [ ] Check application health: `curl https://api.govlogic.com/health`
+- [ ] Check application health: `curl https://api.GovSure.com/health`
 - [ ] Test login functionality
 - [ ] Test core features (opportunities, proposals, etc.)
 - [ ] Check logs for errors
@@ -191,8 +191,8 @@ If deployment fails:
    docker-compose up -d  # With previous version
 
    # Kubernetes
-   kubectl rollout undo deployment/govlogic-backend -n govlogic
-   kubectl rollout undo deployment/govlogic-frontend -n govlogic
+   kubectl rollout undo deployment/GovSure-backend -n GovSure
+   kubectl rollout undo deployment/GovSure-frontend -n GovSure
    ```
 
 3. **Verification**
@@ -218,9 +218,9 @@ If deployment fails:
 
 - README.md - Project overview
 - DEPLOYMENT.md - Detailed deployment guide
-- API Documentation - http://api.govlogic.com/docs
-- Monitoring Dashboard - http://grafana.govlogic.com
-- Log Aggregation - http://kibana.govlogic.com
+- API Documentation - http://api.GovSure.com/docs
+- Monitoring Dashboard - http://grafana.GovSure.com
+- Log Aggregation - http://kibana.GovSure.com
 
 ---
 

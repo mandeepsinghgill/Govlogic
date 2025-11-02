@@ -512,7 +512,7 @@ docker-compose up -d
 
 ### Production (Kubernetes)
 ```bash
-helm install govlogic ./k8s/helm
+helm install GovSure ./k8s/helm
 ```
 
 ### Environment Variables Required

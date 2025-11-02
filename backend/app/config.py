@@ -11,13 +11,13 @@ class Settings(BaseSettings):
     """Application settings"""
     
     # App Info
-    APP_NAME: str = "GovLogic GovConAI"
+    APP_NAME: str = "GovSureAI"
     APP_VERSION: str = "1.0.0"
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = True
     
     # Database
-    DATABASE_URL: str = "postgresql://govlogic:govlogic@postgres:5432/govlogic"
+    DATABASE_URL: str = "postgresql://GovSure:GovSure@postgres:5432/GovSure"
     
     # Redis
     REDIS_URL: str = "redis://redis:6379/0"
@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     DOCUSIGN_INTEGRATION_KEY: Optional[str] = None
     
     # File Storage
-    UPLOAD_DIR: str = "/tmp/govlogic/uploads"
+    UPLOAD_DIR: str = "/tmp/GovSure/uploads"
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024  # 50MB
     
     # CORS

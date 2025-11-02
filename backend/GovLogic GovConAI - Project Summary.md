@@ -136,7 +136,7 @@ A **complete, production-ready, end-to-end AI-powered government contracting pla
 ## File Structure
 
 ```
-govlogic/
+GovSure/
 ├── backend/
 │   ├── app/
 │   │   ├── api/                    # 7 API routers
@@ -291,7 +291,7 @@ Based on specification:
 
 ### 1. Quick Start (5 minutes)
 ```bash
-cd govlogic
+cd GovSure
 docker-compose up -d
 # Visit http://localhost:3000
 ```

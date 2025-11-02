@@ -110,7 +110,7 @@ Open browser: **http://localhost:8000/docs**
 1. Go to: **http://localhost:3000/login**
 2. Enter credentials:
    ```
-   Username: test@govlogic.com
+   Username: test@GovSure.com
    Password: Test123!@#
    ```
 3. Click "Login"
@@ -242,7 +242,7 @@ VITE_API_URL: http://localhost:8000
 
 ### Backend (docker-compose.yml)
 ```yaml
-DATABASE_URL: postgresql://govlogic:govlogic@postgres:5432/govlogic
+DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
 REDIS_URL: redis://redis:6379/0
 CELERY_BROKER_URL: redis://redis:6379/0
 CELERY_RESULT_BACKEND: redis://redis:6379/0
@@ -303,7 +303,7 @@ Your Docker localhost environment is now fully configured and working!
 
 **Test Credentials:**
 ```
-Username: test@govlogic.com
+Username: test@GovSure.com
 Password: Test123!@#
 ```
 
