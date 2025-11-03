@@ -13,14 +13,14 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     cors: {
-      origin: ['localhost', '127.0.0.1', 'backend', '127.0.0.1:8000'],
+      origin: ['localhost', '127.0.0.1', 'backend', '127.0.0.1:8000', 'govsureai.com', 'www.govsureai.com'],
     },
     watch: {
       usePolling: true,
     },
     proxy: {
       '/api': {
-        target: process.env.REACT_APP_API_URL || 'http://backend:8000',
+        target: process.env.REACT_APP_API_URL || 'http://backend:8000' || 'https://api.govsureai.com' || 'http://www.govsureai.com:8000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }
