@@ -55,8 +55,12 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "/tmp/GovSure/uploads"
     MAX_UPLOAD_SIZE: int = 50 * 1024 * 1024  # 50MB
     
-    # CORS
+    # CORS - Allow requests from frontend domains
     CORS_ORIGINS: List[str] = [
+        # Production domains
+        "https://govsureai.com",
+        "https://www.govsureai.com",
+        # Development domains
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",

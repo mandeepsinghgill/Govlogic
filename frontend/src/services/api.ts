@@ -6,8 +6,8 @@ const api = axios.create({
   baseURL: `${API_URL}/api/v1`,
   headers: {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin:': '*',
   },
+  withCredentials: true, // Include cookies for cross-origin requests
 })
 
 // Add token to requests if available

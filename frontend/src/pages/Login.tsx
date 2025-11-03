@@ -29,8 +29,8 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Allow-Origin': '*',
         },
+        credentials: 'include', // Include cookies for cross-origin requests
         body: formBody.toString(),
       });
 

@@ -33,36 +33,33 @@ govsureai.com, www.govsureai.com {
 api.govsureai.com {
   encode zstd gzip
 
+  # CORS headers - Apply to ALL API responses
+  header {
+    # Allow requests from your frontend domains
+    Access-Control-Allow-Origin "https://govsureai.com"
+    Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    Access-Control-Allow-Headers "Content-Type, Authorization, Accept"
+    Access-Control-Allow-Credentials "true"
+    Access-Control-Max-Age "3600"
+    
+    # Security headers
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+
+  # Handle preflight OPTIONS requests
+  @options {
+    method OPTIONS
+  }
+  respond @options 204
+
   # Reverse proxy ALL requests to backend
   reverse_proxy backend:8000 {
     header_up Host {host}
     header_up X-Real-IP {remote}
     header_up X-Forwarded-For {remote}
     header_up X-Forwarded-Proto {scheme}
-  }
-
-  # CORS headers for API subdomain
-  @cors {
-    header Origin https://govsureai.com
-  }
-  header @cors {
-    Access-Control-Allow-Origin https://govsureai.com
-    Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-    Access-Control-Allow-Headers "Content-Type, Authorization"
-    Access-Control-Allow-Credentials true
-  }
-
-  # Handle preflight requests
-  @options {
-    method OPTIONS
-  }
-  respond @options 204
-
-  # Security headers
-  header {
-    X-Content-Type-Options nosniff
-    X-Frame-Options DENY
-    Referrer-Policy strict-origin-when-cross-origin
   }
 }
 
