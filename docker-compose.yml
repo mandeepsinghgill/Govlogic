@@ -1,5 +1,4 @@
 services:
-  # PostgreSQL database with pgvector
   postgres:
     image: ankane/pgvector:latest
     environment:
@@ -16,7 +15,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis for caching and Celery
   redis:
     image: redis:7-alpine
     ports:
@@ -29,19 +27,18 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API
   backend:
     build:
       context: ./backend
       dockerfile: ../docker/Dockerfile.backend
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"              # expose to the compose network only
     environment:
       DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      DEBUG: "true"
+      DEBUG: "false"
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
@@ -53,9 +50,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-  # Celery worker
   celery:
     build:
       context: ./backend
@@ -75,25 +71,41 @@ services:
       - redis
     command: celery -A app.celery_app worker --loglevel=info
 
-  # Frontend
-  frontend:
+  # Frontend built → Caddy runtime (serves dist and proxies /api)
+  web:
     build:
-      context: ./frontend
-      dockerfile: ../docker/Dockerfile.frontend
-    ports:
-      - "3000:3000"
+      context: .
+      dockerfile: docker/Dockerfile.frontend
     environment:
-      VITE_API_URL: http://localhost:8000
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      # embed base path for API into the client bundle (optional if you use relative /api)
+      VITE_API_URL: /api
     depends_on:
       - backend
-    command: npm run dev -- --host 0.0.0.0
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - web
+      - backend
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      # serve the built assets from the web image
+      - type: bind
+        source: ./frontend/dist
+        target: /usr/share/caddy
+        bind:
+          create_host_path: true
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
   uploads:
   exports:
-
+  caddy_data:
+  caddy_config:

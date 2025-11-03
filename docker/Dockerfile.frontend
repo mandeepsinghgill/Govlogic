@@ -1,18 +1,14 @@
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies (use install to allow lock file update)
-RUN npm install
-
-# Copy application code
-COPY . .
-
-# Expose port
-EXPOSE 3000
-
-# Run the application in development mode with host binding
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# --- build stage ---
+    FROM node:20-alpine AS build
+    WORKDIR /app
+    COPY frontend/package*.json ./
+    RUN npm ci
+    COPY frontend .
+    ENV NODE_ENV=production
+    # Make sure your code uses VITE_API_URL (see Step 3)
+    RUN npm run build
+    
+    # --- runtime stage (Caddy serves /usr/share/caddy) ---
+    FROM caddy:2-alpine
+    COPY --from=build /app/dist /usr/share/caddy
+    # Caddyfile will be mounted by compose
