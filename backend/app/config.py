@@ -60,6 +60,7 @@ class Settings(BaseSettings):
         # Production domains
         "https://govsureai.com",
         "https://www.govsureai.com",
+        "https://api.govsureai.com",
         # Development domains
         "http://localhost:3000",
         "http://127.0.0.1:3000",
