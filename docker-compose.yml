@@ -71,17 +71,22 @@ services:
       - redis
     command: celery -A app.celery_app worker --loglevel=info
 
-  # Frontend built → Caddy runtime (serves dist and proxies /api)
+  # Frontend build stage - builds and stores dist files in shared volume
   web:
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
       args:
-        # Use empty string to make API calls relative to current domain
-        # Caddy will proxy /api/* to backend
+        # Option 1: Use subdomain (recommended for production)
+        # VITE_API_URL: "https://api.govsureai.com"
+        # Option 2: Use same domain with /api path (current setup)
         VITE_API_URL: ""
+    volumes:
+      - frontend_dist:/usr/share/caddy
     depends_on:
       - backend
+    # This container just builds and exits, files remain in volume
+    command: /bin/sh -c "echo 'Frontend built successfully'"
 
   caddy:
     image: caddy:2
@@ -95,12 +100,8 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-      # serve the built assets from the web image
-      - type: bind
-        source: ./frontend/dist
-        target: /usr/share/caddy
-        bind:
-          create_host_path: true
+      # serve the built assets from shared volume
+      - frontend_dist:/usr/share/caddy:ro
     restart: unless-stopped
 
 volumes:
@@ -110,3 +111,4 @@ volumes:
   exports:
   caddy_data:
   caddy_config:
+  frontend_dist:

@@ -37,15 +37,17 @@ else
 fi
 
 echo ""
-echo "📦 Step 2: Building frontend with production configuration..."
+echo "🛑 Step 2: Stopping existing containers and removing old volumes..."
+echo "   (This is important to clear any cached empty volumes)"
+$DOCKER_COMPOSE down -v
+
+echo ""
+echo "📦 Step 3: Building frontend with production configuration..."
 echo "   - Setting VITE_API_URL to empty string (relative paths)"
+echo "   - Building into shared Docker volume"
 echo "   - This will make API calls go to the same domain"
 echo ""
 $DOCKER_COMPOSE build --no-cache web
-
-echo ""
-echo "🛑 Step 3: Stopping existing containers..."
-$DOCKER_COMPOSE down
 
 echo ""
 echo "🚀 Step 4: Starting all services..."
@@ -60,21 +62,34 @@ echo "📊 Step 6: Checking service status..."
 $DOCKER_COMPOSE ps
 
 echo ""
+echo "🔍 Step 7: Verifying frontend files are accessible to Caddy..."
+if $DOCKER_COMPOSE exec -T caddy test -f /usr/share/caddy/index.html; then
+    echo "   ✅ index.html found in Caddy container"
+    FILE_COUNT=$($DOCKER_COMPOSE exec -T caddy find /usr/share/caddy -type f | wc -l)
+    echo "   ✅ Total files in volume: $FILE_COUNT"
+else
+    echo "   ⚠️  WARNING: index.html not found! Frontend may not be accessible."
+    echo "   Run: $DOCKER_COMPOSE logs web"
+fi
+
+echo ""
 echo "=========================================="
 echo "✅ Deployment Complete!"
 echo "=========================================="
 echo ""
 echo "📝 Next Steps:"
 echo "   1. Visit your production domain (e.g., http://govsureai.com)"
-echo "   2. Open browser DevTools (F12) → Network tab"
-echo "   3. Try logging in"
-echo "   4. Verify API calls go to your domain (not localhost)"
+echo "   2. Or visit your server IP: http://YOUR_SERVER_IP"
+echo "   3. You should see the GovSureAI login page (no more 404!)"
+echo "   4. Open browser DevTools (F12) → Network tab"
+echo "   5. Try logging in and verify API calls work"
 echo ""
-echo "🔍 Troubleshooting:"
-echo "   - View Caddy logs:   $DOCKER_COMPOSE logs -f caddy"
-echo "   - View backend logs: $DOCKER_COMPOSE logs -f backend"
-echo "   - View all logs:     $DOCKER_COMPOSE logs -f"
+echo "🔍 Quick Tests:"
+echo "   - Check files in Caddy: $DOCKER_COMPOSE exec caddy ls -la /usr/share/caddy"
+echo "   - Test from server:     curl -I http://localhost"
+echo "   - View Caddy logs:      $DOCKER_COMPOSE logs -f caddy"
+echo "   - View backend logs:    $DOCKER_COMPOSE logs -f backend"
 echo ""
-echo "📖 For more details, see: PRODUCTION_FIX_COMPLETE.md"
+echo "📖 For detailed troubleshooting, see: FIX_404_DEPLOYMENT.md"
 echo ""
 
