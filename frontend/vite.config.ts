@@ -13,7 +13,7 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     cors: {
-      origin: ['localhost', '127.0.0.1', 'backend', '127.0.0.1:8000', 'govsureai.com', 'www.govsureai.com'],
+      origin: ['localhost', '127.0.0.1', 'backend', '127.0.0.1:8000', 'govsureai.com', 'www.govsureai.com', 'govsureai.com:8000'],
     },
     watch: {
       usePolling: true,
