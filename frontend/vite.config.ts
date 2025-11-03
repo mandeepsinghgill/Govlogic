@@ -18,6 +18,10 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    allowedHosts: [
+      'govsureai.com',        // your domain
+      'www.govsureai.com',    // optional, if you use www
+    ],
     proxy: {
       '/api': {
         target: process.env.REACT_APP_API_URL || 'http://backend:8000' || 'https://api.govsureai.com' || 'http://www.govsureai.com:8000',
