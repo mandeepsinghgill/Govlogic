@@ -89,27 +89,40 @@ govsureai.com {
 ## Deployment Instructions
 
 ### 1. Rebuild the Frontend Container
+
+**Option A: Use the deployment script** (automatically detects docker compose version)
+```bash
+# On your production server
+cd /path/to/govlogic
+./deploy_production_fix.sh
+```
+
+**Option B: Manual commands**
 ```bash
 # On your production server
 cd /path/to/govlogic
 
-# Rebuild the web service (frontend)
-docker-compose build --no-cache web
+# For Docker Compose V2 (modern, Ubuntu 22.04+)
+docker compose build --no-cache web
+docker compose down
+docker compose up -d
 
-# Restart all services
+# OR for Docker Compose V1 (legacy)
+docker-compose build --no-cache web
 docker-compose down
 docker-compose up -d
 ```
 
 ### 2. Verify the Fix
 ```bash
-# Check that containers are running
+# For Docker Compose V2 (use if you have modern Docker)
+docker compose ps
+docker compose logs -f caddy
+docker compose logs -f backend
+
+# OR for Docker Compose V1 (use if you have legacy docker-compose)
 docker-compose ps
-
-# Check Caddy logs
 docker-compose logs -f caddy
-
-# Check backend logs
 docker-compose logs -f backend
 ```
 
@@ -198,10 +211,12 @@ args:
 ## Support
 
 If you encounter any issues:
-1. Check Caddy logs: `docker-compose logs caddy`
-2. Check backend logs: `docker-compose logs backend`
-3. Verify Caddyfile is mounted correctly: `docker-compose exec caddy cat /etc/caddy/Caddyfile`
+1. Check Caddy logs: `docker compose logs caddy` (or `docker-compose logs caddy`)
+2. Check backend logs: `docker compose logs backend` (or `docker-compose logs backend`)
+3. Verify Caddyfile is mounted correctly: `docker compose exec caddy cat /etc/caddy/Caddyfile`
 4. Test API directly: `curl http://localhost:8000/api/v1/health` (from the server)
+
+**Note**: Use `docker compose` (V2, space) on modern Ubuntu/Docker, or `docker-compose` (V1, hyphen) on older systems.
 
 ---
 
