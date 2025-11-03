@@ -76,9 +76,10 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
-    environment:
-      # embed base path for API into the client bundle (optional if you use relative /api)
-      VITE_API_URL: /api
+      args:
+        # Use empty string to make API calls relative to current domain
+        # Caddy will proxy /api/* to backend
+        VITE_API_URL: ""
     depends_on:
       - backend
 

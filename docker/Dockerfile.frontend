@@ -1,11 +1,16 @@
 # --- build stage ---
     FROM node:20-alpine AS build
     WORKDIR /app
+    
+    # Accept build arg for API URL
+    ARG VITE_API_URL=""
+    ENV VITE_API_URL=$VITE_API_URL
+    
     COPY frontend/package*.json ./
     RUN npm ci
     COPY frontend .
     ENV NODE_ENV=production
-    # Make sure your code uses VITE_API_URL (see Step 3)
+    # VITE_API_URL will be embedded in the build
     RUN npm run build
     
     # --- runtime stage (Caddy serves /usr/share/caddy) ---
