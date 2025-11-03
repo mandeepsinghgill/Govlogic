@@ -40,7 +40,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false, // Disable sourcemaps in production for security
-    minify: 'terser',
+    minify: 'esbuild', // Use esbuild (faster and built into Vite)
     rollupOptions: {
       output: {
         manualChunks: {
