@@ -41,9 +41,9 @@ import sys
 sys.path.insert(0, '/app')
 
 from sqlalchemy.orm import Session
-from app.database import SessionLocal, engine
-from app.models import User, Organization
-from app.core.security import get_password_hash
+from app.core.database import SessionLocal, engine
+from app.models.organization import User, Organization
+from app.services.auth_service import AuthService
 from datetime import datetime
 
 # Test accounts
@@ -97,7 +97,7 @@ def create_user(db: Session, account: dict) -> bool:
         # Create user
         user = User(
             email=account['email'],
-            hashed_password=get_password_hash(account['password']),
+            hashed_password=AuthService.get_password_hash(account['password']),
             full_name=account['full_name'],
             organization_id=org.id,
             role="admin",
