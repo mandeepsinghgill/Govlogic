@@ -2,7 +2,7 @@
  * Compliance Matrix - Interactive View & Edit
  * Map RFP requirements to proposal sections
  * Track compliance status for all requirements
- * GovLogicAI - Enterprise Government Contracting & Grants Platform
+ * GovSure - Enterprise Government Contracting & Grants Platform
  */
 
 import React, { useState, useEffect } from 'react';

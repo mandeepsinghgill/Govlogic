@@ -60,7 +60,7 @@ export default function Onboarding() {
                   <Sparkles className="text-white" size={32} />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Welcome to GovSureAI! 🎉
+                  Welcome to GovSure! 🎉
                 </h2>
                 <p className="text-gray-600 mb-4">
                   Let's personalize your experience. What brings you here?

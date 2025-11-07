@@ -1,5 +1,5 @@
 /**
- * Program Detail Page - GovLogicAI
+ * Program Detail Page - GovSure
  * Detailed view of contract/program with milestones, deliverables, and analytics
  */
 

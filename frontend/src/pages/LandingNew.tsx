@@ -14,14 +14,13 @@ export default function LandingNew() {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">G</span>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                GovSureAI
-              </span>
-            </div>
+            <Link to="/" className="flex items-center space-x-2">
+              <img 
+                src="/govsure-logo.svg" 
+                alt="GovSure" 
+                className="h-8 w-auto"
+              />
+            </Link>
             
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
@@ -120,7 +119,7 @@ export default function LandingNew() {
                   {/* Replace placeholder UI with real dashboard screenshot */}
                   <img
                     src="/dashboard-hero.png"
-                    alt="GovSureAI Dashboard"
+                    alt="GovSure Dashboard"
                     className="w-full h-auto object-cover"
                     loading="eager"
                   />
@@ -205,7 +204,7 @@ export default function LandingNew() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <TestimonialCard
-              quote="GovSureAI cut our proposal time from 3 weeks to 2 days. The ROI is incredible."
+              quote="GovSure cut our proposal time from 3 weeks to 2 days. The ROI is incredible."
               author="Sarah Chen"
               role="Capture Manager"
               company="TechForce Solutions"
@@ -306,8 +305,12 @@ export default function LandingNew() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg"></div>
-                <span className="text-white font-bold text-lg">GovSureAI</span>
+                <img 
+                  src="/govsure-icon.svg" 
+                  alt="GovSure" 
+                  className="h-8 w-8"
+                />
+                <span className="text-white font-bold text-lg">GovSure</span>
               </div>
               <p className="text-sm">AI-powered government contracting platform</p>
             </div>
@@ -337,7 +340,7 @@ export default function LandingNew() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2024 GovSureAI. All rights reserved.</p>
+            <p>&copy; 2024 GovSure. All rights reserved.</p>
           </div>
         </div>
       </footer>

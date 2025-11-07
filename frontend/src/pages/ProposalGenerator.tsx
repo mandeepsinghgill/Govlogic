@@ -1,5 +1,5 @@
 /**
- * Proposal Generator - GovLogicAI
+ * Proposal Generator - GovSure
  * Full AI-powered proposal generation using Shipley + Big-Prime strategies
  * Enterprise-grade proposal intelligence and automation
  */
@@ -118,7 +118,7 @@ const ProposalGenerator: React.FC = () => {
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
                 <Zap className="w-10 h-10 text-purple-600" />
-                GovLogicAI Proposal Generator
+                GovSure Proposal Generator
               </h1>
               <p className="text-lg text-gray-600">
                 AI-Powered Proposal Generation • Shipley Methodology + Big-Prime Strategies

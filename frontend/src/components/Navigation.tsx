@@ -11,9 +11,11 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold text-blue-900">
-              GovSureAI
-            </div>
+            <img 
+              src="/govsure-logo.svg" 
+              alt="GovSure" 
+              className="h-8 w-auto"
+            />
           </Link>
 
           {/* Navigation Links */}
@@ -76,12 +78,14 @@ export default function Navigation() {
             >
               Log in
             </Link>
-            <Link
-              to="/signup"
+            <a
+              href="https://calendly.com/govsure/demo"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-6 py-2 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 transition-all transform hover:scale-105 shadow-md"
             >
-              GET STARTED
-            </Link>
+              BOOK DEMO
+            </a>
           </div>
         </div>
       </div>

@@ -28,7 +28,7 @@ describe('App Component', () => {
 
   test('renders landing page by default', () => {
     renderWithRouter(<App />);
-    expect(screen.getByText(/GovLogicAI/i)).toBeInTheDocument();
+    expect(screen.getByText(/GovSure/i)).toBeInTheDocument();
   });
 
   test('redirects to login when no token', () => {

@@ -1,7 +1,7 @@
 /**
  * Go/No-Go Dashboard - Bid Decision Support System
  * AI-powered analysis of opportunities for bid/no-bid decisions
- * GovLogicAI - Enterprise Government Contracting & Grants Platform
+ * GovSure - Enterprise Government Contracting & Grants Platform
  */
 
 import React, { useState, useEffect } from 'react';

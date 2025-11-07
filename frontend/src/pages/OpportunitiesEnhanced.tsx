@@ -505,7 +505,7 @@ END:VCALENDAR`;
           <div className="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-xl shadow-lg p-6 text-white sticky top-6">
             <div className="flex items-center mb-4">
               <Zap className="mr-2" size={24} />
-              <h3 className="text-xl font-bold">GovLogicAI Agent</h3>
+              <h3 className="text-xl font-bold">GovSure AI Agent</h3>
             </div>
             <p className="text-blue-100 text-sm mb-6">
               Recommended next steps to maximize your win probability

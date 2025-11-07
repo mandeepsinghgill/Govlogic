@@ -26,9 +26,10 @@ export default defineConfig({
       usePolling: true,
     },
     // Development proxy: forward /api requests to backend
+    // Use localhost for local development, 'backend' for Docker
     proxy: {
       '/api': {
-        target: 'http://backend:8000',
+        target: process.env.VITE_API_URL || 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
         ws: true, // Enable WebSocket proxying

@@ -87,7 +87,7 @@ export default function Dashboard() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-1">
-          {stats?.user?.name ? `Welcome back, ${stats.user.name}` : 'Welcome to GovLogicAI'}
+          {stats?.user?.name ? `Welcome back, ${stats.user.name}` : 'Welcome to GovSure'}
         </p>
       </div>
 

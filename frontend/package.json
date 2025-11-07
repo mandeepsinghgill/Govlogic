@@ -1,7 +1,7 @@
 {
-  "name": "GovSure-frontend",
+  "name": "govsure-frontend",
   "version": "1.0.0",
-  "description": "GovLogic GovConAI - AI-powered government contracting platform",
+  "description": "GovSure - AI-powered government contracting and grants platform",
   "type": "module",
   "scripts": {
     "dev": "vite",

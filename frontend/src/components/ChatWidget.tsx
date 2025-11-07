@@ -27,7 +27,7 @@ export default function ChatWidget() {
                 GS
               </div>
               <div>
-                <p className="font-semibold">GovSureAI Support</p>
+                <p className="font-semibold">GovSure Support</p>
                 <p className="text-xs text-blue-200">Online • Usually replies instantly</p>
               </div>
             </div>
@@ -48,10 +48,10 @@ export default function ChatWidget() {
                   <p className="text-sm text-gray-500 mb-4">Looking for more information?</p>
                   <div className="space-y-2">
                     <button 
-                      onClick={() => window.open('/signup', '_blank')}
+                      onClick={() => window.open('https://calendly.com/govsure/demo', '_blank')}
                       className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-900 font-medium transition-colors"
                     >
-                      🚀 Start Free Trial
+                      📅 Book a Demo
                     </button>
                     <button 
                       onClick={() => window.location.href = '/features'}
@@ -66,10 +66,10 @@ export default function ChatWidget() {
                       💰 See Pricing
                     </button>
                     <button 
-                      onClick={() => alert('Schedule a demo feature coming soon!')}
+                      onClick={() => window.open('https://calendly.com/govsure/demo', '_blank')}
                       className="w-full text-left px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-800 transition-colors"
                     >
-                      📅 Schedule a Demo
+                      📞 Contact Sales
                     </button>
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export default function ChatWidget() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Powered by GovSureAI
+              Powered by GovSure
             </p>
           </div>
         </div>

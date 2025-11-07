@@ -154,7 +154,7 @@ const RFPShredder: React.FC = () => {
               </p>
               <div className="mt-2 flex items-center gap-2 text-sm text-indigo-600">
                 <CheckCircle className="w-4 h-4" />
-                <span className="font-semibold">GovLogicAI • Enterprise Proposal Intelligence Platform</span>
+                <span className="font-semibold">GovSure • Enterprise Proposal Intelligence Platform</span>
               </div>
             </div>
             <Link 

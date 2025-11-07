@@ -26,12 +26,14 @@ export default function Landing() {
               compliance checking, and bid qualification with Fortune 500-grade AI.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/signup"
+              <a
+                href="https://calendly.com/govsure/demo"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-8 py-4 bg-white text-blue-900 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all transform hover:scale-105 shadow-xl"
               >
-                Start Free Trial <ArrowRight className="inline ml-2" size={20} />
-              </Link>
+                Book a Demo <ArrowRight className="inline ml-2" size={20} />
+              </a>
               <Link
                 to="/login"
                 className="px-8 py-4 bg-blue-700 text-white rounded-lg font-semibold text-lg hover:bg-blue-600 transition-all border-2 border-blue-500"
@@ -40,7 +42,7 @@ export default function Landing() {
               </Link>
             </div>
             <p className="mt-6 text-blue-200">
-              ✨ No credit card required • 14-day free trial • Cancel anytime
+              🔒 Secure & Compliant • NIST 800-171 • CMMC Ready
             </p>
           </div>
         </div>
@@ -54,6 +56,27 @@ export default function Landing() {
             <StatCard number="$10K" label="Cost Reduction" />
             <StatCard number="5 min" label="Proposal Generation" />
             <StatCard number="500+" label="Happy Customers" />
+          </div>
+        </div>
+      </section>
+
+      {/* Security & Compliance Badges */}
+      <section className="py-12 bg-white border-y border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              Enterprise-Grade Security & Compliance
+            </h3>
+            <p className="text-gray-600">
+              Built to meet the highest government security standards
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 items-center">
+            <SecurityBadge icon={<Shield size={40} />} label="NIST 800-171" />
+            <SecurityBadge icon={<Shield size={40} />} label="CMMC Ready" />
+            <SecurityBadge icon={<Shield size={40} />} label="FedRAMP" />
+            <SecurityBadge icon={<Shield size={40} />} label="SOC 2 Type II" />
+            <SecurityBadge icon={<Shield size={40} />} label="ISO 27001" />
           </div>
         </div>
       </section>
@@ -148,7 +171,7 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <TestimonialCard
-              quote="GovLogicAI reduced our proposal time from 3 weeks to 2 days. Game changer!"
+              quote="GovSure reduced our proposal time from 3 weeks to 2 days. Game changer!"
               author="Sarah Johnson"
               role="Capture Manager, Defense Contractor"
               rating={5}
@@ -165,6 +188,47 @@ export default function Landing() {
               role="CEO, Small Business"
               rating={5}
             />
+          </div>
+        </div>
+      </section>
+
+      {/* App Preview Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              See GovSure In Action
+            </h2>
+            <p className="text-xl text-gray-600">
+              Intuitive interface designed for government contractors
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-2xl">
+            <div className="aspect-video bg-white rounded-lg shadow-lg overflow-hidden border-4 border-gray-200">
+              <img 
+                src="/dashboard-hero.png" 
+                alt="GovSure Dashboard Preview" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <PreviewFeature 
+                icon={<Target className="text-blue-600" size={32} />}
+                title="Smart Pipeline"
+                description="Track all opportunities in one unified dashboard with AI-powered insights"
+              />
+              <PreviewFeature 
+                icon={<FileText className="text-green-600" size={32} />}
+                title="Proposal Builder"
+                description="Generate compliant proposals with drag-and-drop sections and AI assistance"
+              />
+              <PreviewFeature 
+                icon={<TrendingUp className="text-purple-600" size={32} />}
+                title="Analytics"
+                description="Real-time win/loss metrics, pipeline forecasting, and performance tracking"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -241,12 +305,14 @@ export default function Landing() {
           <p className="text-xl mb-8 text-blue-100">
             Join hundreds of government contractors using AI to win more bids
           </p>
-          <Link
-            to="/signup"
+          <a
+            href="https://calendly.com/govsure/demo"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block px-10 py-4 bg-white text-blue-900 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all transform hover:scale-105 shadow-xl"
           >
-            Start Your Free Trial <ArrowRight className="inline ml-2" size={20} />
-          </Link>
+            Book Your Demo <ArrowRight className="inline ml-2" size={20} />
+          </a>
         </div>
       </section>
 
@@ -292,9 +358,9 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-white font-bold text-lg mb-4">GovLogicAI</h3>
+              <h3 className="text-white font-bold text-lg mb-4">GovSure</h3>
               <p className="text-sm">AI-powered government contracting platform</p>
-              <p className="text-sm mt-2">info@GovSure.ai</p>
+              <p className="text-sm mt-2">info@govsure.ai</p>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Features</h4>
@@ -325,7 +391,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-            <p>&copy; 2024 GovLogicAI. All rights reserved.</p>
+            <p>&copy; 2024 GovSure. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -415,16 +481,37 @@ function PricingCard({ tier, price, features, popular }: { tier: string; price: 
           </li>
         ))}
       </ul>
-      <Link
-        to="/signup"
+      <a
+        href="https://calendly.com/govsure/demo"
+        target="_blank"
+        rel="noopener noreferrer"
         className={`block w-full py-3 px-6 rounded-lg font-semibold text-center transition-all ${
           popular
             ? 'bg-blue-900 text-white hover:bg-blue-800'
             : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
         }`}
       >
-        Get Started
-      </Link>
+        Book Demo
+      </a>
+    </div>
+  );
+}
+
+function SecurityBadge({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all">
+      <div className="text-blue-600 mb-2">{icon}</div>
+      <p className="text-sm font-semibold text-gray-900">{label}</p>
+    </div>
+  );
+}
+
+function PreviewFeature({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="mb-3">{icon}</div>
+      <h4 className="text-lg font-bold text-gray-900 mb-2">{title}</h4>
+      <p className="text-sm text-gray-600">{description}</p>
     </div>
   );
 }

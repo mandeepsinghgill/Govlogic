@@ -24,15 +24,20 @@ app = FastAPI(
 if os.getenv("SENTRY_DSN"):
     sentry.init_sentry(os.getenv("SENTRY_DSN"))
 
-# CORS middleware (DISABLED - Caddy handles CORS at reverse proxy level)
-# When using Caddy as reverse proxy, CORS should be configured there to avoid duplicate headers
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=settings.CORS_ORIGINS,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+# CORS middleware - Conditional based on environment
+# Local dev (DEBUG=True): CORS enabled in FastAPI for direct localhost access
+# Production (DEBUG=False): CORS disabled, handled by Caddy reverse proxy to avoid duplicate headers
+if settings.DEBUG:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    print("🔓 CORS enabled for local development")
+else:
+    print("🔒 CORS disabled - handled by Caddy reverse proxy (production)")
 
 # Add production middleware (order matters!)
 app.add_middleware(MonitoringMiddleware)

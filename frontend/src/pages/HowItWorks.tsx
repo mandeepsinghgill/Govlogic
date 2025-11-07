@@ -11,7 +11,7 @@ export default function HowItWorks() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">How GovLogicAI Works</h1>
+          <h1 className="text-5xl font-bold mb-6">How GovSure Works</h1>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
             Our streamlined process turns opportunities into wins
           </p>
@@ -35,7 +35,7 @@ export default function HowItWorks() {
                 number="1"
                 title="Learn"
                 subtitle="Build Your Company Profile"
-                description="GOVLOGIC builds a complete profile of your business by learning from your documents, past performance, capabilities, and expertise."
+                description="GovSure builds a complete profile of your business by learning from your documents, past performance, capabilities, and expertise."
                 icon={<Upload className="text-white" size={32} />}
                 color="blue"
                 items={[
@@ -121,7 +121,7 @@ export default function HowItWorks() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Government Contractors Choose GovLogicAI
+              Why Government Contractors Choose GovSure
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -152,7 +152,7 @@ export default function HowItWorks() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              See GovLogicAI in Action
+              See GovSure in Action
             </h2>
             <p className="text-xl text-gray-600">
               Watch how easy it is to generate a winning proposal
@@ -177,7 +177,7 @@ export default function HowItWorks() {
             Ready to Get Started?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Try GovLogicAI free for 14 days. No credit card required.
+            Try GovSure free for 14 days. No credit card required.
           </p>
           <Link
             to="/signup"

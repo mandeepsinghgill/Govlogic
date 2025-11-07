@@ -23,7 +23,7 @@ export default function ProductTour({ isOpen, onClose, userTypes }: ProductTourP
   const tourSteps: TourStep[] = [
     {
       id: 'welcome',
-      title: 'Welcome to GovSureAI! 🎉',
+      title: 'Welcome to GovSure! 🎉',
       description: 'Let\'s take a quick tour of how AI can transform your government contracting workflow',
       content: (
         <div className="space-y-4">

@@ -1,5 +1,5 @@
 /**
- * New Program Modal - GovLogicAI
+ * New Program Modal - GovSure
  * Modal for creating new programs/contracts
  */
 

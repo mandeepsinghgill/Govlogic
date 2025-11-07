@@ -54,7 +54,7 @@ export default function Pricing() {
               name="Free"
               price={0}
               interval={interval}
-              description="Perfect for trying out GovLogicAI"
+              description="Perfect for trying out GovSure"
               features={[
                 "1 proposal per month",
                 "5 opportunities tracked",
@@ -223,7 +223,7 @@ export default function Pricing() {
             Ready to Get Started?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Try GovLogicAI free for 14 days. No credit card required.
+            Try GovSure free for 14 days. No credit card required.
           </p>
           <Link
             to="/signup"

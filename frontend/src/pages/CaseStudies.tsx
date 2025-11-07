@@ -39,7 +39,7 @@ export default function CaseStudies() {
                   <p className="text-xl">increase in proposal output</p>
                 </div>
                 <p className="text-blue-100 mb-8">
-                  "GovLogicAI transformed our proposal process. What used to take 3 weeks now takes 3 days, and the quality is actually better. We're bidding on 4x more opportunities with the same team."
+                  "GovSure transformed our proposal process. What used to take 3 weeks now takes 3 days, and the quality is actually better. We're bidding on 4x more opportunities with the same team."
                 </p>
                 <div className="flex items-center space-x-4">
                   <img 
@@ -170,21 +170,21 @@ export default function CaseStudies() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <TestimonialCard
-              quote="GovLogicAI is like having a team of experienced proposal writers and compliance experts on staff. The AI understands government contracting."
+              quote="GovSure is like having a team of experienced proposal writers and compliance experts on staff. The AI understands government contracting."
               author="James Williams"
               role="Capture Manager"
               company="NextGen Contracting"
               rating={5}
             />
             <TestimonialCard
-              quote="We were skeptical about AI for proposals, but GovLogicAI proved us wrong. The quality is impressive and the time savings are real."
+              quote="We were skeptical about AI for proposals, but GovSure proved us wrong. The quality is impressive and the time savings are real."
               author="Lisa Anderson"
               role="CEO"
               company="Small Business Contractor"
               rating={5}
             />
             <TestimonialCard
-              quote="The ROI is undeniable. We won two major contracts in our first quarter using GovLogicAI. The platform paid for itself many times over."
+              quote="The ROI is undeniable. We won two major contracts in our first quarter using GovSure. The platform paid for itself many times over."
               author="Carlos Rodriguez"
               role="Business Development"
               company="Engineering Services Firm"
@@ -201,7 +201,7 @@ export default function CaseStudies() {
             Ready to Transform Your Business?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join hundreds of successful government contractors using GovLogicAI
+            Join hundreds of successful government contractors using GovSure
           </p>
           <Link
             to="/signup"

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Circular rings -->
+  <circle cx="16" cy="16" r="14" fill="none" stroke="#0C2340" stroke-width="2"/>
+  <circle cx="16" cy="16" r="10" fill="none" stroke="#0C2340" stroke-width="1.5"/>
+  
+  <!-- Inner circle with checkmark -->
+  <circle cx="16" cy="16" r="7" fill="#FFFFFF"/>
+  <path d="M12 16 L15 19 L20 14" fill="none" stroke="#0096FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+

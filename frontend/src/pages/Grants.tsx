@@ -1,7 +1,7 @@
 /**
  * Grants Management - Complete Grant Writing & Management System
  * SF-424 forms, NOFO parsing, grant tracking, reporting
- * GovLogicAI - Enterprise Government Contracting & Grants Platform
+ * GovSure - Enterprise Government Contracting & Grants Platform
  */
 
 import React, { useState, useEffect } from 'react';

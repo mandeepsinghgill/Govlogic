@@ -45,6 +45,7 @@ import ProgramDetail from './pages/ProgramDetail';
 import { Menu, X, Target, FileText, Briefcase, Database, FolderKanban, LogOut, Upload, Users, CheckSquare, DollarSign, ThumbsUp, Zap, BarChart3, GitBranch, Search, Bell, Settings, User, ChevronDown, HelpCircle, UserCircle, MessageSquare, Sparkles } from 'lucide-react';
 import PipelineManager from './pages/PipelineManager';
 import AIAssistant from './pages/AIAssistant';
+import { useAutoLogout } from './hooks/useAutoLogout';
 
 // Protected Route Component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -65,6 +66,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
+
+  // Enable auto-logout after 10 minutes of inactivity for security & compliance
+  useAutoLogout();
 
   useEffect(() => {
     const userData = localStorage.getItem('user') || sessionStorage.getItem('user');
@@ -132,11 +136,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             >
               {sidebarOpen ? <X size={22} className="text-gray-700" /> : <Menu size={22} className="text-gray-700" />}
             </button>
-            <Link to="/dashboard" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">GA</span>
-              </div>
-              <h1 className="text-xl font-bold text-gray-900 hidden lg:block">GovLogicAI</h1>
+            <Link to="/dashboard" className="flex items-center space-x-3">
+              <img 
+                src="/govsure-icon.svg" 
+                alt="GovSure" 
+                className="h-10 w-10"
+              />
+              <h1 className="text-xl font-bold text-gray-900 hidden lg:block">GovSure</h1>
             </Link>
           </div>
 

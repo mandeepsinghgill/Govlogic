@@ -1,5 +1,5 @@
 /**
- * Advanced Reporting Dashboard - GovLogicAI
+ * Advanced Reporting Dashboard - GovSure
  * Analytics, KPIs, Win/Loss tracking, Pipeline metrics
  * Executive dashboards and custom reports
  */

@@ -1,5 +1,5 @@
 /**
- * Programs Enhanced - GovLogicAI
+ * Programs Enhanced - GovSure
  * Contract tracking, milestones, deliverables management
  * Real backend integration with API calls
  */

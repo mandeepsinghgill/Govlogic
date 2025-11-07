@@ -69,7 +69,9 @@ export default function Login() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-900">GovSureAI</h1>
+          <div className="flex justify-center mb-4">
+            <img src="/govsure-logo.svg" alt="GovSure" className="h-12" />
+          </div>
           <p className="mt-2 text-gray-600">Welcome back</p>
         </div>
 

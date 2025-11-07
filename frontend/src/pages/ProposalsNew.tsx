@@ -1,7 +1,7 @@
 /**
  * Proposals Management - Complete AI-Powered Proposal System
  * Shipley Standards, Red Team Reviews, Compliance Matrix, 508 Compliance
- * GovLogicAI - Enterprise Government Contracting Platform
+ * GovSure - Enterprise Government Contracting Platform
  */
 
 import { useState, useEffect } from 'react';

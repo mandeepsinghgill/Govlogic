@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     """Application settings"""
     
     # App Info
-    APP_NAME: str = "GovSureAI"
+    APP_NAME: str = "GovSure"
     APP_VERSION: str = "1.0.0"
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = True
@@ -62,9 +62,13 @@ class Settings(BaseSettings):
         "https://www.govsureai.com",
         "https://api.govsureai.com",
         # Development domains
-        "http://localhost:3000",
+        "http://localhost",           # Port 80 (default HTTP)
+        "http://localhost:80",        # Port 80 (explicit)
+        "http://localhost:3000",      # Vite dev server
+        "http://localhost:8000",      # Backend direct
+        "http://127.0.0.1",           # IP version
+        "http://127.0.0.1:80",
         "http://127.0.0.1:3000",
-        "http://localhost:8000",
         "http://127.0.0.1:8000"
     ]
     

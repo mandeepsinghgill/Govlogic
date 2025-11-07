@@ -2,7 +2,7 @@
  * Partner Search - Search 800K+ SAM.gov Contractors
  * Find teaming partners, search by NAICS, set-aside, capabilities
  * AI-powered recommendations
- * GovLogicAI - Enterprise Government Contracting & Grants Platform
+ * GovSure - Enterprise Government Contracting & Grants Platform
  */
 
 import React, { useState } from 'react';

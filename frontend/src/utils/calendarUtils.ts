@@ -143,7 +143,7 @@ const generateICSFile = (event: CalendarEvent): string => {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//GovSureAI//EN',
+    'PRODID:-//GovSure//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
