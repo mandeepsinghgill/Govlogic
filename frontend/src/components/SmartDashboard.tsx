@@ -70,12 +70,7 @@ export default function SmartDashboard() {
         <CrossPollinationFeatures userTypes={userTypes} />
       )}
 
-      {/* Dashboard */}
-      {hasBothTypes ? (
-        <AdaptiveDashboard userTypes={userTypes} primaryFocus={primaryFocus} />
-      ) : (
-        <DashboardEnhanced />
-      )}
+      
     </div>
   );
 }

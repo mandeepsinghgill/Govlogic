@@ -16,9 +16,10 @@ export default function LandingNew() {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
               <img 
-                src="/govsure-logo.svg" 
+                src="/govsure-logo.png" 
                 alt="GovSure" 
-                className="h-8 w-auto"
+                className="h-auto"
+                style={{ width: "150px"}}
               />
             </Link>
             
@@ -308,9 +309,9 @@ export default function LandingNew() {
                 <img 
                   src="/govsure-icon.svg" 
                   alt="GovSure" 
-                  className="h-8 w-8"
+                  className="h-10 w-10"
                 />
-                <span className="text-white font-bold text-lg">GovSure</span>
+                <span className="text-white font-bold text-xl">GovSure</span>
               </div>
               <p className="text-sm">AI-powered government contracting platform</p>
             </div>

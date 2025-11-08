@@ -12,9 +12,9 @@ export default function Navigation() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/govsure-logo.svg" 
+              src="/govsure-logo.png" 
               alt="GovSure" 
-              className="h-8 w-auto"
+              className="h-10 w-auto"
             />
           </Link>
 

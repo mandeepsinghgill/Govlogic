@@ -69,10 +69,18 @@ export default function Login() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <img src="/govsure-logo.svg" alt="GovSure" className="h-12" />
+          <div className="flex justify-center mb-6">
+          <Link to="/" className="flex items-center space-x-2">
+            <img 
+                src="/govsure-logo.png" 
+                alt="GovSure" 
+                className="h-auto"
+                style={{ width: "150px"}}
+              />
+            </Link>
           </div>
-          <p className="mt-2 text-gray-600">Welcome back</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
+          <p className="text-gray-600">Sign in to your account</p>
         </div>
 
         {/* Main Card */}

@@ -84,10 +84,11 @@ export default function Signup() {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <img src="/govsure-logo.svg" alt="GovSure" className="h-12" />
+          <div className="flex justify-center mb-6">
+            <img src="/govsure-logo.png" alt="GovSure" style={{ height: 'auto !important', width: '200px !important' }} />
           </div>
-          <p className="mt-2 text-gray-600">Create your account</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h2>
+          <p className="text-gray-600">Join GovSure today</p>
         </div>
 
         {/* Main Card */}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logo Test - GovSure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        .logo-container {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        img {
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>GovSure Logo Test Page</h1>
+    <p>This page tests if the logo files are loading correctly.</p>
+
+    <div class="logo-container">
+        <h2>Full Logo (govsure-logo.svg)</h2>
+        <img src="/govsure-logo.svg" alt="GovSure Logo" style="height: 80px;">
+        <p>Height: 80px</p>
+    </div>
+
+    <div class="logo-container">
+        <h2>Icon Logo (govsure-icon.svg)</h2>
+        <img src="/govsure-icon.svg" alt="GovSure Icon" style="height: 100px; width: 100px;">
+        <p>Size: 100x100px</p>
+    </div>
+
+    <div class="logo-container">
+        <h2>Favicon (favicon.svg)</h2>
+        <img src="/favicon.svg" alt="GovSure Favicon" style="height: 64px; width: 64px;">
+        <p>Size: 64x64px</p>
+    </div>
+
+    <div class="logo-container">
+        <h2>Dashboard Header Simulation</h2>
+        <div style="display: flex; align-items: center; gap: 12px; background: #fff; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <img src="/govsure-icon.svg" alt="GovSure" style="height: 40px; width: 40px; margin: 0; padding: 0; border: none;">
+            <span style="font-size: 20px; font-weight: bold; color: #111;">GovSure</span>
+        </div>
+        <p>This simulates the dashboard header (h-10 w-10 = 40px)</p>
+    </div>
+
+    <script>
+        // Test if images load successfully
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('load', () => {
+                console.log(`✅ Loaded: ${img.src}`);
+            });
+            img.addEventListener('error', () => {
+                console.error(`❌ Failed to load: ${img.src}`);
+                img.style.border = '2px solid red';
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -138,11 +138,11 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             </button>
             <Link to="/dashboard" className="flex items-center space-x-3">
               <img 
-                src="/govsure-icon.svg" 
-                alt="GovSure" 
-                className="h-10 w-10"
-              />
-              <h1 className="text-xl font-bold text-gray-900 hidden lg:block">GovSure</h1>
+                  src="/govsure-logo.png" 
+                  alt="GovSure" 
+                  className="h-auto"
+                  style={{ width: "150px"}}
+                />
             </Link>
           </div>
 
