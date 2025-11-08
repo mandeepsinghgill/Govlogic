@@ -524,41 +524,41 @@ export default function LandingNew() {
           </div>
 
           {/* Additional Security Features */}
-          <div className="mt-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
+          <div className="mt-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-10 border border-blue-100">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="text-3xl font-bold mb-2">99.9%</div>
-                <div className="text-blue-100">Uptime SLA</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">99.9%</div>
+                <div className="text-gray-600 font-medium">Uptime SLA</div>
+              </div>
+              <div className="text-center border-x border-blue-200 md:border-x md:border-y-0">
+                <div className="text-4xl font-bold text-indigo-600 mb-2">24/7</div>
+                <div className="text-gray-600 font-medium">Security Monitoring</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold mb-2">24/7</div>
-                <div className="text-blue-100">Security Monitoring</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold mb-2">ISO 27001</div>
-                <div className="text-blue-100">Certified</div>
+                <div className="text-4xl font-bold text-purple-600 mb-2">ISO 27001</div>
+                <div className="text-gray-600 font-medium">Certified</div>
               </div>
             </div>
           </div>
 
           {/* Trust Badges */}
-          <div className="mt-12 text-center">
-            <p className="text-gray-600 mb-6">Trusted by government contractors and compliant with:</p>
-            <div className="flex flex-wrap justify-center items-center gap-8">
-              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
-                <span className="font-bold text-gray-800">FedRAMP</span>
+          <div className="mt-16 text-center">
+            <p className="text-gray-600 mb-8 text-lg">Trusted by government contractors and compliant with:</p>
+            <div className="flex flex-wrap justify-center items-center gap-4">
+              <div className="px-6 py-3 bg-white rounded-xl shadow-sm border-2 border-gray-100 hover:border-blue-200 hover:shadow-md transition-all">
+                <span className="font-bold text-gray-700">FedRAMP</span>
               </div>
-              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
-                <span className="font-bold text-gray-800">SOC 2 Type II</span>
+              <div className="px-6 py-3 bg-white rounded-xl shadow-sm border-2 border-gray-100 hover:border-blue-200 hover:shadow-md transition-all">
+                <span className="font-bold text-gray-700">SOC 2 Type II</span>
               </div>
-              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
-                <span className="font-bold text-gray-800">ISO 27001</span>
+              <div className="px-6 py-3 bg-white rounded-xl shadow-sm border-2 border-gray-100 hover:border-blue-200 hover:shadow-md transition-all">
+                <span className="font-bold text-gray-700">ISO 27001</span>
               </div>
-              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
-                <span className="font-bold text-gray-800">NIST 800-171</span>
+              <div className="px-6 py-3 bg-white rounded-xl shadow-sm border-2 border-gray-100 hover:border-blue-200 hover:shadow-md transition-all">
+                <span className="font-bold text-gray-700">NIST 800-171</span>
               </div>
-              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
-                <span className="font-bold text-gray-800">CMMC Ready</span>
+              <div className="px-6 py-3 bg-white rounded-xl shadow-sm border-2 border-gray-100 hover:border-blue-200 hover:shadow-md transition-all">
+                <span className="font-bold text-gray-700">CMMC Ready</span>
               </div>
             </div>
           </div>
