@@ -25,6 +25,15 @@ govsureai.com, www.govsureai.com {
     X-XSS-Protection "1; mode=block"
     Referrer-Policy strict-origin-when-cross-origin
   }
+  
+  # Cache control - prevent HTML caching but allow static asset caching
+  header /index.html Cache-Control "no-cache, no-store, must-revalidate"
+  header /*.html Cache-Control "no-cache, no-store, must-revalidate"
+  
+  @static {
+    path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ttf *.ico
+  }
+  header @static Cache-Control "public, max-age=31536000, immutable"
 }
 
 # ============================================================
@@ -68,13 +77,32 @@ api.govsureai.com {
 # ============================================================
 :80 {
   encode zstd gzip
+  
+  # Proxy API to backend container
+  @api path /api*
+  reverse_proxy @api backend:8000
 
   # Serve built SPA
   root * /usr/share/caddy
   try_files {path} /index.html
+  
+  # Cache control headers
+  header {
+    # Prevent HTML caching to ensure fresh content
+    -ETag
+    Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Pragma "no-cache"
+    Expires "0"
+  }
+  
+  # Override cache headers for static assets
+  @static {
+    path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ttf *.ico *.webp
+  }
+  header @static {
+    Cache-Control "public, max-age=31536000, immutable"
+    +ETag
+  }
+  
   file_server
-
-  # Proxy API to backend container
-  @api path /api*
-  reverse_proxy @api backend:8000
 }
