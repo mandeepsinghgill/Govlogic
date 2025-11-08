@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, CheckCircle, Star, Zap, Shield, TrendingUp,
-  Target, FileText, Briefcase, Users, ChevronDown, Play
+  Target, FileText, Briefcase, Users, ChevronDown, Play, Lock, Database
 } from 'lucide-react';
 import { useState } from 'react';
+import DemoBookingModal from '../components/DemoBookingModal';
+import FAQChatbot from '../components/FAQChatbot';
 
 export default function LandingNew() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
@@ -28,12 +31,12 @@ export default function LandingNew() {
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Customers</a>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
-              <Link 
-                to="/signup"
+              <button
+                onClick={() => setIsDemoModalOpen(true)}
                 className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all"
               >
-                Start Free Trial
-              </Link>
+                Book Demo
+              </button>
             </div>
           </div>
         </div>
@@ -82,9 +85,12 @@ export default function LandingNew() {
                 Start Free Trial
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
               </Link>
-              <button className="px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold text-lg hover:shadow-lg transition-all flex items-center justify-center border border-gray-200">
+              <button
+                onClick={() => setIsDemoModalOpen(true)}
+                className="px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold text-lg hover:shadow-lg transition-all flex items-center justify-center border border-gray-200"
+              >
                 <Play className="mr-2" size={20} />
-                Watch Demo
+                Book Demo
               </button>
             </div>
 
@@ -229,6 +235,146 @@ export default function LandingNew() {
         </div>
       </section>
 
+      {/* How GovSure Works */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full mb-6">
+              <Zap className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-blue-600 font-semibold">Powered by AI</span>
+            </div>
+            <h2 className="text-5xl font-bold text-gray-900 mb-4">
+              How <span className="text-blue-600">GovSure</span> Works
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our streamlined process turns opportunities into wins
+            </p>
+          </div>
+
+          {/* Process Flow */}
+          <div className="relative">
+            {/* Connection Line - Desktop */}
+            <div className="hidden lg:block absolute top-20 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-indigo-300 to-purple-200 mx-24"></div>
+
+            {/* Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-4">
+              {/* Step 1: Learn */}
+              <div className="relative group">
+                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-blue-100 hover:border-blue-300 h-full">
+                  <div className="absolute -top-4 left-8 bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                    1
+                  </div>
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                      <Target className="w-8 h-8 text-blue-600" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Learn</h3>
+                  <p className="text-gray-600 text-center text-sm">
+                    GovSure builds a complete profile of your business, analyzing past performance, certifications, and capabilities.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2: Find */}
+              <div className="relative group">
+                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-green-100 hover:border-green-300 h-full">
+                  <div className="absolute -top-4 left-8 bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                    2
+                  </div>
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                      <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Find</h3>
+                  <p className="text-gray-600 text-center text-sm">
+                    AI-powered opportunity matching finds contracts perfectly aligned with your capabilities and experience.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3: Bid */}
+              <div className="relative group">
+                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-purple-100 hover:border-purple-300 h-full">
+                  <div className="absolute -top-4 left-8 bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                    3
+                  </div>
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                      <svg className="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Bid</h3>
+                  <p className="text-gray-600 text-center text-sm">
+                    Smart pricing analysis and competitive intelligence help you submit winning bids with optimal pricing.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 4: Respond */}
+              <div className="relative group">
+                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-orange-100 hover:border-orange-300 h-full">
+                  <div className="absolute -top-4 left-8 bg-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                    4
+                  </div>
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                      <svg className="w-8 h-8 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Respond</h3>
+                  <p className="text-gray-600 text-center text-sm">
+                    Generate compliant, compelling proposals in minutes with AI-powered writing and compliance checking.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 5: Win */}
+              <div className="relative group">
+                <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-cyan-100 hover:border-cyan-300 h-full">
+                  <div className="absolute -top-4 left-8 bg-cyan-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                    5
+                  </div>
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                      <svg className="w-8 h-8 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">Win</h3>
+                  <p className="text-gray-600 text-center text-sm">
+                    Track progress, manage post-award activities, and leverage insights to win even more contracts.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="mt-16 text-center">
+            <button
+              onClick={() => setIsDemoModalOpen(true)}
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+            >
+              <Play className="mr-2" size={20} />
+              See How It Works
+            </button>
+            <p className="mt-4 text-gray-600">
+              Watch a 2-minute demo or schedule a personalized walkthrough
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="py-24 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-6">
@@ -278,6 +424,147 @@ export default function LandingNew() {
         </div>
       </section>
 
+      {/* Enterprise-Grade Security */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50"></div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6">
+              <Shield className="w-5 h-5 text-green-600 mr-2" />
+              <span className="text-green-700 font-semibold">Trusted & Secure</span>
+            </div>
+            <h2 className="text-5xl font-bold text-gray-900 mb-4">
+              Enterprise-Grade <span className="text-blue-600">Security</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Your data security is our top priority. GovSure implements industry-leading security measures to protect your sensitive information.
+            </p>
+          </div>
+
+          {/* Security Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Government-Grade Security */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-blue-100 hover:border-blue-300">
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <Shield className="w-8 h-8 text-blue-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                Government-Grade Security
+              </h3>
+              <p className="text-gray-600 text-center text-sm">
+                Built to satisfy strict federal controls and compliance requirements including NIST 800-171 standards.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <span className="text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full">NIST 800-171</span>
+                <span className="text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full">CMMC Ready</span>
+              </div>
+            </div>
+
+            {/* AES-256 Encryption */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-purple-100 hover:border-purple-300">
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <Lock className="w-8 h-8 text-purple-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                AES-256 Encryption
+              </h3>
+              <p className="text-gray-600 text-center text-sm">
+                Military-grade data protection with end-to-end encryption for all your sensitive proposal and business data.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <span className="text-xs px-3 py-1 bg-purple-50 text-purple-700 rounded-full">In Transit</span>
+                <span className="text-xs px-3 py-1 bg-purple-50 text-purple-700 rounded-full">At Rest</span>
+              </div>
+            </div>
+
+            {/* Data Privacy */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-green-100 hover:border-green-300">
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <Database className="w-8 h-8 text-green-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                Data Privacy
+              </h3>
+              <p className="text-gray-600 text-center text-sm">
+                No AI training with your data. Your proposals, business information, and documents remain 100% private and confidential.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <span className="text-xs px-3 py-1 bg-green-50 text-green-700 rounded-full">SOC 2 Type II</span>
+                <span className="text-xs px-3 py-1 bg-green-50 text-green-700 rounded-full">GDPR</span>
+              </div>
+            </div>
+
+            {/* Granular Access Control */}
+            <div className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-orange-100 hover:border-orange-300">
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                  <CheckCircle className="w-8 h-8 text-orange-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                Granular Access Control
+              </h3>
+              <p className="text-gray-600 text-center text-sm">
+                Granular permissions with restricted user options. Control who sees what with role-based access and audit logs.
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                <span className="text-xs px-3 py-1 bg-orange-50 text-orange-700 rounded-full">RBAC</span>
+                <span className="text-xs px-3 py-1 bg-orange-50 text-orange-700 rounded-full">Audit Logs</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Security Features */}
+          <div className="mt-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">99.9%</div>
+                <div className="text-blue-100">Uptime SLA</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">24/7</div>
+                <div className="text-blue-100">Security Monitoring</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2">ISO 27001</div>
+                <div className="text-blue-100">Certified</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="mt-12 text-center">
+            <p className="text-gray-600 mb-6">Trusted by government contractors and compliant with:</p>
+            <div className="flex flex-wrap justify-center items-center gap-8">
+              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
+                <span className="font-bold text-gray-800">FedRAMP</span>
+              </div>
+              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
+                <span className="font-bold text-gray-800">SOC 2 Type II</span>
+              </div>
+              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
+                <span className="font-bold text-gray-800">ISO 27001</span>
+              </div>
+              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
+                <span className="font-bold text-gray-800">NIST 800-171</span>
+              </div>
+              <div className="px-6 py-3 bg-white rounded-lg shadow-md border border-gray-200">
+                <span className="font-bold text-gray-800">CMMC Ready</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-24 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
         <div className="max-w-4xl mx-auto text-center px-6">
@@ -287,13 +574,22 @@ export default function LandingNew() {
           <p className="text-xl mb-10 text-blue-100">
             Join 850+ government contractors using AI to win more bids
           </p>
-          <Link
-            to="/signup"
-            className="inline-flex items-center px-10 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
-          >
-            Start Your Free Trial
-            <ArrowRight className="ml-2" size={20} />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/signup"
+              className="inline-flex items-center justify-center px-10 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all"
+            >
+              Start Your Free Trial
+              <ArrowRight className="ml-2" size={20} />
+            </Link>
+            <button
+              onClick={() => setIsDemoModalOpen(true)}
+              className="inline-flex items-center justify-center px-10 py-4 bg-transparent border-2 border-white text-white rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 hover:shadow-2xl hover:scale-105 transition-all"
+            >
+              <Play className="mr-2" size={20} />
+              Book Demo
+            </button>
+          </div>
           <p className="mt-6 text-blue-100 text-sm">
             ✨ No credit card required • 14-day free trial • Cancel anytime
           </p>
@@ -362,6 +658,14 @@ export default function LandingNew() {
           animation-delay: 4s;
         }
       `}</style>
+
+      {/* Demo Booking Modal */}
+      <DemoBookingModal 
+        isOpen={isDemoModalOpen} 
+        onClose={() => setIsDemoModalOpen(false)} 
+      />
+      
+      <FAQChatbot />
     </div>
   );
 }

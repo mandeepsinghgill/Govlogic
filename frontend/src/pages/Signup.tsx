@@ -85,7 +85,14 @@ export default function Signup() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <img src="/govsure-logo.png" alt="GovSure" style={{ height: 'auto !important', width: '200px !important' }} />
+          <Link to="/" className="flex items-center space-x-2">
+            <img 
+                src="/govsure-logo.png" 
+                alt="GovSure" 
+                className="h-auto"
+                style={{ width: "150px"}}
+              />
+            </Link>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h2>
           <p className="text-gray-600">Join GovSure today</p>
