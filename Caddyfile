@@ -42,33 +42,42 @@ govsureai.com, www.govsureai.com {
 api.govsureai.com {
   encode zstd gzip
 
-  # CORS headers - Apply to ALL API responses
-  header {
-    # Allow requests from your frontend domains
-    Access-Control-Allow-Origin "https://govsureai.com"
-    Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-    Access-Control-Allow-Headers "Content-Type, Authorization, Accept"
-    Access-Control-Allow-Credentials "true"
-    Access-Control-Max-Age "3600"
-    
-    # Security headers
-    X-Content-Type-Options "nosniff"
-    X-Frame-Options "DENY"
-    Referrer-Policy "strict-origin-when-cross-origin"
-  }
-
-  # Handle preflight OPTIONS requests
+  # Handle preflight OPTIONS requests first (before proxying)
   @options {
     method OPTIONS
   }
-  respond @options 204
+  handle @options {
+    header {
+      Access-Control-Allow-Origin "https://govsureai.com"
+      Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+      Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With"
+      Access-Control-Allow-Credentials "true"
+      Access-Control-Max-Age "3600"
+    }
+    respond 204
+  }
 
-  # Reverse proxy ALL requests to backend
-  reverse_proxy backend:8000 {
-    header_up Host {host}
-    header_up X-Real-IP {remote}
-    header_up X-Forwarded-For {remote}
-    header_up X-Forwarded-Proto {scheme}
+  # Reverse proxy ALL other requests to backend
+  handle {
+    reverse_proxy backend:8000 {
+      header_up Host {host}
+      header_up X-Real-IP {remote}
+      header_up X-Forwarded-For {remote}
+      header_up X-Forwarded-Proto {scheme}
+      
+      # Add CORS headers to backend responses (without duplicating)
+      header_down Access-Control-Allow-Origin "https://govsureai.com"
+      header_down Access-Control-Allow-Credentials "true"
+      header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+      header_down Access-Control-Allow-Headers "Content-Type, Authorization, Accept, X-Requested-With"
+    }
+    
+    # Security headers (only for non-OPTIONS requests)
+    header {
+      X-Content-Type-Options "nosniff"
+      X-Frame-Options "DENY"
+      Referrer-Policy "strict-origin-when-cross-origin"
+    }
   }
 }
 
