@@ -80,7 +80,7 @@ services:
         # Option 1: Use subdomain (recommended for production)
         # VITE_API_URL: "https://api.govsureai.com"
         # Option 2: Use same domain with /api path (current setup)
-        VITE_API_URL: ""
+        VITE_API_URL: "https://api.govsureai.com"
     volumes:
       - frontend_dist:/usr/share/caddy
     depends_on:
