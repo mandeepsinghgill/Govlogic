@@ -1,21 +1,32 @@
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, CheckCircle, Star, Zap, Shield, TrendingUp,
-  Target, FileText, Briefcase, Users, ChevronDown, Play, Lock, Database
+  Target, FileText, Briefcase, Users, ChevronDown, Play, Lock, Database,
+  Menu, X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DemoBookingModal from '../components/DemoBookingModal';
 import FAQChatbot from '../components/FAQChatbot';
 
 export default function LandingNew() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const discountRate = 0.25;
+
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Modern Navigation */}
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
               <img 
@@ -38,12 +49,77 @@ export default function LandingNew() {
                 Book Demo
               </button>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
       </nav>
 
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-40">
+          <div className="absolute inset-0 bg-gray-900/55" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <div className="relative bg-white h-full w-full pt-24 px-6 pb-16 overflow-y-auto">
+            <nav className="space-y-6 text-lg">
+              <a
+                href="#features"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-gray-900 font-semibold"
+              >
+                Features
+              </a>
+              <a
+                href="#pricing"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-gray-900 font-semibold"
+              >
+                Pricing
+              </a>
+              <a
+                href="#testimonials"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-gray-900 font-semibold"
+              >
+                Customers
+              </a>
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-gray-900 font-semibold"
+              >
+                Sign In
+              </Link>
+            </nav>
+            <div className="mt-10 space-y-4">
+              <Link
+                to="/signup"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full text-center py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg"
+              >
+                Start Free Trial
+              </Link>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsDemoModalOpen(true);
+                }}
+                className="block w-full text-center py-3 px-6 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold"
+              >
+                Book Demo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section - Ultra Modern */}
-      <section className="pt-32 pb-20 px-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      <section className="pt-28 md:pt-32 pb-20 px-4 sm:px-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
@@ -60,7 +136,7 @@ export default function LandingNew() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
                 Win More Government
               </span>
@@ -71,7 +147,7 @@ export default function LandingNew() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
               Generate winning proposals in <span className="font-semibold text-blue-600">5 minutes</span>, 
               not weeks. The complete AI platform for government contractors.
             </p>
@@ -139,7 +215,7 @@ export default function LandingNew() {
 
       {/* Social Proof Stats */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <StatCard number="$127M+" label="Contracts Won" color="blue" />
             <StatCard number="850+" label="Active Users" color="green" />
@@ -151,7 +227,7 @@ export default function LandingNew() {
 
       {/* Features Section - Modern Cards */}
       <section id="features" className="py-24 bg-gradient-to-b from-white to-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Everything You Need to Win
@@ -198,7 +274,7 @@ export default function LandingNew() {
 
       {/* Testimonials */}
       <section id="testimonials" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Loved by Government Contractors</h2>
             <div className="flex justify-center space-x-1 mb-4">
@@ -237,7 +313,7 @@ export default function LandingNew() {
 
       {/* How GovSure Works */}
       <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full mb-6">
@@ -377,16 +453,49 @@ export default function LandingNew() {
 
       {/* Pricing */}
       <section id="pricing" className="py-24 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
             <p className="text-xl text-gray-600">Start free, scale as you grow</p>
           </div>
 
+          <div className="flex flex-col items-center mb-12">
+            <div className="flex items-center gap-4">
+              <span className={`text-sm font-semibold transition-colors ${billingCycle === 'monthly' ? 'text-gray-900' : 'text-gray-500'}`}>
+                Monthly
+              </span>
+              <button
+                type="button"
+                onClick={() => setBillingCycle(prev => prev === 'monthly' ? 'yearly' : 'monthly')}
+                role="switch"
+                aria-checked={billingCycle === 'yearly'}
+                aria-label="Toggle billing frequency"
+                className={`relative w-16 h-9 rounded-full transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 ${billingCycle === 'yearly' ? 'bg-indigo-600' : 'bg-gray-300'}`}
+              >
+                <span
+                  className={`absolute top-1 left-1 w-7 h-7 bg-white rounded-full shadow-md transform transition-transform duration-300 ${billingCycle === 'yearly' ? 'translate-x-7' : ''}`}
+                />
+              </button>
+              <span className={`text-sm font-semibold flex items-center gap-2 transition-colors ${billingCycle === 'yearly' ? 'text-gray-900' : 'text-gray-500'}`}>
+                Yearly
+                <span className="px-2 py-0.5 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
+                  Save 25%
+                </span>
+              </span>
+            </div>
+            <p className="mt-3 text-sm text-gray-500 text-center">
+              {billingCycle === 'monthly'
+                ? 'Switch to yearly billing and save 25% on every plan.'
+                : 'Prices reflect a 25% discount when billed annually.'}
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <PricingCard
               name="Starter"
-              price="99"
+              priceMonthly={99}
+              billingCycle={billingCycle}
+              discountRate={discountRate}
               description="Perfect for small contractors"
               features={[
                 "5 proposals/month",
@@ -397,7 +506,9 @@ export default function LandingNew() {
             />
             <PricingCard
               name="Professional"
-              price="299"
+              priceMonthly={299}
+              billingCycle={billingCycle}
+              discountRate={discountRate}
               description="For established businesses"
               features={[
                 "20 proposals/month",
@@ -410,7 +521,9 @@ export default function LandingNew() {
             />
             <PricingCard
               name="Enterprise"
-              price="Custom"
+              customLabel="Custom"
+              billingCycle={billingCycle}
+              discountRate={discountRate}
               description="For large organizations"
               features={[
                 "Unlimited proposals",
@@ -429,7 +542,7 @@ export default function LandingNew() {
         {/* Background Decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50"></div>
         
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6">
@@ -709,7 +822,7 @@ function FeatureCard({
 }) {
   return (
     <div 
-      className={`p-8 rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-all duration-300 cursor-pointer ${isHovered ? 'scale-105 border-transparent' : ''}`}
+      className={`p-6 md:p-8 rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-all duration-300 cursor-pointer ${isHovered ? 'scale-105 border-transparent' : ''}`}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
@@ -736,7 +849,7 @@ function TestimonialCard({
   image: string;
 }) {
   return (
-    <div className="p-8 rounded-2xl bg-white border border-gray-200 hover:shadow-xl transition-all">
+    <div className="p-6 md:p-8 rounded-2xl bg-white border border-gray-200 hover:shadow-xl transition-all">
       <div className="flex space-x-1 mb-4">
         {[...Array(5)].map((_, i) => (
           <Star key={i} className="text-yellow-400 fill-yellow-400" size={16} />
@@ -756,19 +869,49 @@ function TestimonialCard({
 
 function PricingCard({ 
   name, 
-  price, 
+  priceMonthly,
+  customLabel,
   description, 
   features, 
-  popular 
+  popular,
+  billingCycle,
+  discountRate
 }: { 
   name: string; 
-  price: string; 
+  priceMonthly?: number;
+  customLabel?: string;
   description: string; 
   features: string[]; 
   popular?: boolean;
+  billingCycle: 'monthly' | 'yearly';
+  discountRate: number;
 }) {
+  const isCustom = typeof priceMonthly !== 'number';
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: value % 1 === 0 ? 0 : 2,
+    }).format(value);
+
+  let displayPrice = '';
+  let billedCopy = '';
+
+  if (!isCustom && typeof priceMonthly === 'number') {
+    if (billingCycle === 'monthly') {
+      displayPrice = formatCurrency(priceMonthly);
+      billedCopy = 'Billed monthly. Cancel anytime.';
+    } else {
+      const discountedMonthly = priceMonthly * (1 - discountRate);
+      const annualTotal = priceMonthly * 12 * (1 - discountRate);
+      displayPrice = formatCurrency(discountedMonthly);
+      billedCopy = `Billed annually at ${formatCurrency(annualTotal)}.`;
+    }
+  }
+
   return (
-    <div className={`p-8 rounded-2xl bg-white border-2 ${popular ? 'border-blue-600 shadow-2xl scale-105' : 'border-gray-200'} relative`}>
+    <div className={`p-6 md:p-8 rounded-2xl bg-white border-2 ${popular ? 'border-blue-600 shadow-2xl scale-105' : 'border-gray-200'} relative`}>
       {popular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
           <span className="px-4 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full text-sm font-semibold">
@@ -779,13 +922,21 @@ function PricingCard({
       <h3 className="text-2xl font-bold text-gray-900 mb-2">{name}</h3>
       <p className="text-gray-600 mb-6">{description}</p>
       <div className="mb-6">
-        {price !== "Custom" ? (
+        {!isCustom && priceMonthly !== undefined ? (
           <>
-            <span className="text-5xl font-bold text-gray-900">${price}</span>
-            <span className="text-gray-600">/month</span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-5xl font-bold text-gray-900">{displayPrice}</span>
+              <span className="text-gray-600 text-lg">/month</span>
+            </div>
+            {billingCycle === 'yearly' && (
+              <span className="inline-flex items-center px-3 py-1 mt-3 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
+                Save {Math.round(discountRate * 100)}%
+              </span>
+            )}
+            <p className="text-sm text-gray-500 mt-2">{billedCopy}</p>
           </>
         ) : (
-          <span className="text-5xl font-bold text-gray-900">{price}</span>
+          <span className="text-5xl font-bold text-gray-900">{customLabel ?? 'Custom'}</span>
         )}
       </div>
       <ul className="space-y-3 mb-8">
