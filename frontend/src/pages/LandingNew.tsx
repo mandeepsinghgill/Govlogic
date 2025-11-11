@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { 
   ArrowRight, CheckCircle, Star, Zap, Shield,
   Target, FileText, Briefcase, Play, Lock, Database,
-  Menu, X, LayoutDashboard, Youtube, Linkedin, Twitter, ChevronDown, Sparkles
+  Menu, X, Youtube, Linkedin, Twitter, ChevronDown, Sparkles
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import DemoBookingModal from '../components/DemoBookingModal';
 import FAQChatbot from '../components/FAQChatbot';
-import { platformSections, type PlatformSection } from '../content/platformSections';
+import { platformSections } from '../content/platformSections';
 
 type SocialLink = {
   name: string;
@@ -363,7 +363,7 @@ export default function LandingNew() {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center max-w-4xl mx-auto">
+          <div className="text-center max-w-5xl mx-auto">
             {/* Badge */}
             <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-blue-200 mb-8">
               <Zap className="text-blue-600" size={16} />
@@ -371,20 +371,20 @@ export default function LandingNew() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            <h1 style={{ fontSize: '44px' }} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
-                Win More Government
+              Win Contracts. Secure Grants. Accelerate Growth.
               </span>
               <br />
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Contracts with AI
+                 with GovSure AI
               </span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Generate winning proposals in <span className="font-semibold text-blue-600">5 minutes</span>, 
-              not weeks. The complete AI platform for government contractors.
+            GovSure AI identifies&nbsp;
+            <span className="font-semibold text-blue-600">winning RFPs&nbsp;</span> before competitors, optimizes your pricing strategy, and automates compliance—giving you the edge to be first to know, first to bid, and first to win every federal contract.
             </p>
 
             {/* CTA Buttons */}
@@ -495,7 +495,7 @@ export default function LandingNew() {
                     {logos.map(({ key, label }) => (
                       <span
                         key={key}
-                        className={`verified-sprite ${spriteClassMap[key]}`}
+                        className={`verified-sprite verified-sprite--lg ${spriteClassMap[key]}`}
                         role="img"
                         aria-label={label}
                       />
@@ -515,7 +515,7 @@ export default function LandingNew() {
                 key={seal.label}
                 className="flex h-20 w-20 flex-col items-center justify-center rounded-full border border-gray-200 bg-white text-center shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"
               >
-                <span className={`verified-sprite ${spriteClassMap[seal.spriteKey]} verified-sprite--sm`} role="img" aria-label={seal.label} />
+                <span className={`verified-sprite verified-sprite--sm ${spriteClassMap[seal.spriteKey]}`} role="img" aria-label={seal.label} />
                 <span className="mt-1 px-2 text-[10px] font-medium text-gray-600 leading-tight">
                   {seal.subtext}
                 </span>
@@ -541,79 +541,110 @@ export default function LandingNew() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+ 
+          <div className="mt-16">
+            <div className="rounded-[32px] border border-blue-500/20 bg-slate-950/90 p-10 shadow-[0_40px_80px_rgba(15,23,42,0.55)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mb-10">
             {[
               {
-                icon: <Target className="text-blue-600" size={28} />,
+                icon: <Target className="text-blue-200" size={28} />,
                 title: 'Smart Opportunity Matching',
                 description:
                   'AI monitors SAM.gov 24/7 and scores opportunities based on your capabilities, with automated bid/no-bid recommendations.',
                 cta: { label: 'Explore Pipeline', to: '/platform/pipeline' },
-                iconBg: 'from-blue-100 via-blue-50 to-white'
+                highlights: [
+                  'Opportunity scoring with capture-ready summaries',
+                  'Competitor radar and historical insights',
+                  'KPI dashboard for pursuit ROI'
+                ]
               },
               {
-                icon: <FileText className="text-emerald-600" size={28} />,
+                icon: <FileText className="text-emerald-200" size={28} />,
                 title: 'AI Proposal Generation',
                 description:
                   'Generate Shipley-compliant proposals in minutes with automatic compliance matrices and win theme integration.',
                 cta: { label: 'Explore Proposal Workspace', to: '/platform/proposal-workspace' },
-                iconBg: 'from-emerald-100 via-emerald-50 to-white'
+                highlights: [
+                  'Clause library with ownership and version tracking',
+                  'AI drafting assistant tuned to Shipley best practices',
+                  'Review rooms that capture pink/red team feedback'
+                ]
               },
               {
-                icon: <Briefcase className="text-purple-600" size={28} />,
+                icon: <Briefcase className="text-purple-200" size={28} />,
                 title: 'Capture Management',
                 description:
                   'Centralize your capture plans, competitive intelligence, teaming strategy, and pipeline forecasting.',
                 cta: { label: 'Explore Capture HQ', to: '/platform/pipeline' },
-                iconBg: 'from-purple-100 via-fuchsia-50 to-white'
+                highlights: [
+                  'Gate review scorecards and executive briefs',
+                  'Partner and subcontractor gap analysis',
+                  'Forecasting tied to revenue and resource plans'
+                ]
               },
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="group rounded-3xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-blue-200 hover:shadow-xl"
+                className="group relative overflow-hidden rounded-3xl border border-blue-500/30 bg-slate-900 p-8 shadow-[0_30px_60px_rgba(15,23,42,0.45)] transition-transform duration-300 hover:-translate-y-2 hover:border-blue-400/60"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.iconBg} shadow-inner`}>
-                    {feature.icon}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-900" />
+                <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: 'radial-gradient(120% 120% at 0% 0%, rgba(59,130,246,0.25), transparent 60%)' }} />
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800/80 shadow-inner border border-slate-700`}
+                    >
+                      {feature.icon}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.3em] text-slate-400 uppercase">Powered by GovSure AI</p>
+                      <h3 className="mt-2 text-2xl font-semibold text-white">{feature.title}</h3>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-gray-900">{feature.title}</h3>
-                    <p className="mt-1 text-sm text-gray-500">Powered by GovSure AI</p>
+                  <p className="mt-6 text-slate-200 leading-relaxed flex-1 mb-6">{feature.description}</p>
+                  
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <Link
+                      to={feature.cta.to}
+                      className="inline-flex items-center gap-2 rounded-xl bg-white text-blue-600 px-5 py-2.5 text-sm font-semibold transition-transform hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      {feature.cta.label}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </div>
                 </div>
-                <p className="mt-6 text-gray-600 leading-relaxed">{feature.description}</p>
-                <Link
-                  to={feature.cta.to}
-                  className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-all hover:text-blue-700"
-                >
-                  {feature.cta.label}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Dashboard Menu */}
-      <section className="py-24 bg-white" id="dashboard-menu">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-100 rounded-full mb-6">
-              <LayoutDashboard className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-sm font-semibold text-blue-700">Inside the GovSure Workspace</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                {platformSections.map((section) => (
+                  <div
+                    key={section.id}
+                    className="group relative overflow-hidden rounded-3xl border border-slate-700/60 bg-slate-900 p-8 transition-transform duration-300 hover:-translate-y-2 hover:border-blue-400/60"
+                  >
+                    <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: 'radial-gradient(120% 120% at 0% 0%, rgba(59,130,246,0.18), transparent 60%)' }} />
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800/80 shadow-inner border border-slate-700`}>
+                          <section.icon className={`h-6 w-6 ${section.iconClass}`} />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-semibold text-white">{section.title}</h3>
+                          <p className="mt-1 text-sm text-slate-300">{section.summary}</p>
+                        </div>
+                      </div>
+                      <p className="mt-6 text-slate-200 leading-relaxed flex-1 mb-6">{section.description}</p>
+                      <Link
+                        to={section.path}
+                        className="inline-flex items-center gap-2 rounded-xl bg-white text-blue-600 px-5 py-2.5 text-sm font-semibold transition-transform hover:-translate-y-0.5 hover:shadow-lg mb-2"
+                      >
+                        Explore {section.title}
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Navigate Every Mission-Critical Area
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover the modules your teams use every day—each menu highlights what it does and the quick actions your admins can launch.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {platformSections.map((section) => (
-              <DashboardMenuCard key={section.id} section={section} />
-            ))}
           </div>
         </div>
       </section>
@@ -1132,19 +1163,23 @@ export default function LandingNew() {
         }
         .verified-sprite {
           display: inline-block;
-          width: 52px;
-          height: 52px;
+          width: 48px;
+          height: 48px;
           border-radius: 9999px;
           border: 1px solid #e5e7eb;
           background-color: #ffffff;
           background-image: url('/seals/verified-sprite.jpg');
-          background-size: 200% 200%;
+          background-size: 300% 300%;
           background-repeat: no-repeat;
           background-position: center;
         }
+        .verified-sprite--lg {
+          width: 52px;
+          height: 52px;
+        }
         .verified-sprite--sm {
-          width: 46px;
-          height: 46px;
+          width: 44px;
+          height: 44px;
         }
         .verified-sprite--dod { background-position: 0% 0%; }
         .verified-sprite--nasa { background-position: 50% 0%; }
@@ -1152,8 +1187,8 @@ export default function LandingNew() {
         .verified-sprite--state { background-position: 0% 50%; }
         .verified-sprite--doe { background-position: 50% 50%; }
         .verified-sprite--dia { background-position: 100% 50%; }
-        .verified-sprite--nih { background-position: 0% 100%; }
-        .verified-sprite--ohio { background-position: 50% 100%; }
+        .verified-sprite--nih { background-position: 26% 97%; }
+        .verified-sprite--ohio { background-position: 72% 97%; }
       `}</style>
 
       {/* Demo Booking Modal */}
@@ -1163,45 +1198,6 @@ export default function LandingNew() {
       />
       
       <FAQChatbot />
-    </div>
-  );
-}
-
-function DashboardMenuCard({ section }: { section: PlatformSection }) {
-  const Icon = section.icon;
-
-  return (
-    <div className="group relative rounded-3xl border border-gray-200 bg-white/80 px-6 py-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl">
-      <div className="flex items-start gap-4 mb-6">
-        <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${section.iconBg}`}>
-          <Icon className={`h-6 w-6 ${section.iconClass}`} />
-        </div>
-        <div>
-          <h3 className="text-xl font-semibold text-gray-900">{section.title}</h3>
-          <p className="mt-1 text-sm text-gray-600">{section.summary}</p>
-        </div>
-      </div>
-      <div className="space-y-4">
-        {section.features.map((item) => (
-          <div
-            key={item.title}
-            className="group flex items-start justify-between rounded-2xl border border-gray-100 bg-gray-50/70 p-4 transition-all duration-200 hover:border-blue-200 hover:bg-white hover:shadow-sm"
-          >
-            <div className="pr-3">
-              <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-              <p className="mt-1 text-sm text-gray-600">{item.description}</p>
-            </div>
-            <ArrowRight className="mt-1 h-5 w-5 text-gray-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-blue-600" />
-          </div>
-        ))}
-      </div>
-      <Link
-        to={section.path}
-        className="mt-6 inline-flex items-center text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700"
-      >
-        Explore {section.title}
-        <ArrowRight className="ml-1 h-4 w-4" />
-      </Link>
     </div>
   );
 }
