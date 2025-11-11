@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-ro
 import { useState, useEffect } from 'react';
 import './App.css';
 import LandingNew from './pages/LandingNew';
+import PlatformAreaPage from './pages/PlatformAreaPage';
 import DashboardModern from './pages/DashboardModern';
 import Features from './pages/Features';
 import HowItWorks from './pages/HowItWorks';
@@ -388,6 +389,7 @@ function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/platform/:sectionId" element={<PlatformAreaPage />} />
         
         {/* Onboarding (Protected) */}
         <Route

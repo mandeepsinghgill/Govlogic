@@ -1,19 +1,107 @@
 import { Link } from 'react-router-dom';
 import { 
-  ArrowRight, CheckCircle, Star, Zap, Shield, TrendingUp,
-  Target, FileText, Briefcase, Users, ChevronDown, Play, Lock, Database,
-  Menu, X
+  ArrowRight, CheckCircle, Star, Zap, Shield,
+  Target, FileText, Briefcase, Play, Lock, Database,
+  Menu, X, LayoutDashboard, Youtube, Linkedin, Twitter, ChevronDown, Sparkles
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DemoBookingModal from '../components/DemoBookingModal';
 import FAQChatbot from '../components/FAQChatbot';
+import { platformSections, type PlatformSection } from '../content/platformSections';
+
+type SocialLink = {
+  name: string;
+  href: string;
+  Icon: typeof Youtube;
+  hoverClass: string;
+};
 
 export default function LandingNew() {
-  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPlatformMenuOpen, setIsPlatformMenuOpen] = useState(false);
+  const closeMenuTimeoutRef = useRef<number | null>(null);
   const discountRate = 0.25;
+  const platformMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const socialLinks: SocialLink[] = [
+    {
+      name: 'LinkedIn',
+      href: 'https://www.linkedin.com/in/govsure-ai-5aa818391/',
+      Icon: Linkedin,
+      hoverClass: 'hover:text-blue-400 hover:border-blue-400/40'
+    },
+    {
+      name: 'X (Twitter)',
+      href: 'https://x.com/GovSureAI',
+      Icon: Twitter,
+      hoverClass: 'hover:text-indigo-400 hover:border-indigo-400/40'
+    },
+    {
+      name: 'YouTube',
+      href: 'https://www.youtube.com/@GovSureAI',
+      Icon: Youtube,
+      hoverClass: 'hover:text-red-400 hover:border-red-400/40'
+    }
+  ];
+
+  const verifiedSourceCategories = [
+    {
+      title: 'Defense & Intelligence',
+      agencies: 'DoD • DIA • NSA',
+      description:
+        'Stay current on mission needs with direct feeds from the Department of Defense and intelligence community notices, classified summaries, and procurement forecasts.',
+      logos: [
+        { key: 'dod', label: 'Department of Defense' },
+        { key: 'dia', label: 'Defense Intelligence Agency' }
+      ]
+    },
+    {
+      title: 'Civilian Agencies',
+      agencies: 'NASA • GSA • SBA',
+      description:
+        'Track technology priorities across civilian agencies with curated award history, mission roadmaps, and program spending trends.',
+      logos: [
+        { key: 'nasa', label: 'NASA' },
+        { key: 'house', label: 'U.S. House of Representatives' },
+        { key: 'state', label: 'Department of State' }
+      ]
+    },
+    {
+      title: 'Health & Research',
+      agencies: 'NIH • HHS • CDC',
+      description:
+        'Unlock grant and contract opportunities in health, bioscience, and public sector research with consolidated program intelligence and compliance checklists.',
+      logos: [
+        { key: 'nih', label: 'National Institutes of Health' },
+        { key: 'doe', label: 'Department of Energy' },
+        { key: 'ohio', label: 'State of Ohio' }
+      ]
+    },
+  ] as const;
+
+  const verifiedSourceBadges = [
+    { label: 'Department of Defense', subtext: 'DoD', spriteKey: 'dod' },
+    { label: 'NASA', subtext: 'NASA', spriteKey: 'nasa' },
+    { label: 'U.S. House of Representatives', subtext: 'House', spriteKey: 'house' },
+    { label: 'Department of State', subtext: 'State', spriteKey: 'state' },
+    { label: 'Department of Energy', subtext: 'DOE', spriteKey: 'doe' },
+    { label: 'Defense Intelligence Agency', subtext: 'DIA', spriteKey: 'dia' },
+    { label: 'National Institutes of Health', subtext: 'NIH', spriteKey: 'nih' },
+    { label: 'State of Ohio', subtext: 'Ohio', spriteKey: 'ohio' },
+  ] as const;
+
+  const spriteClassMap: Record<string, string> = {
+    dod: 'verified-sprite--dod',
+    nasa: 'verified-sprite--nasa',
+    house: 'verified-sprite--house',
+    state: 'verified-sprite--state',
+    doe: 'verified-sprite--doe',
+    dia: 'verified-sprite--dia',
+    nih: 'verified-sprite--nih',
+    ohio: 'verified-sprite--ohio'
+  };
 
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
@@ -21,6 +109,31 @@ export default function LandingNew() {
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const handleClickAway = (event: MouseEvent) => {
+      if (platformMenuRef.current && !platformMenuRef.current.contains(event.target as Node)) {
+        setIsPlatformMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsPlatformMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickAway);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickAway);
+      window.removeEventListener('keydown', handleKeyDown);
+      if (closeMenuTimeoutRef.current) {
+        window.clearTimeout(closeMenuTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -38,9 +151,105 @@ export default function LandingNew() {
             </Link>
             
             <div className="hidden md:flex items-center space-x-8">
+              <div
+                ref={platformMenuRef}
+                className="relative"
+                onMouseEnter={() => {
+                  if (closeMenuTimeoutRef.current) {
+                    window.clearTimeout(closeMenuTimeoutRef.current);
+                    closeMenuTimeoutRef.current = null;
+                  }
+                  setIsPlatformMenuOpen(true);
+                }}
+                onMouseLeave={() => {
+                  closeMenuTimeoutRef.current = window.setTimeout(() => {
+                    setIsPlatformMenuOpen(false);
+                  }, 160);
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (closeMenuTimeoutRef.current) {
+                      window.clearTimeout(closeMenuTimeoutRef.current);
+                      closeMenuTimeoutRef.current = null;
+                    }
+                    setIsPlatformMenuOpen(prev => !prev);
+                  }}
+                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  aria-haspopup="true"
+                  aria-expanded={isPlatformMenuOpen}
+                >
+                  Platform
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${isPlatformMenuOpen ? 'rotate-180 text-gray-900' : ''}`}
+                  />
+                </button>
+
+                {isPlatformMenuOpen && (
+                  <div
+                    className="absolute left-1/2 top-full z-50 mt-4 w-[760px] -translate-x-1/2 rounded-3xl border border-gray-200 bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur"
+                    onMouseEnter={() => {
+                      if (closeMenuTimeoutRef.current) {
+                        window.clearTimeout(closeMenuTimeoutRef.current);
+                        closeMenuTimeoutRef.current = null;
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      closeMenuTimeoutRef.current = window.setTimeout(() => {
+                        setIsPlatformMenuOpen(false);
+                      }, 150);
+                    }}
+                  >
+                    <div className="px-6 pt-6 pb-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
+                          Explore GovSure
+                        </p>
+                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                          6 focus areas
+                        </span>
+                      </div>
+                      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                        {platformSections.map(section => {
+                          const Icon = section.icon;
+                          return (
+                            <Link
+                              key={section.id}
+                              to={section.path}
+                              onClick={() => setIsPlatformMenuOpen(false)}
+                              className="group rounded-2xl border border-transparent bg-white/70 p-4 transition-all duration-200 hover:-translate-y-[2px] hover:border-blue-200 hover:bg-white hover:shadow-lg"
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className={`mt-0.5 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${section.iconBg}`}>
+                                  <Icon className={`h-5 w-5 ${section.iconClass}`} />
+                                </div>
+                                <div>
+                                  <p className="text-base font-semibold text-gray-900">{section.title}</p>
+                                  <p className="mt-1 text-sm text-gray-600 leading-snug">
+                                    {section.summary}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="rounded-b-3xl border-t border-gray-100 bg-gray-50/70 px-6 py-4">
+                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                        Tip
+                      </p>
+                      <p className="mt-1 text-sm text-gray-600">
+                        Pick any module above to jump down the page to deep-dive content or open it inside the platform.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-              <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Customers</a>
+              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
               <button
                 onClick={() => setIsDemoModalOpen(true)}
@@ -82,11 +291,11 @@ export default function LandingNew() {
                 Pricing
               </a>
               <a
-                href="#testimonials"
+                href="#how-it-works"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-gray-900 font-semibold"
               >
-                Customers
+                How It Works
               </a>
               <Link
                 to="/login"
@@ -96,6 +305,32 @@ export default function LandingNew() {
                 Sign In
               </Link>
             </nav>
+              <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50/80 p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Platform Areas
+              </p>
+              <div className="mt-4 space-y-4">
+                {platformSections.map(section => {
+                  const Icon = section.icon;
+                  return (
+                    <Link
+                      key={section.id}
+                      to={section.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white/70 p-4 transition-all duration-200 hover:border-blue-200 hover:shadow-sm"
+                    >
+                      <div className={`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${section.iconBg}`}>
+                        <Icon className={`h-5 w-5 ${section.iconClass}`} />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">{section.title}</p>
+                        <p className="mt-1 text-sm text-gray-600">{section.summary}</p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
             <div className="mt-10 space-y-4">
               <Link
                 to="/signup"
@@ -163,6 +398,7 @@ export default function LandingNew() {
               </Link>
               <button
                 onClick={() => setIsDemoModalOpen(true)}
+                id="book-demo"
                 className="px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold text-lg hover:shadow-lg transition-all flex items-center justify-center border border-gray-200"
               >
                 <Play className="mr-2" size={20} />
@@ -225,49 +461,159 @@ export default function LandingNew() {
         </div>
       </section>
 
+      {/* Verified Sources */}
+      <section className="py-24 bg-gradient-to-b from-blue-50 via-white to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-white shadow-sm rounded-full border border-blue-200 mb-6">
+              <Shield className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-sm font-semibold text-blue-700 uppercase tracking-[0.2em]">
+                Verified Sources
+              </span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+              Trusted Government Data at Your Fingertips
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              GovSure connects to authoritative U.S. Government systems to deliver compliant,
+              audit-ready insights for capture, proposal, and compliance teams.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {verifiedSourceCategories.map(({ title, agencies, description, logos }) => (
+              <div
+                key={title}
+                className="bg-white rounded-3xl border border-gray-200 p-8 shadow-sm hover:shadow-lg transition-all"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{agencies}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {logos.map(({ key, label }) => (
+                      <span
+                        key={key}
+                        className={`verified-sprite ${spriteClassMap[key]}`}
+                        role="img"
+                        aria-label={label}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="mt-6 text-gray-600 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 flex flex-wrap justify-center gap-6">
+            {verifiedSourceBadges.map((seal) => (
+              <div
+                key={seal.label}
+                className="flex h-20 w-20 flex-col items-center justify-center rounded-full border border-gray-200 bg-white text-center shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg"
+              >
+                <span className={`verified-sprite ${spriteClassMap[seal.spriteKey]} verified-sprite--sm`} role="img" aria-label={seal.label} />
+                <span className="mt-1 px-2 text-[10px] font-medium text-gray-600 leading-tight">
+                  {seal.subtext}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section - Modern Cards */}
       <section id="features" className="py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 bg-blue-50 text-sm font-semibold text-blue-700 uppercase tracking-[0.25em] mb-6">
+              <Sparkles className="w-4 h-4" />
+              Platform Superpowers
+            </div>
             <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Everything You Need to Win
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From opportunity discovery to proposal submission, all in one powerful platform
+              From opportunity discovery to proposal submission, each workspace accelerates a critical GovCon workflow.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<Target className="text-blue-600" size={32} />}
-              title="Smart Opportunity Matching"
-              description="AI monitors SAM.gov 24/7 and scores opportunities based on your capabilities, with automated bid/no-bid recommendations."
-              gradient="from-blue-500 to-indigo-500"
-              index={0}
-              isHovered={hoveredFeature === 0}
-              onHover={() => setHoveredFeature(0)}
-              onLeave={() => setHoveredFeature(null)}
-            />
-            <FeatureCard
-              icon={<FileText className="text-green-600" size={32} />}
-              title="AI Proposal Generation"
-              description="Generate Shipley-compliant proposals in minutes with automatic compliance matrices and win theme integration."
-              gradient="from-green-500 to-emerald-500"
-              index={1}
-              isHovered={hoveredFeature === 1}
-              onHover={() => setHoveredFeature(1)}
-              onLeave={() => setHoveredFeature(null)}
-            />
-            <FeatureCard
-              icon={<Briefcase className="text-purple-600" size={32} />}
-              title="Capture Management"
-              description="Centralize your capture plans, competitive intelligence, teaming strategy, and pipeline forecasting."
-              gradient="from-purple-500 to-pink-500"
-              index={2}
-              isHovered={hoveredFeature === 2}
-              onHover={() => setHoveredFeature(2)}
-              onLeave={() => setHoveredFeature(null)}
-            />
+          <div className="grid lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Target className="text-blue-600" size={28} />,
+                title: 'Smart Opportunity Matching',
+                description:
+                  'AI monitors SAM.gov 24/7 and scores opportunities based on your capabilities, with automated bid/no-bid recommendations.',
+                cta: { label: 'Explore Pipeline', to: '/platform/pipeline' },
+                iconBg: 'from-blue-100 via-blue-50 to-white'
+              },
+              {
+                icon: <FileText className="text-emerald-600" size={28} />,
+                title: 'AI Proposal Generation',
+                description:
+                  'Generate Shipley-compliant proposals in minutes with automatic compliance matrices and win theme integration.',
+                cta: { label: 'Explore Proposal Workspace', to: '/platform/proposal-workspace' },
+                iconBg: 'from-emerald-100 via-emerald-50 to-white'
+              },
+              {
+                icon: <Briefcase className="text-purple-600" size={28} />,
+                title: 'Capture Management',
+                description:
+                  'Centralize your capture plans, competitive intelligence, teaming strategy, and pipeline forecasting.',
+                cta: { label: 'Explore Capture HQ', to: '/platform/pipeline' },
+                iconBg: 'from-purple-100 via-fuchsia-50 to-white'
+              },
+            ].map((feature) => (
+              <div
+                key={feature.title}
+                className="group rounded-3xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-blue-200 hover:shadow-xl"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.iconBg} shadow-inner`}>
+                    {feature.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-gray-900">{feature.title}</h3>
+                    <p className="mt-1 text-sm text-gray-500">Powered by GovSure AI</p>
+                  </div>
+                </div>
+                <p className="mt-6 text-gray-600 leading-relaxed">{feature.description}</p>
+                <Link
+                  to={feature.cta.to}
+                  className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-all hover:text-blue-700"
+                >
+                  {feature.cta.label}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Dashboard Menu */}
+      <section className="py-24 bg-white" id="dashboard-menu">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border border-blue-100 rounded-full mb-6">
+              <LayoutDashboard className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-sm font-semibold text-blue-700">Inside the GovSure Workspace</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Navigate Every Mission-Critical Area
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+              Discover the modules your teams use every day—each menu highlights what it does and the quick actions your admins can launch.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {platformSections.map((section) => (
+              <DashboardMenuCard key={section.id} section={section} />
+            ))}
           </div>
         </div>
       </section>
@@ -312,7 +658,7 @@ export default function LandingNew() {
       </section>
 
       {/* How GovSure Works */}
-      <section className="py-24 bg-white">
+      <section id="how-it-works" className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="text-center mb-16">
@@ -493,7 +839,7 @@ export default function LandingNew() {
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <PricingCard
               name="Starter"
-              priceMonthly={99}
+              priceMonthly={150}
               billingCycle={billingCycle}
               discountRate={discountRate}
               description="Perfect for small contractors"
@@ -506,7 +852,7 @@ export default function LandingNew() {
             />
             <PricingCard
               name="Professional"
-              priceMonthly={299}
+              priceMonthly={300}
               billingCycle={billingCycle}
               discountRate={discountRate}
               description="For established businesses"
@@ -723,6 +1069,20 @@ export default function LandingNew() {
                 <span className="text-white font-bold text-xl">GovSure</span>
               </div>
               <p className="text-sm">AI-powered government contracting platform</p>
+              <div className="mt-6 flex items-center gap-3">
+                {socialLinks.map(link => (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={`GovSure on ${link.name}`}
+                    className={`inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-800 bg-gray-800/40 text-gray-300 transition-all duration-200 hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${link.hoverClass}`}
+                  >
+                    <link.Icon className="h-5 w-5" aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Product</h4>
@@ -770,6 +1130,30 @@ export default function LandingNew() {
         .animation-delay-4000 {
           animation-delay: 4s;
         }
+        .verified-sprite {
+          display: inline-block;
+          width: 52px;
+          height: 52px;
+          border-radius: 9999px;
+          border: 1px solid #e5e7eb;
+          background-color: #ffffff;
+          background-image: url('/seals/verified-sprite.jpg');
+          background-size: 200% 200%;
+          background-repeat: no-repeat;
+          background-position: center;
+        }
+        .verified-sprite--sm {
+          width: 46px;
+          height: 46px;
+        }
+        .verified-sprite--dod { background-position: 0% 0%; }
+        .verified-sprite--nasa { background-position: 50% 0%; }
+        .verified-sprite--house { background-position: 100% 0%; }
+        .verified-sprite--state { background-position: 0% 50%; }
+        .verified-sprite--doe { background-position: 50% 50%; }
+        .verified-sprite--dia { background-position: 100% 50%; }
+        .verified-sprite--nih { background-position: 0% 100%; }
+        .verified-sprite--ohio { background-position: 50% 100%; }
       `}</style>
 
       {/* Demo Booking Modal */}
@@ -779,6 +1163,45 @@ export default function LandingNew() {
       />
       
       <FAQChatbot />
+    </div>
+  );
+}
+
+function DashboardMenuCard({ section }: { section: PlatformSection }) {
+  const Icon = section.icon;
+
+  return (
+    <div className="group relative rounded-3xl border border-gray-200 bg-white/80 px-6 py-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl">
+      <div className="flex items-start gap-4 mb-6">
+        <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${section.iconBg}`}>
+          <Icon className={`h-6 w-6 ${section.iconClass}`} />
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900">{section.title}</h3>
+          <p className="mt-1 text-sm text-gray-600">{section.summary}</p>
+        </div>
+      </div>
+      <div className="space-y-4">
+        {section.features.map((item) => (
+          <div
+            key={item.title}
+            className="group flex items-start justify-between rounded-2xl border border-gray-100 bg-gray-50/70 p-4 transition-all duration-200 hover:border-blue-200 hover:bg-white hover:shadow-sm"
+          >
+            <div className="pr-3">
+              <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+              <p className="mt-1 text-sm text-gray-600">{item.description}</p>
+            </div>
+            <ArrowRight className="mt-1 h-5 w-5 text-gray-400 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-blue-600" />
+          </div>
+        ))}
+      </div>
+      <Link
+        to={section.path}
+        className="mt-6 inline-flex items-center text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700"
+      >
+        Explore {section.title}
+        <ArrowRight className="ml-1 h-4 w-4" />
+      </Link>
     </div>
   );
 }
@@ -797,40 +1220,6 @@ function StatCard({ number, label, color }: { number: string; label: string; col
         {number}
       </div>
       <div className="text-gray-600 font-medium">{label}</div>
-    </div>
-  );
-}
-
-function FeatureCard({ 
-  icon, 
-  title, 
-  description, 
-  gradient,
-  index,
-  isHovered,
-  onHover,
-  onLeave
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  description: string; 
-  gradient: string;
-  index: number;
-  isHovered: boolean;
-  onHover: () => void;
-  onLeave: () => void;
-}) {
-  return (
-    <div 
-      className={`p-6 md:p-8 rounded-2xl bg-white border border-gray-200 hover:shadow-2xl transition-all duration-300 cursor-pointer ${isHovered ? 'scale-105 border-transparent' : ''}`}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-    >
-      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-6 ${isHovered ? 'scale-110' : ''} transition-transform`}>
-        {icon}
-      </div>
-      <h3 className="text-2xl font-bold text-gray-900 mb-4">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -904,8 +1293,9 @@ function PricingCard({
       billedCopy = 'Billed monthly. Cancel anytime.';
     } else {
       const discountedMonthly = priceMonthly * (1 - discountRate);
-      const annualTotal = priceMonthly * 12 * (1 - discountRate);
-      displayPrice = formatCurrency(discountedMonthly);
+      const roundedMonthly = Math.round(discountedMonthly);
+      const annualTotal = roundedMonthly * 12;
+      displayPrice = formatCurrency(roundedMonthly);
       billedCopy = `Billed annually at ${formatCurrency(annualTotal)}.`;
     }
   }
