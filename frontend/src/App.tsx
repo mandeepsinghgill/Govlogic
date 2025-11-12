@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './App.css';
 import LandingNew from './pages/LandingNew';
@@ -8,6 +8,10 @@ import Features from './pages/Features';
 import HowItWorks from './pages/HowItWorks';
 import CaseStudies from './pages/CaseStudies';
 import Pricing from './pages/Pricing';
+import AboutUs from './pages/AboutUs';
+import TermsAndConditions from './pages/TermsAndConditions';
+import ContactUs from './pages/ContactUs';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
@@ -47,6 +51,18 @@ import { Menu, X, Target, FileText, Briefcase, Database, FolderKanban, LogOut, U
 import PipelineManager from './pages/PipelineManager';
 import AIAssistant from './pages/AIAssistant';
 import { useAutoLogout } from './hooks/useAutoLogout';
+
+// ScrollToTop Component - Scrolls to top on route change
+// This must be inside Router, so we'll use it in a wrapper
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 // Protected Route Component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -379,6 +395,15 @@ function NavLink({ to, icon, text, collapsed }: { to: string; icon: React.ReactN
 function App() {
   return (
     <Router>
+      <AppContent />
+    </Router>
+  );
+}
+
+function AppContent() {
+  return (
+    <>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingNew />} />
@@ -387,6 +412,10 @@ function App() {
         <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/case-studies" element={<CaseStudies />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/platform/:sectionId" element={<PlatformAreaPage />} />
@@ -695,7 +724,7 @@ function App() {
           }
         />
       </Routes>
-    </Router>
+    </>
   );
 }
 

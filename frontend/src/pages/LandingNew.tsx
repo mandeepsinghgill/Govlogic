@@ -9,10 +9,17 @@ import DemoBookingModal from '../components/DemoBookingModal';
 import FAQChatbot from '../components/FAQChatbot';
 import { platformSections } from '../content/platformSections';
 
+// Facebook Icon Component
+const FacebookIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+  </svg>
+);
+
 type SocialLink = {
   name: string;
   href: string;
-  Icon: typeof Youtube;
+  Icon: React.ComponentType<{ className?: string }>;
   hoverClass: string;
 };
 
@@ -37,6 +44,12 @@ export default function LandingNew() {
       href: 'https://x.com/GovSureAI',
       Icon: Twitter,
       hoverClass: 'hover:text-indigo-400 hover:border-indigo-400/40'
+    },
+    {
+      name: 'Facebook',
+      href: 'https://www.facebook.com/GovSureAI',
+      Icon: FacebookIcon,
+      hoverClass: 'hover:text-blue-500 hover:border-blue-500/40'
     },
     {
       name: 'YouTube',
@@ -376,15 +389,15 @@ export default function LandingNew() {
               Win Contracts. Secure Grants. Accelerate Growth.
               </span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {/* <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                  with GovSure AI
-              </span>
+              </span> */}
             </h1>
 
             {/* Subtitle */}
             <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
             GovSure AI identifies&nbsp;
-            <span className="font-semibold text-blue-600">winning RFPs&nbsp;</span> before competitors, optimizes your pricing strategy, and automates compliance—giving you the edge to be first to know, first to bid, and first to win every federal contract.
+            <span className="font-semibold text-blue-600">winning RFPs&nbsp;</span> before competitors, optimizes your pricing strategy, and crafts compliant winning proposals and grant applications—giving you the edge to be first to know, first to bid, and first to win every contract.
             </p>
 
             {/* CTA Buttons */}
@@ -1099,7 +1112,7 @@ export default function LandingNew() {
                 />
                 <span className="text-white font-bold text-xl">GovSure</span>
               </div>
-              <p className="text-sm">AI-powered government contracting platform</p>
+              <p className="text-sm">GovSure is the AI-powered platform that helps contractors and grant-seekers discover government opportunities the moment they’re released, analyze pricing, craft winning proposals and grant applications, ensure compliance, and manage every step from submission to award—giving you the edge to bid smarter, win faster, and grow predictable government and grant revenue.</p>
               <div className="mt-6 flex items-center gap-3">
                 {socialLinks.map(link => (
                   <a
@@ -1126,7 +1139,7 @@ export default function LandingNew() {
             <div>
               <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">About</a></li>
+                <li><Link to="/about" className="hover:text-white">About</Link></li>
                 <li><a href="#" className="hover:text-white">Blog</a></li>
                 <li><a href="#" className="hover:text-white">Careers</a></li>
               </ul>
@@ -1134,14 +1147,15 @@ export default function LandingNew() {
             <div>
               <h4 className="text-white font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><Link to="/privacy" className="hover:text-white">Privacy</Link></li>
+                <li><Link to="/terms" className="hover:text-white">Terms</Link></li>
+                <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2024 GovSure. All rights reserved.</p>
+            <p className='mb-2'>🇺🇸 Made in Washington, D.C.</p>
+            <p>&copy; 2025 GovSure. All rights reserved.</p>
           </div>
         </div>
       </footer>
