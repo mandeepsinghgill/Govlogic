@@ -476,10 +476,10 @@ export default function LandingNew() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <StatCard number="$127M+" label="Contracts Won" color="blue" />
-            <StatCard number="850+" label="Active Users" color="green" />
+            <StatCard number="$127M+" label="Active Pipeline" color="blue" />
+            <StatCard number="100+" label="Active Users" color="green" />
             <StatCard number="99%" label="Time Saved" color="purple" />
-            <StatCard number="4.9/5" label="Customer Rating" color="orange" />
+            <StatCard number="5/5" label="Customer Rating" color="orange" />
           </div>
         </div>
       </section>
@@ -771,30 +771,30 @@ export default function LandingNew() {
                 <Star key={i} className="text-yellow-400 fill-yellow-400" size={24} />
               ))}
             </div>
-            <p className="text-gray-600">4.9/5 from 500+ reviews</p>
+            <p className="text-gray-600">5/5 from 100+ reviews</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <TestimonialCard
               quote="GovSure cut our proposal time from 3 weeks to 2 days. The ROI is incredible."
-              author="Sarah Chen"
-              role="Capture Manager"
-              company="TechForce Solutions"
-              image="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop"
-            />
-            <TestimonialCard
-              quote="Best investment we made this year. Won 3 major contracts in our first quarter."
-              author="Michael Rodriguez"
-              role="CEO"
-              company="Federal Systems Inc"
+              author="Sam B"
+              role="Chief Growth Officer"
+              company="StarLight GCS"
               image="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
             />
             <TestimonialCard
+              quote="Best investment we made this year. Won 3 major contracts in our first quarter."
+              author="Collin C"
+              role="CEO"
+              company="TerraSecure"
+              image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop"
+            />
+            <TestimonialCard
               quote="The AI compliance checking caught errors we would have missed. Saved us from rejection."
-              author="Jennifer Park"
+              author="Elijah O"
               role="Proposal Director"
-              company="Defense Solutions"
-              image="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop"
+              company="LexLing Consulting"
+              image="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop"
             />
           </div>
         </div>
@@ -1138,7 +1138,7 @@ export default function LandingNew() {
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-purple-600 mb-2">ISO 27001</div>
-                <div className="text-gray-600 font-medium">Certified</div>
+                <div className="text-gray-600 font-medium">Ready</div>
               </div>
             </div>
           </div>

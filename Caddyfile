@@ -93,22 +93,18 @@ blog.govsureai.com, www.blog.govsureai.com {
   # WordPress rewrite rules - try files, then pass to index.php
   try_files {path} {path}/ /index.php?{query}
   
-  # PHP processing via FastCGI (requires php-fpm installed)
-  # Note: If using Caddy with PHP, you may need caddy-php-fpm plugin
-  # Or use Nginx for PHP processing
+  # PHP processing via FastCGI
+  # Note: Update the socket path to match your PHP-FPM version
+  # Common paths: /var/run/php/php8.3-fpm.sock, /var/run/php/php8.2-fpm.sock, etc.
   @php {
     path *.php
   }
   
-  # For Caddy with PHP-FPM, use this format:
-  # php_fastcgi unix//var/run/php/php8.1-fpm.sock
-  
-  # Alternative: Use reverse proxy to PHP-FPM
-  reverse_proxy @php unix//var/run/php/php8.1-fpm.sock {
-    transport fastcgi {
-      split .php
-      index index.php
-    }
+  # Use php_fastcgi directive (Caddy v2 native support)
+  # Update the socket path below to match your installed PHP version
+  php_fastcgi unix//var/run/php/php8.3-fpm.sock {
+    index index.php
+    split .php
   }
   
   # Serve static files
