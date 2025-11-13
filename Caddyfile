@@ -82,6 +82,64 @@ api.govsureai.com {
 }
 
 # ============================================================
+# Blog Subdomain - WordPress
+# ============================================================
+blog.govsureai.com, www.blog.govsureai.com {
+  encode zstd gzip
+
+  # Root directory for WordPress
+  root * /var/www/blog.govsureai.com
+  
+  # WordPress rewrite rules - try files, then pass to index.php
+  try_files {path} {path}/ /index.php?{query}
+  
+  # PHP processing via FastCGI (requires php-fpm installed)
+  # Note: If using Caddy with PHP, you may need caddy-php-fpm plugin
+  # Or use Nginx for PHP processing
+  @php {
+    path *.php
+  }
+  
+  # For Caddy with PHP-FPM, use this format:
+  # php_fastcgi unix//var/run/php/php8.1-fpm.sock
+  
+  # Alternative: Use reverse proxy to PHP-FPM
+  reverse_proxy @php unix//var/run/php/php8.1-fpm.sock {
+    transport fastcgi {
+      split .php
+      index index.php
+    }
+  }
+  
+  # Serve static files
+  file_server
+  
+  # Security headers
+  header {
+    X-Frame-Options "SAMEORIGIN"
+    X-Content-Type-Options "nosniff"
+    X-XSS-Protection "1; mode=block"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+  
+  # Cache static assets
+  @static {
+    path *.js *.css *.png *.jpg *.jpeg *.gif *.svg *.woff *.woff2 *.ttf *.ico *.webp
+  }
+  header @static Cache-Control "public, max-age=31536000, immutable"
+  
+  # Deny access to sensitive files
+  @deny {
+    path /.htaccess
+    path /.user.ini
+    path /wp-config.php
+    path /readme.html
+    path /license.txt
+  }
+  respond @deny 403
+}
+
+# ============================================================
 # Fallback for direct IP access (development/testing)
 # ============================================================
 :80 {

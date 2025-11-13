@@ -263,7 +263,7 @@ export default function LandingNew() {
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
-              <a href="http://localhost/blog" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">Blog</a>
+              <a href="https://blog.govsureai.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">Blog</a>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
               <button
                 onClick={() => setIsDemoModalOpen(true)}
@@ -312,7 +312,7 @@ export default function LandingNew() {
                 How It Works
               </a>
               <a
-                href="http://localhost/blog"
+                href="https://blog.govsureai.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsMobileMenuOpen(false)}

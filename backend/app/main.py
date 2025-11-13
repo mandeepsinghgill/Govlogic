@@ -147,6 +147,7 @@ from app.api.inztan import router as inztan_router
 from app.api.continuous_learning import router as continuous_learning_router
 from app.api.rich_editor import router as rich_editor_router
 from app.api.enhanced_export import router as enhanced_export_router
+from app.api.contact import router as contact_router
 from app.api.briefs import router as briefs_router
 from app.api.pipeline import router as pipeline_router
 
@@ -243,6 +244,11 @@ app.include_router(
 app.include_router(
     customer_portal_router,
     tags=["customer_portal"]
+)
+
+app.include_router(
+    contact_router,
+    tags=["contact"]
 )
 
 app.include_router(
