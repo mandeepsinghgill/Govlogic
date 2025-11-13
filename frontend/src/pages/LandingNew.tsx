@@ -263,6 +263,7 @@ export default function LandingNew() {
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
+              <a href="http://localhost/blog" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">Blog</a>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
               <button
                 onClick={() => setIsDemoModalOpen(true)}
@@ -309,6 +310,15 @@ export default function LandingNew() {
                 className="block text-gray-900 font-semibold"
               >
                 How It Works
+              </a>
+              <a
+                href="http://localhost/blog"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block text-gray-900 font-semibold"
+              >
+                Blog
               </a>
               <Link
                 to="/login"
@@ -470,6 +480,95 @@ export default function LandingNew() {
             <StatCard number="850+" label="Active Users" color="green" />
             <StatCard number="99%" label="Time Saved" color="purple" />
             <StatCard number="4.9/5" label="Customer Rating" color="orange" />
+          </div>
+        </div>
+      </section>
+
+      {/* The Numbers Don't Lie - Metrics Table */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+              The Numbers Don't Lie
+            </h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Across 100+ Organizations Using GovSure:
+            </p>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="w-full" style={{ maxWidth: '960px' }}>
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+                <div className="p-8 md:p-10">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-slate-700/50">
+                          <th className="text-left py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-[0.1em]">
+                            Metric
+                          </th>
+                          <th className="text-left py-4 px-6 text-xs font-semibold text-slate-400 uppercase tracking-[0.1em]">
+                            Average Result
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-700/40">
+                        <tr className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Time Savings on Search</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">95% reduction</span>
+                            <span className="text-slate-400 text-sm block mt-1">(40 → 2 week)</span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Proposal Output Increase</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">4-6× more submission</span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Win-Readiness Improvement</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">+30-45 percentage point</span>
+                            <span className="text-slate-400 text-sm block mt-1">quality & preparedness</span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Compliance Error Rate</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Near-zero missed requirements</span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">ROI Timeline</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Positive in 60-90 days</span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/30 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">Potential Contract Value</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className="text-white font-semibold text-base">$2M-$50M surfaced in year</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
