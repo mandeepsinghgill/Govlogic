@@ -69,22 +69,47 @@ else
     apt-get update
     
     if [ "$OS" = "ubuntu" ]; then
-        # Add Ondrej's PPA for PHP 8.1
-        apt-get install -y software-properties-common
-        add-apt-repository -y ppa:ondrej/php
-        apt-get update
-        
-        # Try PHP 8.1 first, fallback to available version
-        if apt-cache search php8.1-fpm | grep -q php8.1-fpm; then
-            apt-get install -y php8.1-fpm php8.1-cli php8.1-common \
-              php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring \
-              php8.1-curl php8.1-xml php8.1-bcmath php8.1-pgsql
-            PHP_VERSION="8.1"
-        else
-            # Fallback to default PHP version
-            apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
-              php-mbstring php-curl php-xml php-bcmath php-pgsql
+        # Try default PHP packages first (Ubuntu 24.04+ comes with PHP 8.3)
+        echo "   Trying default PHP packages..."
+        if apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+          php-mbstring php-curl php-xml php-bcmath php-pgsql 2>/dev/null; then
             PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+            echo "✅ Installed default PHP: ${PHP_VERSION}"
+        else
+            # If default fails, try adding PPA
+            echo "   Default PHP not available, adding Ondrej's PPA..."
+            apt-get install -y software-properties-common
+            
+            # Detect Ubuntu codename properly
+            UBUNTU_CODENAME=$(lsb_release -cs)
+            echo "   Detected Ubuntu codename: ${UBUNTU_CODENAME}"
+            
+            # Add PPA with proper codename
+            add-apt-repository -y ppa:ondrej/php 2>&1 | grep -v "N: " || true
+            apt-get update
+            
+            # Try PHP 8.1 first, then 8.2, then 8.3, then default
+            if apt-cache search php8.1-fpm 2>/dev/null | grep -q php8.1-fpm; then
+                apt-get install -y php8.1-fpm php8.1-cli php8.1-common \
+                  php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring \
+                  php8.1-curl php8.1-xml php8.1-bcmath php8.1-pgsql
+                PHP_VERSION="8.1"
+            elif apt-cache search php8.2-fpm 2>/dev/null | grep -q php8.2-fpm; then
+                apt-get install -y php8.2-fpm php8.2-cli php8.2-common \
+                  php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring \
+                  php8.2-curl php8.2-xml php8.2-bcmath php8.2-pgsql
+                PHP_VERSION="8.2"
+            elif apt-cache search php8.3-fpm 2>/dev/null | grep -q php8.3-fpm; then
+                apt-get install -y php8.3-fpm php8.3-cli php8.3-common \
+                  php8.3-mysql php8.3-zip php8.3-gd php8.3-mbstring \
+                  php8.3-curl php8.3-xml php8.3-bcmath php8.3-pgsql
+                PHP_VERSION="8.3"
+            else
+                # Final fallback
+                apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+                  php-mbstring php-curl php-xml php-bcmath php-pgsql
+                PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+            fi
         fi
     elif [ "$OS" = "debian" ]; then
         # For Debian, add sury.org repository
@@ -162,21 +187,26 @@ elif systemctl is-active --quiet nginx; then
     echo "✅ Nginx is running"
     SERVER="nginx"
     
-    # Detect PHP-FPM socket
+    # Detect PHP-FPM socket (check multiple versions)
     PHP_FPM_SOCKET=""
-    if [ -S /var/run/php/php8.1-fpm.sock ]; then
-        PHP_FPM_SOCKET="/var/run/php/php8.1-fpm.sock"
-    elif [ -S /var/run/php/php8.2-fpm.sock ]; then
-        PHP_FPM_SOCKET="/var/run/php/php8.2-fpm.sock"
-    elif [ -S /var/run/php/php8.0-fpm.sock ]; then
-        PHP_FPM_SOCKET="/var/run/php/php8.0-fpm.sock"
-    elif [ -S /var/run/php/php-fpm.sock ]; then
-        PHP_FPM_SOCKET="/var/run/php/php-fpm.sock"
-    else
-        # Try to find any PHP-FPM socket
-        PHP_FPM_SOCKET=$(ls /var/run/php/*.sock 2>/dev/null | head -1)
-        if [ -z "$PHP_FPM_SOCKET" ]; then
+    for version in 8.3 8.2 8.1 8.0 7.4; do
+        if [ -S /var/run/php/php${version}-fpm.sock ]; then
+            PHP_FPM_SOCKET="/var/run/php/php${version}-fpm.sock"
+            break
+        fi
+    done
+    
+    # If no version-specific socket found, try generic
+    if [ -z "$PHP_FPM_SOCKET" ]; then
+        if [ -S /var/run/php/php-fpm.sock ]; then
             PHP_FPM_SOCKET="/var/run/php/php-fpm.sock"
+        else
+            # Try to find any PHP-FPM socket
+            PHP_FPM_SOCKET=$(ls /var/run/php/*.sock 2>/dev/null | head -1)
+            if [ -z "$PHP_FPM_SOCKET" ]; then
+                # Default fallback
+                PHP_FPM_SOCKET="/var/run/php/php-fpm.sock"
+            fi
         fi
     fi
     
@@ -216,20 +246,25 @@ fi
 echo ""
 echo "⚙️  Step 6: Starting PHP-FPM..."
 
-# Detect PHP-FPM service name
-if systemctl list-unit-files | grep -q php8.1-fpm; then
-    PHP_FPM_SERVICE="php8.1-fpm"
-elif systemctl list-unit-files | grep -q php8.2-fpm; then
-    PHP_FPM_SERVICE="php8.2-fpm"
-elif systemctl list-unit-files | grep -q php8.0-fpm; then
-    PHP_FPM_SERVICE="php8.0-fpm"
-elif systemctl list-unit-files | grep -q php-fpm; then
-    PHP_FPM_SERVICE="php-fpm"
-else
-    # Try to find PHP-FPM service
-    PHP_FPM_SERVICE=$(systemctl list-unit-files | grep -o 'php[0-9.]*-fpm' | head -1)
-    if [ -z "$PHP_FPM_SERVICE" ]; then
+# Detect PHP-FPM service name (check multiple versions)
+PHP_FPM_SERVICE=""
+for version in 8.3 8.2 8.1 8.0 7.4; do
+    if systemctl list-unit-files 2>/dev/null | grep -q "php${version}-fpm"; then
+        PHP_FPM_SERVICE="php${version}-fpm"
+        break
+    fi
+done
+
+# If no version-specific service found, try generic
+if [ -z "$PHP_FPM_SERVICE" ]; then
+    if systemctl list-unit-files 2>/dev/null | grep -q "php-fpm"; then
         PHP_FPM_SERVICE="php-fpm"
+    else
+        # Try to find any PHP-FPM service
+        PHP_FPM_SERVICE=$(systemctl list-unit-files 2>/dev/null | grep -o 'php[0-9.]*-fpm' | head -1)
+        if [ -z "$PHP_FPM_SERVICE" ]; then
+            PHP_FPM_SERVICE="php-fpm"
+        fi
     fi
 fi
 
