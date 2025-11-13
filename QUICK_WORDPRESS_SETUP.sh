@@ -30,15 +30,97 @@ echo "   Web Root: ${WEB_ROOT}"
 echo ""
 
 # Step 1: Install PHP
-echo "🔧 Step 1: Installing PHP 8.1 and extensions..."
-apt-get update
-apt-get install -y php8.1-fpm php8.1-cli php8.1-common \
-  php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring \
-  php8.1-curl php8.1-xml php8.1-bcmath php8.1-pgsql
+echo "🔧 Step 1: Installing PHP and extensions..."
+
+# Detect OS and add PHP repository if needed
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS=$ID
+    VER=$VERSION_ID
+else
+    echo "❌ Cannot detect OS. Please install PHP manually."
+    exit 1
+fi
+
+# Check if PHP is already installed
+if command -v php &> /dev/null; then
+    PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+    echo "✅ PHP already installed: ${PHP_VERSION}"
+    PHP_MAJOR=$(php -r 'echo PHP_MAJOR_VERSION;')
+    PHP_MINOR=$(php -r 'echo PHP_MINOR_VERSION;')
+    echo "   Using PHP ${PHP_MAJOR}.${PHP_MINOR}"
+    
+    # Install extensions for existing PHP version
+    if [ "$OS" = "ubuntu" ] || [ "$OS" = "debian" ]; then
+        apt-get update
+        apt-get install -y php${PHP_MAJOR}.${PHP_MINOR}-fpm php${PHP_MAJOR}.${PHP_MINOR}-cli php${PHP_MAJOR}.${PHP_MINOR}-common \
+          php${PHP_MAJOR}.${PHP_MINOR}-mysql php${PHP_MAJOR}.${PHP_MINOR}-zip php${PHP_MAJOR}.${PHP_MINOR}-gd \
+          php${PHP_MAJOR}.${PHP_MINOR}-mbstring php${PHP_MAJOR}.${PHP_MINOR}-curl \
+          php${PHP_MAJOR}.${PHP_MINOR}-xml php${PHP_MAJOR}.${PHP_MINOR}-bcmath \
+          php${PHP_MAJOR}.${PHP_MINOR}-pgsql || {
+            echo "⚠️  Some extensions may not be available. Installing available ones..."
+            apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+              php-mbstring php-curl php-xml php-bcmath php-pgsql
+        }
+    fi
+else
+    # Install PHP from scratch
+    echo "Installing PHP..."
+    apt-get update
+    
+    if [ "$OS" = "ubuntu" ]; then
+        # Add Ondrej's PPA for PHP 8.1
+        apt-get install -y software-properties-common
+        add-apt-repository -y ppa:ondrej/php
+        apt-get update
+        
+        # Try PHP 8.1 first, fallback to available version
+        if apt-cache search php8.1-fpm | grep -q php8.1-fpm; then
+            apt-get install -y php8.1-fpm php8.1-cli php8.1-common \
+              php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring \
+              php8.1-curl php8.1-xml php8.1-bcmath php8.1-pgsql
+            PHP_VERSION="8.1"
+        else
+            # Fallback to default PHP version
+            apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+              php-mbstring php-curl php-xml php-bcmath php-pgsql
+            PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+        fi
+    elif [ "$OS" = "debian" ]; then
+        # For Debian, add sury.org repository
+        apt-get install -y apt-transport-https lsb-release ca-certificates
+        wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+        apt-get update
+        
+        if apt-cache search php8.1-fpm | grep -q php8.1-fpm; then
+            apt-get install -y php8.1-fpm php8.1-cli php8.1-common \
+              php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring \
+              php8.1-curl php8.1-xml php8.1-bcmath php8.1-pgsql
+            PHP_VERSION="8.1"
+        else
+            apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+              php-mbstring php-curl php-xml php-bcmath php-pgsql
+            PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+        fi
+    else
+        # Generic installation
+        apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+          php-mbstring php-curl php-xml php-bcmath php-pgsql
+        PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+    fi
+    
+    echo "✅ PHP installed: ${PHP_VERSION}"
+fi
 
 # Verify PHP installation
-PHP_VERSION=$(php -r 'echo PHP_VERSION;')
-echo "✅ PHP installed: ${PHP_VERSION}"
+if command -v php &> /dev/null; then
+    PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+    echo "✅ PHP verified: ${PHP_VERSION}"
+else
+    echo "❌ PHP installation failed"
+    exit 1
+fi
 
 # Step 2: Create web directory
 echo ""
@@ -79,6 +161,27 @@ if systemctl is-active --quiet caddy; then
 elif systemctl is-active --quiet nginx; then
     echo "✅ Nginx is running"
     SERVER="nginx"
+    
+    # Detect PHP-FPM socket
+    PHP_FPM_SOCKET=""
+    if [ -S /var/run/php/php8.1-fpm.sock ]; then
+        PHP_FPM_SOCKET="/var/run/php/php8.1-fpm.sock"
+    elif [ -S /var/run/php/php8.2-fpm.sock ]; then
+        PHP_FPM_SOCKET="/var/run/php/php8.2-fpm.sock"
+    elif [ -S /var/run/php/php8.0-fpm.sock ]; then
+        PHP_FPM_SOCKET="/var/run/php/php8.0-fpm.sock"
+    elif [ -S /var/run/php/php-fpm.sock ]; then
+        PHP_FPM_SOCKET="/var/run/php/php-fpm.sock"
+    else
+        # Try to find any PHP-FPM socket
+        PHP_FPM_SOCKET=$(ls /var/run/php/*.sock 2>/dev/null | head -1)
+        if [ -z "$PHP_FPM_SOCKET" ]; then
+            PHP_FPM_SOCKET="/var/run/php/php-fpm.sock"
+        fi
+    fi
+    
+    echo "   Using PHP-FPM socket: ${PHP_FPM_SOCKET}"
+    
     # Create Nginx config
     cat > "/etc/nginx/sites-available/${BLOG_DOMAIN}" <<EOF
 server {
@@ -93,7 +196,7 @@ server {
     
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        fastcgi_pass unix:${PHP_FPM_SOCKET};
     }
     
     location ~ /\. {
@@ -112,9 +215,28 @@ fi
 # Step 6: Start PHP-FPM
 echo ""
 echo "⚙️  Step 6: Starting PHP-FPM..."
-systemctl enable php8.1-fpm
-systemctl start php8.1-fpm
-systemctl status php8.1-fpm --no-pager -l
+
+# Detect PHP-FPM service name
+if systemctl list-unit-files | grep -q php8.1-fpm; then
+    PHP_FPM_SERVICE="php8.1-fpm"
+elif systemctl list-unit-files | grep -q php8.2-fpm; then
+    PHP_FPM_SERVICE="php8.2-fpm"
+elif systemctl list-unit-files | grep -q php8.0-fpm; then
+    PHP_FPM_SERVICE="php8.0-fpm"
+elif systemctl list-unit-files | grep -q php-fpm; then
+    PHP_FPM_SERVICE="php-fpm"
+else
+    # Try to find PHP-FPM service
+    PHP_FPM_SERVICE=$(systemctl list-unit-files | grep -o 'php[0-9.]*-fpm' | head -1)
+    if [ -z "$PHP_FPM_SERVICE" ]; then
+        PHP_FPM_SERVICE="php-fpm"
+    fi
+fi
+
+echo "   Using PHP-FPM service: ${PHP_FPM_SERVICE}"
+systemctl enable "${PHP_FPM_SERVICE}"
+systemctl start "${PHP_FPM_SERVICE}"
+systemctl status "${PHP_FPM_SERVICE}" --no-pager -l || true
 echo "✅ PHP-FPM is running"
 
 echo ""
