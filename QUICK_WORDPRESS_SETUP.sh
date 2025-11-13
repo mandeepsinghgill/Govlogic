@@ -69,48 +69,22 @@ else
     apt-get update
     
     if [ "$OS" = "ubuntu" ]; then
-        # Try default PHP packages first (Ubuntu 24.04+ comes with PHP 8.3)
-        echo "   Trying default PHP packages..."
-        if apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
-          php-mbstring php-curl php-xml php-bcmath php-pgsql 2>/dev/null; then
-            PHP_VERSION=$(php -r 'echo PHP_VERSION;')
-            echo "✅ Installed default PHP: ${PHP_VERSION}"
-        else
-            # If default fails, try adding PPA
-            echo "   Default PHP not available, adding Ondrej's PPA..."
-            apt-get install -y software-properties-common
-            
-            # Detect Ubuntu codename properly
-            UBUNTU_CODENAME=$(lsb_release -cs)
-            echo "   Detected Ubuntu codename: ${UBUNTU_CODENAME}"
-            
-            # Add PPA with proper codename
-            add-apt-repository -y ppa:ondrej/php 2>&1 | grep -v "N: " || true
+        # Remove any broken PPA first
+        if [ -f /etc/apt/sources.list.d/ondrej-ubuntu-php-*.sources ] || [ -f /etc/apt/sources.list.d/ondrej-ubuntu-php-*.list ]; then
+            echo "   Removing broken PPA..."
+            rm -f /etc/apt/sources.list.d/ondrej-ubuntu-php-*.sources
+            rm -f /etc/apt/sources.list.d/ondrej-ubuntu-php-*.list
+            sed -i '/ondrej\/php/d' /etc/apt/sources.list 2>/dev/null || true
             apt-get update
-            
-            # Try PHP 8.1 first, then 8.2, then 8.3, then default
-            if apt-cache search php8.1-fpm 2>/dev/null | grep -q php8.1-fpm; then
-                apt-get install -y php8.1-fpm php8.1-cli php8.1-common \
-                  php8.1-mysql php8.1-zip php8.1-gd php8.1-mbstring \
-                  php8.1-curl php8.1-xml php8.1-bcmath php8.1-pgsql
-                PHP_VERSION="8.1"
-            elif apt-cache search php8.2-fpm 2>/dev/null | grep -q php8.2-fpm; then
-                apt-get install -y php8.2-fpm php8.2-cli php8.2-common \
-                  php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring \
-                  php8.2-curl php8.2-xml php8.2-bcmath php8.2-pgsql
-                PHP_VERSION="8.2"
-            elif apt-cache search php8.3-fpm 2>/dev/null | grep -q php8.3-fpm; then
-                apt-get install -y php8.3-fpm php8.3-cli php8.3-common \
-                  php8.3-mysql php8.3-zip php8.3-gd php8.3-mbstring \
-                  php8.3-curl php8.3-xml php8.3-bcmath php8.3-pgsql
-                PHP_VERSION="8.3"
-            else
-                # Final fallback
-                apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
-                  php-mbstring php-curl php-xml php-bcmath php-pgsql
-                PHP_VERSION=$(php -r 'echo PHP_VERSION;')
-            fi
         fi
+        
+        # Install using default PHP packages (Ubuntu 24.04+ comes with PHP 8.3)
+        echo "   Installing PHP using default Ubuntu packages..."
+        apt-get install -y php-fpm php-cli php-common php-mysql php-zip php-gd \
+          php-mbstring php-curl php-xml php-bcmath php-pgsql
+        
+        PHP_VERSION=$(php -r 'echo PHP_VERSION;')
+        echo "✅ Installed PHP: ${PHP_VERSION}"
     elif [ "$OS" = "debian" ]; then
         # For Debian, add sury.org repository
         apt-get install -y apt-transport-https lsb-release ca-certificates
