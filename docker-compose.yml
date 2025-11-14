@@ -11,7 +11,7 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -prootpassword"]
+      test: [ "CMD-SHELL", "mysqladmin ping -h localhost -u root -g0vsur3_ai_p4ssw0rd" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,7 +26,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U GovSure"]
+      test: [ "CMD-SHELL", "pg_isready -U GovSure" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -38,7 +38,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -48,13 +48,13 @@ services:
       context: ./backend
       dockerfile: ../docker/Dockerfile.backend
     ports:
-      - "8000:8000"         # expose to host machine for development
+      - "8000:8000" # expose to host machine for development
     environment:
       DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      DEBUG: "true"         # Enable DEBUG for local development (CORS enabled in FastAPI)
+      DEBUG: "true" # Enable DEBUG for local development (CORS enabled in FastAPI)
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
@@ -117,7 +117,7 @@ services:
       - PHP_UPLOAD_MAX_FILESIZE=64M
       - PHP_POST_MAX_SIZE=64M
     depends_on:
-      - postgres
+      - mysql
     restart: unless-stopped
 
   caddy:
@@ -148,3 +148,4 @@ volumes:
   caddy_config:
   frontend_dist:
   wordpress_uploads:
+  mysql_data:
