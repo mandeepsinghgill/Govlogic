@@ -7,6 +7,7 @@ import DashboardModern from './pages/DashboardModern';
 import Features from './pages/Features';
 import HowItWorks from './pages/HowItWorks';
 import CaseStudies from './pages/CaseStudies';
+import CaseStudyDetail from './pages/CaseStudyDetail';
 import Pricing from './pages/Pricing';
 import AboutUs from './pages/AboutUs';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -47,6 +48,8 @@ import ProposalGenerator from './pages/ProposalGenerator';
 import Reports from './pages/Reports';
 import ProgramsEnhanced from './pages/ProgramsEnhanced';
 import ProgramDetail from './pages/ProgramDetail';
+import GovConWebinar from './pages/GovConWebinar';
+import GovConTools from './pages/GovConTools';
 import { Menu, X, Target, FileText, Briefcase, Database, FolderKanban, LogOut, Upload, Users, CheckSquare, DollarSign, ThumbsUp, Zap, BarChart3, GitBranch, Search, Bell, Settings, User, ChevronDown, HelpCircle, UserCircle, MessageSquare, Sparkles } from 'lucide-react';
 import PipelineManager from './pages/PipelineManager';
 import AIAssistant from './pages/AIAssistant';
@@ -411,6 +414,9 @@ function AppContent() {
         <Route path="/features" element={<Features />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/case-studies" element={<CaseStudies />} />
+        <Route path="/case-studies/:slug" element={<CaseStudyDetail />} />
+        <Route path="/resources/ai-govcon-webinar" element={<GovConWebinar />} />
+        <Route path="/resources/free-govcon-tools" element={<GovConTools />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/terms" element={<TermsAndConditions />} />

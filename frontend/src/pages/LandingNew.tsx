@@ -632,10 +632,7 @@ export default function LandingNew() {
       <section id="features" className="py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 bg-blue-50 text-sm font-semibold text-blue-700 uppercase tracking-[0.25em] mb-6">
-              <Sparkles className="w-4 h-4" />
-              Platform Superpowers
-            </div>
+            
             <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Everything You Need to Win
             </h2>
@@ -925,7 +922,7 @@ export default function LandingNew() {
               See How It Works
             </button>
             <p className="mt-4 text-gray-600">
-              Watch a 2-minute demo or schedule a personalized walkthrough
+              Schedule a personalized walkthrough
             </p>
           </div>
         </div>
@@ -1165,7 +1162,7 @@ export default function LandingNew() {
             Ready to Win More Contracts?
           </h2>
           <p className="text-xl mb-10 text-blue-100">
-            Join 850+ government contractors using AI to win more bids
+            Join 100+ government contractors using AI to win more bids
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -1192,8 +1189,8 @@ export default function LandingNew() {
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-12">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
+          <div className="grid md:grid-cols-6 gap-8 mb-8">
+            <div className="md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
                 <img 
                   src="/govsure-icon.svg" 
@@ -1231,6 +1228,7 @@ export default function LandingNew() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/about" className="hover:text-white">About</Link></li>
                 <li><a href="https://blog.govsureai.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">Blog</a></li>
+                <li><Link to="/case-studies" className="hover:text-white">Case Studies</Link></li>
                 <li><a href="#" className="hover:text-white">Careers</a></li>
               </ul>
             </div>
@@ -1240,6 +1238,36 @@ export default function LandingNew() {
                 <li><Link to="/privacy" className="hover:text-white">Privacy</Link></li>
                 <li><Link to="/terms" className="hover:text-white">Terms</Link></li>
                 <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link to="/resources/ai-govcon-webinar" className="hover:text-white">
+                    AI for GovCon Free Webinar
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/resources/free-govcon-tools" className="hover:text-white">
+                    Free Government Contracting Tools
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/how-it-works" className="hover:text-white">
+                    Learn GovCon
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/partner-search" className="hover:text-white">
+                    Fractional BD Services
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/signup" className="hover:text-white">
+                    Start Your GovCon Journey
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
