@@ -93,8 +93,9 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.php-fpm
-      volumes:
-       - ./blog/wordpress:/var/www/html
+    volumes:
+      - ./blog/wordpress:/var/www/html
+      - wordpress_uploads:/var/www/html/wp-content/uploads
     environment:
       - PHP_MEMORY_LIMIT=256M
       - PHP_UPLOAD_MAX_FILESIZE=64M
