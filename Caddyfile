@@ -88,7 +88,7 @@ blog.govsureai.com, www.blog.govsureai.com {
   encode zstd gzip
 
   # Root directory for WordPress
-  root * /var/www/blog.govsureai.com
+  root * /var/www/html
   
   # WordPress rewrite rules - try files, then pass to index.php
   try_files {path} {path}/ /index.php?{query}
@@ -105,14 +105,6 @@ blog.govsureai.com, www.blog.govsureai.com {
       }
     }
   }
-  
-  # # Proxy PHP requests to PHP-FPM container
-  # reverse_proxy @php php-fpm:9000 {
-  #   transport fastcgi {
-  #     split .php
-  #     index index.php
-  #   }
-  # }
   
   # Serve static files
   file_server
@@ -152,11 +144,23 @@ blog.govsureai.com, www.blog.govsureai.com {
   @api path /api*
   reverse_proxy @api backend:8000
 
-  # Serve built SPA
+  @php {
+    path *.php
+  }
+  handle @php {
+    root * /var/www/html
+    reverse_proxy php-fpm:9000 {
+      transport fastcgi {
+        split .php
+      }
+    }
+  }
+
+  # Serve built SPA for any other request
   root * /usr/share/caddy
   try_files {path} /index.html
   
-  # Cache control headers
+  # Cache control headers for SPA
   header {
     # Prevent HTML caching to ensure fresh content
     -ETag
@@ -164,18 +168,6 @@ blog.govsureai.com, www.blog.govsureai.com {
     Pragma "no-cache"
     Expires "0"
   }
-
-  @php {
-    path *.php
-  }
-  reverse_proxy @php php-fpm:9000 {
-    transport fastcgi {
-      split .php
-    }
-  }
-
-  root * /usr/share/caddy
-  try_files {path} {path}/ /index.php?{query}
   
   # Override cache headers for static assets
   @static {
