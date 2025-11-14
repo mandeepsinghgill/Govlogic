@@ -143,7 +143,6 @@ blog.govsureai.com, www.blog.govsureai.com {
   # Proxy API to backend container
   @api path /api*
   reverse_proxy @api backend:8000
-  reverse_proxy @php php-fpm:9000
 
   # Serve built SPA
   root * /usr/share/caddy
