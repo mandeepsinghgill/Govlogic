@@ -263,7 +263,6 @@ export default function LandingNew() {
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
               <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
-              <a href="https://blog.govsureai.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors">Blog</a>
               <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
               <button
                 onClick={() => setIsDemoModalOpen(true)}
@@ -311,15 +310,7 @@ export default function LandingNew() {
               >
                 How It Works
               </a>
-              <a
-                href="https://blog.govsureai.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-gray-900 font-semibold"
-              >
-                Blog
-              </a>
+              
               <Link
                 to="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -1239,7 +1230,7 @@ export default function LandingNew() {
               <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link to="/about" className="hover:text-white">About</Link></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
+                <li><a href="https://blog.govsureai.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">Blog</a></li>
                 <li><a href="#" className="hover:text-white">Careers</a></li>
               </ul>
             </div>
