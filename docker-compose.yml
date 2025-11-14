@@ -94,7 +94,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.php-fpm
     volumes:
-      - /var/www/blog.govsureai.com:/var/www/html
+      - ./blog/wordpress:/var/www/html
       - wordpress_uploads:/var/www/html/wp-content/uploads
     environment:
       - PHP_MEMORY_LIMIT=256M
@@ -120,7 +120,7 @@ services:
       # serve the built assets from shared volume
       - frontend_dist:/usr/share/caddy:ro
       # WordPress files (read-only, PHP-FPM handles processing)
-      - /var/www/blog.govsureai.com:/var/www/blog.govsureai.com:ro
+      - ./blog/wordpress:/var/www/blog.govsureai.com:ro
     restart: unless-stopped
 
 volumes:
