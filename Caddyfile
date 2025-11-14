@@ -102,7 +102,6 @@ blog.govsureai.com, www.blog.govsureai.com {
     reverse_proxy php-fpm:9000 {
       transport fastcgi {
         split .php
-        index index.php
       }
     }
   }
@@ -172,7 +171,6 @@ blog.govsureai.com, www.blog.govsureai.com {
   reverse_proxy @php php-fpm:9000 {
     transport fastcgi {
       split .php
-      index index.php
     }
   }
 
