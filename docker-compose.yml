@@ -88,6 +88,22 @@ services:
     # This container just builds and exits, files remain in volume
     command: /bin/sh -c "echo 'Frontend built successfully'"
 
+  # PHP-FPM for WordPress
+  php-fpm:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.php-fpm
+    volumes:
+      - ./blog/wordpress:/var/www/html:ro
+      - wordpress_uploads:/var/www/html/wp-content/uploads
+    environment:
+      - PHP_MEMORY_LIMIT=256M
+      - PHP_UPLOAD_MAX_FILESIZE=64M
+      - PHP_POST_MAX_SIZE=64M
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
   caddy:
     image: caddy:2
     ports:
@@ -96,12 +112,15 @@ services:
     depends_on:
       - web
       - backend
+      - php-fpm
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
       # serve the built assets from shared volume
       - frontend_dist:/usr/share/caddy:ro
+      # WordPress files (read-only, PHP-FPM handles processing)
+      - ./blog/wordpress:/var/www/blog.govsureai.com:ro
     restart: unless-stopped
 
 volumes:
@@ -112,3 +131,4 @@ volumes:
   caddy_data:
   caddy_config:
   frontend_dist:
+  wordpress_uploads:

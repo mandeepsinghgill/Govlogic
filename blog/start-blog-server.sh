@@ -58,5 +58,5 @@ echo ""
 
 # Change to WordPress directory and start server
 cd "$WORDPRESS_DIR"
-php -S "$HOST:$PORT"
+php -d max_execution_time=300 -S "$HOST:$PORT"
 
