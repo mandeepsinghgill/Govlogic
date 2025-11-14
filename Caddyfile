@@ -84,7 +84,7 @@ api.govsureai.com {
 # ============================================================
 # Blog Subdomain - WordPress
 # ============================================================
-blog.govsureai.com, www.blog.govsureai.com {
+blog.govsureai.com {
   encode zstd gzip
 
   # Root directory for WordPress
