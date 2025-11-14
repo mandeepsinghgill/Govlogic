@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
+    mariadb-dev \
     libzip-dev \
     curl-dev \
     libxml2-dev \
@@ -13,6 +14,8 @@ RUN apk add --no-cache \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
     pdo \
+    mysqli \
+    pdo_mysql \
     pdo_pgsql \
     pgsql \
     gd \
