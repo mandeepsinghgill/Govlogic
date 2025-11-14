@@ -97,14 +97,23 @@ blog.govsureai.com, www.blog.govsureai.com {
   @php {
     path *.php
   }
-  
-  # Proxy PHP requests to PHP-FPM container
-  reverse_proxy @php php-fpm:9000 {
-    transport fastcgi {
-      split .php
-      index index.php
+
+  handle @php {
+    reverse_proxy php-fpm:9000 {
+      transport fastcgi {
+        split .php
+        index index.php
+      }
     }
   }
+  
+  # # Proxy PHP requests to PHP-FPM container
+  # reverse_proxy @php php-fpm:9000 {
+  #   transport fastcgi {
+  #     split .php
+  #     index index.php
+  #   }
+  # }
   
   # Serve static files
   file_server
