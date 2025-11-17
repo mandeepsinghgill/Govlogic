@@ -3,7 +3,7 @@ import { ArrowRight, Calendar, Clock, GraduationCap, Headphones, ShieldCheck, Sp
 import Navigation from '../components/Navigation';
 import ChatWidget from '../components/ChatWidget';
 
-const registrationUrl = 'https://www.cleat.ai/demo/booking/webinar';
+const registrationUrl = '/signup';
 
 const agenda = [
   { title: 'AI Briefing', detail: 'What FAR-compliant AI can (and cannot) do for BD teams.' },
@@ -49,14 +49,14 @@ function Hero() {
             Learn exactly how top-performing contractors are multiplying their pipeline (without multiplying headcount) using GovSure’s fully compliant AI stack.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <a
+            {/* <a
               href={registrationUrl}
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-2 rounded-full bg-white text-blue-900 px-8 py-3 font-semibold shadow-lg hover:bg-blue-50 transition-all"
             >
               Reserve My Spot <ArrowRight size={18} />
-            </a>
+            </a> */}
             <Link
               to="/contact"
               className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3 font-semibold text-white hover:bg-white/10 transition-all"
@@ -214,7 +214,7 @@ function CTA() {
         <p className="mt-4 text-lg text-blue-100">Seats are limited to keep Q&A high-impact.</p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
-            href={registrationUrl}
+            href="/contact"
             target="_blank"
             rel="noreferrer noopener"
             className="inline-flex items-center gap-2 rounded-full bg-white text-blue-900 px-8 py-3 font-semibold shadow-xl hover:bg-blue-50 transition-all"

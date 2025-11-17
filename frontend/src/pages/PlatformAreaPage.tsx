@@ -153,7 +153,7 @@ export default function PlatformAreaPage() {
                     to="/signup"
                     className="block w-full rounded-xl bg-white px-6 py-4 text-center text-base font-semibold text-blue-700 transition-transform hover:-translate-y-0.5 hover:shadow-xl"
                   >
-                    Start 14-Day Free Trial
+                    Start 7-Day Free Trial
                   </Link>
                   <Link
                     to={{ pathname: '/', hash: '#book-demo' }}

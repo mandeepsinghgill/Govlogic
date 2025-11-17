@@ -38,7 +38,7 @@ const faqs: FAQ[] = [
   {
     category: "Pricing",
     question: "How much does GovSure cost?",
-    answer: "GovSure offers flexible pricing: Starter at $99/month (5 proposals), Professional at $299/month (20 proposals), and Enterprise with custom pricing. All plans include a 14-day free trial with no credit card required."
+    answer: "GovSure offers flexible pricing: Starter at $99/month (5 proposals), Professional at $299/month (20 proposals), and Enterprise with custom pricing. All plans include a 7-day free trial with no credit card required."
   },
   {
     category: "Pricing",

@@ -54,10 +54,10 @@ export default function DemoBookingModal({ isOpen, onClose }: DemoBookingModalPr
         <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-gray-900">
-              Less expensive than a lost bid
+              Missing a bid hits harder than the cost.
             </h2>
             <p className="text-gray-600 mt-2">
-              Submit the form to schedule your GovSure tour and get your custom quote started.
+              Submit the form to schedule your GovSure tour and get started.
             </p>
           </div>
           <button

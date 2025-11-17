@@ -3,7 +3,7 @@ import { ArrowRight, BarChart3, CheckCircle2, Download, FolderKanban, Layers, Se
 import Navigation from '../components/Navigation';
 import ChatWidget from '../components/ChatWidget';
 
-const toolsUrl = 'https://www.cleat.ai/free-govcon-tools';
+const toolsUrl = '#';
 
 const kits = [
   {
@@ -59,7 +59,6 @@ function Hero() {
           <div className="mt-10 flex flex-wrap gap-4">
             <a
               href={toolsUrl}
-              target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-2 rounded-full bg-white text-blue-900 px-8 py-3 font-semibold shadow-lg hover:bg-blue-50 transition-all"
             >
@@ -199,7 +198,6 @@ function CTA() {
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
             href={toolsUrl}
-            target="_blank"
             rel="noreferrer noopener"
             className="inline-flex items-center gap-2 rounded-full bg-white text-blue-900 px-8 py-3 font-semibold shadow-xl hover:bg-blue-50 transition-all"
           >

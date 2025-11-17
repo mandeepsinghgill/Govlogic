@@ -1,13 +1,25 @@
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, CheckCircle, Star, Zap, Shield,
-  Target, FileText, Briefcase, Play, Lock, Database,
-  Menu, X, Youtube, Linkedin, Twitter, ChevronDown, Sparkles
+import {
+  ArrowRight,
+  CheckCircle,
+  Star,
+  Zap,
+  Shield,
+  Target,
+  FileText,
+  Briefcase,
+  Play,
+  Lock,
+  Database,
+  Youtube,
+  Linkedin,
+  Twitter,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DemoBookingModal from '../components/DemoBookingModal';
 import FAQChatbot from '../components/FAQChatbot';
 import { platformSections } from '../content/platformSections';
+import Navigation from '../components/Navigation';
 
 // Facebook Icon Component
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -26,11 +38,7 @@ type SocialLink = {
 export default function LandingNew() {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isPlatformMenuOpen, setIsPlatformMenuOpen] = useState(false);
-  const closeMenuTimeoutRef = useRef<number | null>(null);
   const discountRate = 0.25;
-  const platformMenuRef = useRef<HTMLDivElement | null>(null);
 
   const socialLinks: SocialLink[] = [
     {
@@ -116,256 +124,9 @@ export default function LandingNew() {
     ohio: 'verified-sprite--ohio'
   };
 
-  useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    const handleClickAway = (event: MouseEvent) => {
-      if (platformMenuRef.current && !platformMenuRef.current.contains(event.target as Node)) {
-        setIsPlatformMenuOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsPlatformMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickAway);
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickAway);
-      window.removeEventListener('keydown', handleKeyDown);
-      if (closeMenuTimeoutRef.current) {
-        window.clearTimeout(closeMenuTimeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Modern Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <img 
-                src="/govsure-logo.png" 
-                alt="GovSure" 
-                className="h-auto"
-                style={{ width: "150px"}}
-              />
-            </Link>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <div
-                ref={platformMenuRef}
-                className="relative"
-                onMouseEnter={() => {
-                  if (closeMenuTimeoutRef.current) {
-                    window.clearTimeout(closeMenuTimeoutRef.current);
-                    closeMenuTimeoutRef.current = null;
-                  }
-                  setIsPlatformMenuOpen(true);
-                }}
-                onMouseLeave={() => {
-                  closeMenuTimeoutRef.current = window.setTimeout(() => {
-                    setIsPlatformMenuOpen(false);
-                  }, 160);
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (closeMenuTimeoutRef.current) {
-                      window.clearTimeout(closeMenuTimeoutRef.current);
-                      closeMenuTimeoutRef.current = null;
-                    }
-                    setIsPlatformMenuOpen(prev => !prev);
-                  }}
-                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                  aria-haspopup="true"
-                  aria-expanded={isPlatformMenuOpen}
-                >
-                  Platform
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${isPlatformMenuOpen ? 'rotate-180 text-gray-900' : ''}`}
-                  />
-                </button>
-
-                {isPlatformMenuOpen && (
-                  <div
-                    className="absolute left-1/2 top-full z-50 mt-4 w-[760px] -translate-x-1/2 rounded-3xl border border-gray-200 bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.18)] backdrop-blur"
-                    onMouseEnter={() => {
-                      if (closeMenuTimeoutRef.current) {
-                        window.clearTimeout(closeMenuTimeoutRef.current);
-                        closeMenuTimeoutRef.current = null;
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      closeMenuTimeoutRef.current = window.setTimeout(() => {
-                        setIsPlatformMenuOpen(false);
-                      }, 150);
-                    }}
-                  >
-                    <div className="px-6 pt-6 pb-4">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
-                          Explore GovSure
-                        </p>
-                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                          6 focus areas
-                        </span>
-                      </div>
-                      <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-                        {platformSections.map(section => {
-                          const Icon = section.icon;
-                          return (
-                            <Link
-                              key={section.id}
-                              to={section.path}
-                              onClick={() => setIsPlatformMenuOpen(false)}
-                              className="group rounded-2xl border border-transparent bg-white/70 p-4 transition-all duration-200 hover:-translate-y-[2px] hover:border-blue-200 hover:bg-white hover:shadow-lg"
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className={`mt-0.5 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${section.iconBg}`}>
-                                  <Icon className={`h-5 w-5 ${section.iconClass}`} />
-                                </div>
-                                <div>
-                                  <p className="text-base font-semibold text-gray-900">{section.title}</p>
-                                  <p className="mt-1 text-sm text-gray-600 leading-snug">
-                                    {section.summary}
-                                  </p>
-                                </div>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="rounded-b-3xl border-t border-gray-100 bg-gray-50/70 px-6 py-4">
-                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                        Tip
-                      </p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        Pick any module above to jump down the page to deep-dive content or open it inside the platform.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">How It Works</a>
-              <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Sign In</Link>
-              <button
-                onClick={() => setIsDemoModalOpen(true)}
-                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all"
-              >
-                Book Demo
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(prev => !prev)}
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              aria-label="Toggle navigation menu"
-              aria-expanded={isMobileMenuOpen}
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-40">
-          <div className="absolute inset-0 bg-gray-900/55" onClick={() => setIsMobileMenuOpen(false)}></div>
-          <div className="relative bg-white h-full w-full pt-24 px-6 pb-16 overflow-y-auto">
-            <nav className="space-y-6 text-lg">
-              <a
-                href="#features"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-gray-900 font-semibold"
-              >
-                Features
-              </a>
-              <a
-                href="#pricing"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-gray-900 font-semibold"
-              >
-                Pricing
-              </a>
-              <a
-                href="#how-it-works"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-gray-900 font-semibold"
-              >
-                How It Works
-              </a>
-              
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-gray-900 font-semibold"
-              >
-                Sign In
-              </Link>
-            </nav>
-              <div className="mt-10 rounded-2xl border border-gray-200 bg-gray-50/80 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Platform Areas
-              </p>
-              <div className="mt-4 space-y-4">
-                {platformSections.map(section => {
-                  const Icon = section.icon;
-                  return (
-                    <Link
-                      key={section.id}
-                      to={section.path}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white/70 p-4 transition-all duration-200 hover:border-blue-200 hover:shadow-sm"
-                    >
-                      <div className={`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${section.iconBg}`}>
-                        <Icon className={`h-5 w-5 ${section.iconClass}`} />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900">{section.title}</p>
-                        <p className="mt-1 text-sm text-gray-600">{section.summary}</p>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="mt-10 space-y-4">
-              <Link
-                to="/signup"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-center py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow-lg"
-              >
-                Start Free Trial
-              </Link>
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setIsDemoModalOpen(true);
-                }}
-                className="block w-full text-center py-3 px-6 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold"
-              >
-                Book Demo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Navigation variant="fixed" onBookDemoClick={() => setIsDemoModalOpen(true)} />
 
       {/* Hero Section - Ultra Modern */}
       <section className="pt-28 md:pt-32 pb-20 px-4 sm:px-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
@@ -428,7 +189,7 @@ export default function LandingNew() {
               </div>
               <div className="flex items-center space-x-1">
                 <CheckCircle className="text-green-500" size={16} />
-                <span>14-day free trial</span>
+                <span>7-day free trial</span>
               </div>
               <div className="flex items-center space-x-1">
                 <CheckCircle className="text-green-500" size={16} />
@@ -793,10 +554,11 @@ export default function LandingNew() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full mb-6">
+            {/* Powred by AI badge - commented out for now */}
+            {/* <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full mb-6">
               <Zap className="w-5 h-5 text-blue-600 mr-2" />
               <span className="text-blue-600 font-semibold">Powered by AI</span>
-            </div>
+            </div> */}
             <h2 className="text-5xl font-bold text-gray-900 mb-4">
               How <span className="text-blue-600">GovSure</span> Works
             </h2>
@@ -1181,7 +943,7 @@ export default function LandingNew() {
             </button>
           </div>
           <p className="mt-6 text-blue-100 text-sm">
-            ✨ No credit card required • 14-day free trial • Cancel anytime
+            ✨ No credit card required • 7-day free trial • Cancel anytime
           </p>
         </div>
       </section>
@@ -1260,7 +1022,7 @@ export default function LandingNew() {
                 </li>
                 <li>
                   <Link to="/partner-search" className="hover:text-white">
-                    Fractional BD Services
+                    Fractional BD ( Done-For-You BD )                    )
                   </Link>
                 </li>
                 <li>
