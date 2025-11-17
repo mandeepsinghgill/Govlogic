@@ -50,6 +50,8 @@ import ProgramsEnhanced from './pages/ProgramsEnhanced';
 import ProgramDetail from './pages/ProgramDetail';
 import GovConWebinar from './pages/GovConWebinar';
 import GovConTools from './pages/GovConTools';
+import Careers from './pages/Careers';
+import FractionalBD from './pages/FractionalBD';
 import { Menu, X, Target, FileText, Briefcase, Database, FolderKanban, LogOut, Upload, Users, CheckSquare, DollarSign, ThumbsUp, Zap, BarChart3, GitBranch, Search, Bell, Settings, User, ChevronDown, HelpCircle, UserCircle, MessageSquare, Sparkles } from 'lucide-react';
 import PipelineManager from './pages/PipelineManager';
 import AIAssistant from './pages/AIAssistant';
@@ -419,6 +421,8 @@ function AppContent() {
         <Route path="/resources/free-govcon-tools" element={<GovConTools />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/fractional-bd" element={<FractionalBD />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />

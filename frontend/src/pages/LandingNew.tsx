@@ -991,7 +991,7 @@ export default function LandingNew() {
                 <li><Link to="/about" className="hover:text-white">About</Link></li>
                 <li><a href="https://blog.govsureai.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">Blog</a></li>
                 <li><Link to="/case-studies" className="hover:text-white">Case Studies</Link></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
+                <li><Link to="/careers" className="hover:text-white">Careers</Link></li>
               </ul>
             </div>
             <div>
@@ -1021,8 +1021,8 @@ export default function LandingNew() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/partner-search" className="hover:text-white">
-                    Fractional BD ( Done-For-You BD )                    )
+                  <Link to="/fractional-bd" className="hover:text-white">
+                    Fractional BD (Done-For-You BD)
                   </Link>
                 </li>
                 <li>

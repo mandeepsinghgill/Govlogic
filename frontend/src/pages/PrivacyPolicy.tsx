@@ -637,7 +637,9 @@ export default function PrivacyPolicy() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/about" className="hover:text-white">About</Link></li>
                 <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
+                <li><a href="https://blog.govsureai.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">Blog</a></li>
+                <li><Link to="/careers" className="hover:text-white">Careers</Link></li>
+                <li><Link to="/fractional-bd" className="hover:text-white">Fractional BD</Link></li>
               </ul>
             </div>
             <div>
