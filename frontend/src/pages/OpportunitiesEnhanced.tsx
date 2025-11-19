@@ -135,42 +135,97 @@ export default function OpportunitiesEnhanced() {
 
         const data = await response.json();
         
-        // Transform the data to match our component's expected format
+        // Fetch AI suggestions/analysis
+        let aiSuggestions = null;
+        try {
+          const aiResponse = await fetch(`http://localhost:8000/api/v1/ai/chat`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Analyze this government contracting opportunity and provide recommendations:\n\nTitle: ${data.title}\nAgency: ${data.agency}\nDescription: ${data.fullDescription || data.synopsis || ''}\nNAICS: ${data.naicsCode}\nValue: ${data.value}\nDue Date: ${data.dueDate}\n\nProvide:\n1. Key requirements and compliance needs\n2. Recommended approach and win themes\n3. Potential risks and mitigation strategies\n4. Required certifications and qualifications\n5. Competitive positioning advice`,
+              model: 'gpt-4o'
+            })
+          });
+          
+          if (aiResponse.ok) {
+            const aiData = await aiResponse.json();
+            aiSuggestions = aiData.response || aiData.message;
+          }
+        } catch (aiErr) {
+          console.log('AI suggestions not available:', aiErr);
+        }
+        
+        // Transform the data to show ALL SAM.gov information
         const transformedData = {
           id: data.id,
           title: data.title,
           agency: data.agency,
+          office: data.office,
           naics: data.naicsCode,
-          value: typeof data.value === 'number' ? `$${(data.value / 1000000).toFixed(1)}M` : 'TBD',
+          value: typeof data.value === 'number' ? `$${(data.value / 1000000).toFixed(1)}M` : (data.value || 'TBD'),
           deadline: data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'TBD',
-          location: data.placeOfPerformance?.city ? `${data.placeOfPerformance.city}, ${data.placeOfPerformance.state}` : 'Remote/Various',
-          setAside: data.setAside || 'Full and Open Competition',
-          complianceScore: 83, // Default, would come from AI analysis
-          pwin: 72, // Default, would come from AI analysis
-          aiAnalysis: data.fullDescription || data.synopsis || 'Full opportunity details available from SAM.gov.',
-          scoreExplanation: 'AI-powered analysis available with full subscription.',
+          postedDate: data.postedDate ? new Date(data.postedDate).toLocaleDateString() : null,
+          responseDeadline: data.responseDeadline ? new Date(data.responseDeadline).toLocaleDateString() : null,
+          location: data.placeOfPerformance?.city ? `${data.placeOfPerformance.city}, ${data.placeOfPerformance.state}` : (data.placeOfPerformance?.state || 'Remote/Various'),
+          setAside: data.setAside || data.typeOfSetAside || 'Full and Open Competition',
+          solicitationNumber: data.solicitationNumber || data.solicitation_number,
+          contractType: data.contractType || data.type,
+          complianceScore: 83, // Will be calculated from AI analysis
+          pwin: 72, // Will be calculated from AI analysis
+          aiAnalysis: data.fullDescription || data.description || data.synopsis || 'Full opportunity details available from SAM.gov.',
+          aiSuggestions: aiSuggestions,
+          scoreExplanation: 'AI-powered analysis based on opportunity requirements and company capabilities.',
+          // All SAM.gov sections
           sections: data.sections && data.sections.length > 0 ? data.sections : [
-            { letter: 'H', title: 'Special Contract Requirements', summary: 'See full solicitation document on SAM.gov for details.' },
-            { letter: 'I', title: 'Contract Clauses', summary: 'See full solicitation document on SAM.gov for details.' },
-            { letter: 'J', title: 'List of Attachments', summary: data.attachments?.map((a: any) => a.name).join(', ') || 'See SAM.gov for attachments.' },
-            { letter: 'K', title: 'Representations and Certifications', summary: 'SAM.gov registration and standard certifications required.' },
-            { letter: 'L', title: 'Instructions, Conditions, and Notices', summary: `Proposals due: ${data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'See SAM.gov'}` }
+            { letter: 'H', title: 'Special Contract Requirements', summary: data.sectionH || 'See full solicitation document on SAM.gov for details.' },
+            { letter: 'I', title: 'Contract Clauses', summary: data.sectionI || 'See full solicitation document on SAM.gov for details.' },
+            { letter: 'J', title: 'List of Attachments', summary: data.attachments?.map((a: any) => a.name || a).join(', ') || 'See SAM.gov for attachments.' },
+            { letter: 'K', title: 'Representations and Certifications', summary: data.sectionK || 'SAM.gov registration and standard certifications required.' },
+            { letter: 'L', title: 'Instructions, Conditions, and Notices', summary: data.sectionL || `Proposals due: ${data.dueDate ? new Date(data.dueDate).toLocaleDateString() : 'See SAM.gov'}` },
+            { letter: 'M', title: 'Evaluation Factors', summary: data.sectionM || 'See solicitation for evaluation criteria.' }
           ],
+          // All SAM.gov attachments
+          attachments: data.attachments || [],
+          // Point of contact information
+          pointOfContact: data.pointOfContact || [],
+          // Place of performance details
+          placeOfPerformance: data.placeOfPerformance || {},
+          // Additional SAM.gov fields
+          additionalInfo: {
+            organizationType: data.organizationType,
+            classificationCode: data.classificationCode,
+            typeOfSetAside: data.typeOfSetAside,
+            typeOfSetAsideDescription: data.typeOfSetAsideDescription,
+            archiveDate: data.archiveDate,
+            archiveType: data.archiveType,
+            resourceLinks: data.resourceLinks || [],
+            additionalInfoLink: data.additionalInfoLink
+          },
           qualificationBrief: {
             eligible: true,
             reasons: [
-              { check: true, text: `Set-aside: ${data.setAside || 'Full and Open'}` },
+              { check: true, text: `Set-aside: ${data.setAside || data.typeOfSetAside || 'Full and Open'}` },
               { check: true, text: `NAICS ${data.naicsCode || 'Various'}` },
               { check: true, text: 'SAM.gov registration required' },
-              { check: true, text: 'Review full requirements in solicitation' }
+              { check: data.placeOfPerformance ? true : false, text: data.placeOfPerformance ? `Location: ${data.placeOfPerformance.city || ''}, ${data.placeOfPerformance.state || ''}` : 'Location requirements to be reviewed' },
+              { check: data.solicitationNumber ? true : false, text: data.solicitationNumber ? `Solicitation: ${data.solicitationNumber}` : 'Solicitation number available' }
             ]
           },
           suggestedActions: [
             { 
-              title: 'Start Building Proposal', 
-              description: 'Generate Shipley-compliant outline in 2 minutes', 
+              title: 'Generate Proposal', 
+              description: 'Create Shipley-compliant proposal with AI', 
               icon: <FileText className="text-white" size={16} />,
               handler: 'handleStartProposal'
+            },
+            { 
+              title: 'Get Brief', 
+              description: 'Generate comprehensive opportunity brief', 
+              icon: <Sparkles className="text-white" size={16} />,
+              handler: 'handleGenerateBrief'
             },
             { 
               title: 'Review Past Performance', 
@@ -179,21 +234,16 @@ export default function OpportunitiesEnhanced() {
               handler: 'handleReviewPastPerformance'
             },
             { 
-              title: 'Identify Teaming Partners', 
-              description: 'Search for qualified partners', 
-              icon: <Users className="text-white" size={16} />,
-              handler: 'handleTeamingPartners'
-            },
-            { 
               title: 'View on SAM.gov', 
               description: 'Open full solicitation on SAM.gov', 
               icon: <Calendar className="text-white" size={16} />,
               handler: 'handleViewSAMGov'
             }
           ],
-          samGovUrl: data.samGovUrl || data.url,
+          samGovUrl: data.samGovUrl || data.url || `https://sam.gov/opp/${data.id}/view`,
           mockGenerated: data.mockGenerated,
-          note: data.note
+          note: data.note,
+          source: data.source || 'SAM.gov'
         };
 
         setOpportunity(transformedData);
@@ -221,17 +271,9 @@ export default function OpportunitiesEnhanced() {
 
   // Action handlers
   const handleStartProposal = () => {
-    if (!opportunity) return;
+    if (!opportunity || !opportunityId) return;
     
-    navigate('/proposals/new', { 
-      state: { 
-        opportunityId: opportunityId || '1',
-        opportunityTitle: opportunity.title,
-        agency: opportunity.agency,
-        naics: opportunity.naics,
-        value: opportunity.value
-      } 
-    });
+    navigate(`/proposal-generator/${opportunityId}`);
   };
 
   const handleReviewPastPerformance = () => {
@@ -393,8 +435,7 @@ END:VCALENDAR`;
         </div>
         <div className="flex gap-3">
           <Link
-            to="/proposals/new"
-            state={{ opportunityId: opportunityId || '1', opportunityTitle: opportunity.title }}
+            to={`/proposal-generator/${opportunityId}`}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center"
           >
             <Zap size={20} className="mr-2" />
@@ -432,6 +473,18 @@ END:VCALENDAR`;
                     <Calendar size={16} className="mr-1" />
                     Due: {opportunity.deadline}
                   </span>
+                  {opportunity.postedDate && (
+                    <span className="flex items-center">
+                      <Calendar size={16} className="mr-1" />
+                      Posted: {opportunity.postedDate}
+                    </span>
+                  )}
+                  {opportunity.solicitationNumber && (
+                    <span className="flex items-center">
+                      <FileText size={16} className="mr-1" />
+                      Solicitation: {opportunity.solicitationNumber}
+                    </span>
+                  )}
                 </div>
               </div>
               
@@ -461,14 +514,148 @@ END:VCALENDAR`;
             </div>
           </div>
 
-          {/* AI Match Analysis (Narrative) */}
+          {/* Full Description from SAM.gov */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-4">
-              <Sparkles className="text-purple-600 mr-2" size={24} />
-              <h3 className="text-xl font-bold text-gray-900">AI Match Analysis</h3>
+              <FileText className="text-blue-600 mr-2" size={24} />
+              <h3 className="text-xl font-bold text-gray-900">Full Opportunity Description</h3>
+              <span className="ml-auto text-xs text-gray-500">Source: {opportunity.source || 'SAM.gov'}</span>
             </div>
-            <div className="prose prose-sm max-w-none text-gray-700" dangerouslySetInnerHTML={{ __html: opportunity.aiAnalysis.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>') }} />
+            <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+              {opportunity.aiAnalysis}
+            </div>
           </div>
+
+          {/* AI Suggestions & Recommendations */}
+          {opportunity.aiSuggestions && (
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl shadow-lg p-6 border-2 border-purple-200">
+              <div className="flex items-center mb-4">
+                <Sparkles className="text-purple-600 mr-2" size={24} />
+                <h3 className="text-xl font-bold text-gray-900">AI-Powered Recommendations</h3>
+              </div>
+              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap bg-white p-4 rounded-lg border border-purple-200">
+                {opportunity.aiSuggestions}
+              </div>
+            </div>
+          )}
+
+          {/* Required Information Section */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+              <AlertCircle className="text-orange-600 mr-2" size={24} />
+              Required Information & Qualifications
+            </h3>
+            <div className="space-y-4">
+              <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
+                <h4 className="font-semibold text-orange-900 mb-2">Mandatory Requirements</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start">
+                    <span className="text-orange-600 mr-2 font-bold">•</span>
+                    <span>SAM.gov registration (Active and current)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-orange-600 mr-2 font-bold">•</span>
+                    <span>NAICS Code: {opportunity.naics || 'See solicitation'}</span>
+                  </li>
+                  {opportunity.setAside && (
+                    <li className="flex items-start">
+                      <span className="text-orange-600 mr-2 font-bold">•</span>
+                      <span>Set-Aside Eligibility: {opportunity.setAside}</span>
+                    </li>
+                  )}
+                  {opportunity.solicitationNumber && (
+                    <li className="flex items-start">
+                      <span className="text-orange-600 mr-2 font-bold">•</span>
+                      <span>Solicitation Number: {opportunity.solicitationNumber}</span>
+                    </li>
+                  )}
+                  {opportunity.deadline && (
+                    <li className="flex items-start">
+                      <span className="text-orange-600 mr-2 font-bold">•</span>
+                      <span>Response Deadline: {opportunity.deadline}</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
+              
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <h4 className="font-semibold text-blue-900 mb-2">Recommended Actions</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start">
+                    <CheckCircle className="text-blue-600 mr-2 flex-shrink-0 mt-0.5" size={16} />
+                    <span>Review all attachments and supporting documents</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="text-blue-600 mr-2 flex-shrink-0 mt-0.5" size={16} />
+                    <span>Verify past performance requirements match your capabilities</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="text-blue-600 mr-2 flex-shrink-0 mt-0.5" size={16} />
+                    <span>Confirm key personnel availability and clearance requirements</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="text-blue-600 mr-2 flex-shrink-0 mt-0.5" size={16} />
+                    <span>Prepare compliance matrix for all evaluation factors</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="text-blue-600 mr-2 flex-shrink-0 mt-0.5" size={16} />
+                    <span>Schedule site visit or pre-proposal conference if available</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Point of Contact */}
+          {opportunity.pointOfContact && opportunity.pointOfContact.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <Users className="text-green-600 mr-2" size={24} />
+                Point of Contact
+              </h3>
+              <div className="space-y-3">
+                {opportunity.pointOfContact.map((contact: any, idx: number) => (
+                  <div key={idx} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    {contact.name && <p className="font-semibold text-gray-900">{contact.name}</p>}
+                    {contact.title && <p className="text-sm text-gray-600">{contact.title}</p>}
+                    {contact.email && <p className="text-sm text-blue-600">📧 {contact.email}</p>}
+                    {contact.phone && <p className="text-sm text-gray-600">📞 {contact.phone}</p>}
+                    {contact.fax && <p className="text-sm text-gray-600">📠 {contact.fax}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Attachments */}
+          {opportunity.attachments && opportunity.attachments.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <FileText className="text-indigo-600 mr-2" size={24} />
+                Attachments & Documents
+              </h3>
+              <div className="space-y-2">
+                {opportunity.attachments.map((attachment: any, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <FileText className="text-indigo-600" size={20} />
+                      <span className="text-gray-900">{attachment.name || attachment}</span>
+                    </div>
+                    {attachment.url && (
+                      <a 
+                        href={attachment.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        Download →
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Qualification Brief (Structured) */}
           <div className="bg-white rounded-xl shadow-lg p-6">

@@ -341,11 +341,59 @@ export default function OpportunityBriefDrawer({ isOpen, onClose, opportunity }:
                     {brief.competitiveAnalysis.competitors && (
                       <div className="mb-4">
                         <p className="text-sm font-semibold text-gray-700 mb-2">Likely Competitors</p>
-                        <ul className="space-y-1">
-                          {brief.competitiveAnalysis.competitors.map((comp: string, idx: number) => (
-                            <li key={idx} className="text-sm text-gray-600">• {comp}</li>
-                          ))}
-                        </ul>
+                        <div className="space-y-3">
+                          {brief.competitiveAnalysis.competitors.map((comp: any, idx: number) => {
+                            // Handle both object and string formats
+                            if (typeof comp === 'string') {
+                              return (
+                                <div key={idx} className="text-sm text-gray-600">• {comp}</div>
+                              );
+                            }
+                            // Render competitor object with details
+                            return (
+                              <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                <div className="flex items-center justify-between mb-2">
+                                  <h4 className="text-sm font-semibold text-gray-900">{comp.name || 'Competitor'}</h4>
+                                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                    {comp.type || 'Competitor'}
+                                  </span>
+                                </div>
+                                {comp.strengths && comp.strengths.length > 0 && (
+                                  <div className="mb-2">
+                                    <p className="text-xs font-semibold text-gray-600 mb-1">Strengths:</p>
+                                    <ul className="text-xs text-gray-600 space-y-0.5">
+                                      {comp.strengths.map((strength: string, sIdx: number) => (
+                                        <li key={sIdx}>• {strength}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {comp.weaknesses && comp.weaknesses.length > 0 && (
+                                  <div className="mb-2">
+                                    <p className="text-xs font-semibold text-gray-600 mb-1">Weaknesses:</p>
+                                    <ul className="text-xs text-gray-600 space-y-0.5">
+                                      {comp.weaknesses.map((weakness: string, wIdx: number) => (
+                                        <li key={wIdx}>• {weakness}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {comp.ghostingStrategy && (
+                                  <div className="mt-2 pt-2 border-t border-gray-200">
+                                    <p className="text-xs font-semibold text-blue-600 mb-1">Ghosting Strategy:</p>
+                                    <p className="text-xs text-gray-700">{comp.ghostingStrategy}</p>
+                                  </div>
+                                )}
+                                {comp.phantomStrategy && (
+                                  <div className="mt-2 pt-2 border-t border-gray-200">
+                                    <p className="text-xs font-semibold text-purple-600 mb-1">Phantom Strategy:</p>
+                                    <p className="text-xs text-gray-700">{comp.phantomStrategy}</p>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                     {brief.competitiveAnalysis.differentiators && (
