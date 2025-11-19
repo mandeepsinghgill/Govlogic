@@ -76,6 +76,13 @@ class Proposal(Base, UUIDMixin, TimestampMixin, TenantMixin, SoftDeleteMixin):
     # 508 compliance
     is_508_compliant = Column(Boolean, default=False)
     
+    # SharePoint integration (temporarily commented out - columns don't exist in DB yet)
+    # TODO: Add database migration to add these columns
+    # sharepoint_url = Column(String(1000), nullable=True)
+    # sharepoint_file_id = Column(String(100), nullable=True)
+    # auto_sync_sharepoint = Column(Boolean, default=False)
+    # sharepoint_folder_path = Column(String(500), nullable=True)
+    
     # Relationships
     sections_rel = relationship("ProposalSection", back_populates="proposal")
     reviews = relationship("ProposalReview", back_populates="proposal")

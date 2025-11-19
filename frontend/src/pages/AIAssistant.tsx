@@ -1,7 +1,8 @@
 /**
  * AI Assistant - Your Intelligent Proposal Writing Companion
- * ChatGPT-like interface with Ollama AI integration
+ * ChatGPT-like interface with OpenAI integration
  * Optimized prompts for government contracting and proposal writing
+ * Returns formatted responses with markdown support
  */
 
 import { useState, useRef, useEffect } from 'react';
@@ -27,14 +28,14 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('qwen3:8b');
-  const [ollamaStatus, setOllamaStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [selectedModel, setSelectedModel] = useState('gpt-4o');
+  const [aiStatus, setAiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Check Ollama status on mount
+  // Check AI status on mount
   useEffect(() => {
-    checkOllamaStatus();
+    checkAIStatus();
   }, []);
 
   // Scroll to bottom when messages change
@@ -42,7 +43,7 @@ export default function AIAssistant() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const checkOllamaStatus = async () => {
+  const checkAIStatus = async () => {
     try {
       const response = await fetch(`${API_URL}/api/v1/ai/status`, {
         headers: {
@@ -50,9 +51,9 @@ export default function AIAssistant() {
         },
       });
       const data = await response.json();
-      setOllamaStatus(data.status === 'online' ? 'online' : 'offline');
+      setAiStatus(data.status === 'online' ? 'online' : 'offline');
     } catch {
-      setOllamaStatus('offline');
+      setAiStatus('offline');
     }
   };
 
@@ -132,7 +133,7 @@ Always be concise, actionable, and focused on helping win government contracts. 
         messageCount: messages.length + 1
       });
 
-      // Call Ollama API through backend
+      // Call OpenAI API through backend
       const response = await fetch(`${API_URL}/api/v1/ai/chat`, {
         method: 'POST',
         headers: {
@@ -147,6 +148,8 @@ Always be concise, actionable, and focused on helping win government contracts. 
             { role: 'user', content: input.trim() }
           ],
           stream: false,
+          temperature: 0.7,
+          max_tokens: 2000,
         }),
       });
 
@@ -155,7 +158,14 @@ Always be concise, actionable, and focused on helping win government contracts. 
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ API Error:', errorText);
-        throw new Error(`API Error: ${response.status}`);
+        let errorMessage = 'Failed to get AI response.';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -169,24 +179,23 @@ Always be concise, actionable, and focused on helping win government contracts. 
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      setOllamaStatus('online'); // Update status on successful response
-    } catch (error) {
+      setAiStatus('online'); // Update status on successful response
+    } catch (error: any) {
       console.error('❌ AI Error:', error);
-      setOllamaStatus('offline'); // Update status on error
+      setAiStatus('offline'); // Update status on error
       
       // Error message for user
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I'm having trouble connecting to Ollama. Please make sure:
+        content: `I'm having trouble connecting to the AI service. ${error.message || 'Please check your OpenAI API key configuration.'}
 
-1. **Ollama is running**: Open terminal and run \`ollama serve\`
-2. **Model is downloaded**: Run \`ollama list\` to check available models
-3. **Try different model**: Switch to "Llama" or "Qwen" in the dropdown
+**Troubleshooting:**
+1. **Check API Key**: Ensure OPENAI_API_KEY is set in backend environment
+2. **Verify Connection**: Check backend logs for errors
+3. **Try Again**: The service may be temporarily unavailable
 
-Current selected model: **${selectedModel}**
-
-If Ollama is running, try refreshing the page or check the browser console for errors.`,
+If the issue persists, please contact support.`,
         timestamp: new Date(),
       };
 
@@ -199,6 +208,88 @@ If Ollama is running, try refreshing the page or check the browser console for e
   const handleQuickPrompt = (prompt: string) => {
     setInput(prompt);
     textareaRef.current?.focus();
+  };
+
+  // Format message content with markdown support
+  const formatMessageContent = (content: string) => {
+    // Split content into lines for processing
+    const lines = content.split('\n');
+    const formattedLines: React.ReactNode[] = [];
+    let inList = false;
+    let listItems: string[] = [];
+    
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      
+      // Headers
+      if (trimmed.startsWith('### ')) {
+        if (inList) {
+          formattedLines.push(<ul key={`list-${index}`} className="list-disc list-inside my-2 space-y-1">{listItems.map((item, i) => <li key={i}>{item}</li>)}</ul>);
+          listItems = [];
+          inList = false;
+        }
+        formattedLines.push(<h3 key={index} className="font-bold text-lg mt-4 mb-2">{trimmed.substring(4)}</h3>);
+        return;
+      }
+      if (trimmed.startsWith('## ')) {
+        if (inList) {
+          formattedLines.push(<ul key={`list-${index}`} className="list-disc list-inside my-2 space-y-1">{listItems.map((item, i) => <li key={i}>{item}</li>)}</ul>);
+          listItems = [];
+          inList = false;
+        }
+        formattedLines.push(<h2 key={index} className="font-bold text-xl mt-4 mb-2">{trimmed.substring(3)}</h2>);
+        return;
+      }
+      if (trimmed.startsWith('# ')) {
+        if (inList) {
+          formattedLines.push(<ul key={`list-${index}`} className="list-disc list-inside my-2 space-y-1">{listItems.map((item, i) => <li key={i}>{item}</li>)}</ul>);
+          listItems = [];
+          inList = false;
+        }
+        formattedLines.push(<h1 key={index} className="font-bold text-2xl mt-4 mb-2">{trimmed.substring(2)}</h1>);
+        return;
+      }
+      
+      // Lists
+      if (trimmed.match(/^[-*] /) || trimmed.match(/^\d+\. /)) {
+        const itemText = trimmed.replace(/^[-*] /, '').replace(/^\d+\. /, '');
+        listItems.push(itemText);
+        inList = true;
+        return;
+      }
+      
+      // Close list if we hit a non-list line
+      if (inList && trimmed) {
+        formattedLines.push(<ul key={`list-${index}`} className="list-disc list-inside my-2 space-y-1">{listItems.map((item, i) => <li key={i}>{item}</li>)}</ul>);
+        listItems = [];
+        inList = false;
+      }
+      
+      // Code blocks
+      if (trimmed.startsWith('```')) {
+        // Skip code block markers, they'll be handled separately if needed
+        return;
+      }
+      
+      // Regular text with markdown formatting
+      if (trimmed) {
+        let formatted = trimmed;
+        // Bold (**text**)
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Inline code (`code`)
+        formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">$1</code>');
+        formattedLines.push(<p key={index} dangerouslySetInnerHTML={{ __html: formatted }} className="mb-2" />);
+      } else if (!inList) {
+        formattedLines.push(<br key={`br-${index}`} />);
+      }
+    });
+    
+    // Close any remaining list
+    if (inList && listItems.length > 0) {
+      formattedLines.push(<ul key="list-final" className="list-disc list-inside my-2 space-y-1">{listItems.map((item, i) => <li key={i}>{item}</li>)}</ul>);
+    }
+    
+    return <div>{formattedLines}</div>;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -234,20 +325,18 @@ If Ollama is running, try refreshing the page or check the browser console for e
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${
-                ollamaStatus === 'online' ? 'bg-green-500' : 
-                ollamaStatus === 'offline' ? 'bg-red-500' : 
+                aiStatus === 'online' ? 'bg-green-500' : 
+                aiStatus === 'offline' ? 'bg-red-500' : 
                 'bg-yellow-500'
-              }`} title={ollamaStatus === 'online' ? 'Ollama Online' : 'Ollama Offline'} />
+              }`} title={aiStatus === 'online' ? 'OpenAI Online' : 'OpenAI Offline'} />
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
-                <option value="qwen3:8b">Qwen 3 (8B)</option>
-                <option value="llama3.1:latest">Llama 3.1</option>
-                <option value="llama2">Llama 2</option>
-                <option value="mistral">Mistral</option>
-                <option value="codellama">Code Llama</option>
+                <option value="gpt-4o">GPT-4o (Recommended)</option>
+                <option value="gpt-4o-mini">GPT-4o Mini (Faster)</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
               </select>
             </div>
             {messages.length > 0 && (
@@ -324,10 +413,10 @@ If Ollama is running, try refreshing the page or check the browser console for e
                       </div>
                     )}
                     <div className="flex-1">
-                      <div className="prose prose-sm max-w-none">
-                        <p className={`whitespace-pre-wrap ${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}>
-                          {message.content}
-                        </p>
+                      <div className={`prose prose-sm max-w-none ${message.role === 'user' ? 'prose-invert' : ''}`}>
+                        <div className={`${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}>
+                          {formatMessageContent(message.content)}
+                        </div>
                       </div>
                       {message.role === 'assistant' && (
                         <div className="flex items-center space-x-2 mt-3 pt-3 border-t border-gray-100">
@@ -404,7 +493,7 @@ If Ollama is running, try refreshing the page or check the browser console for e
             </button>
           </div>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            Press Enter to send, Shift+Enter for new line • Powered by Ollama AI
+            Press Enter to send, Shift+Enter for new line • Powered by OpenAI GPT-4o
           </p>
         </div>
       </div>

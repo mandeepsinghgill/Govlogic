@@ -1017,7 +1017,7 @@ export default function LandingNew() {
                 </li>
                 <li>
                   <Link to="/how-it-works" className="hover:text-white">
-                    Learn GovCon
+                    Learn GovSure
                   </Link>
                 </li>
                 <li>

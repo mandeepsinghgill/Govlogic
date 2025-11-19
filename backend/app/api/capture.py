@@ -129,3 +129,36 @@ async def generate_capture_plan(
         "plan": result
     }
 
+
+@router.get("/{capture_plan_id}/workflow")
+async def get_workflow_state(
+    capture_plan_id: str,
+    db: Session = Depends(get_db)
+):
+    """Get current workflow state"""
+    from app.services.capture_workflow_service import CaptureWorkflowService
+    
+    service = CaptureWorkflowService(db)
+    state = service.get_workflow_state(capture_plan_id)
+    
+    if not state:
+        raise HTTPException(status_code=404, detail="Capture plan not found")
+        
+    return state
+
+
+@router.post("/{capture_plan_id}/advance")
+async def advance_workflow_stage(
+    capture_plan_id: str,
+    db: Session = Depends(get_db)
+):
+    """Advance to next workflow stage"""
+    from app.services.capture_workflow_service import CaptureWorkflowService
+    
+    service = CaptureWorkflowService(db)
+    try:
+        new_state = service.advance_stage(capture_plan_id)
+        return new_state
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+

@@ -11,4 +11,5 @@ from .pricing import *
 from .awards import *
 from .subscription import *
 from .pipeline import *
+from .brief import *
 

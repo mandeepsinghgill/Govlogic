@@ -89,6 +89,40 @@ async def get_grant_opportunity(
         raise HTTPException(status_code=500, detail=f"Error fetching grant details: {str(e)}")
 
 
+@router.get("/stats")
+async def get_grant_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get statistics for organization's grant applications"""
+    grants = db.query(Grant).filter(
+        Grant.organization_id == current_user.organization_id,
+        Grant.is_deleted == False
+    ).all()
+    
+    stats = {
+        "total": len(grants),
+        "draft": 0,
+        "submitted": 0,
+        "awarded": 0,
+        "total_value": 0.0
+    }
+    
+    for g in grants:
+        status = (g.status or "").lower()
+        if status == "draft":
+            stats["draft"] += 1
+        elif status == "submitted":
+            stats["submitted"] += 1
+        elif status == "awarded":
+            stats["awarded"] += 1
+            
+        if g.total_funding:
+            stats["total_value"] += g.total_funding
+            
+    return stats
+
+
 @router.get("/", response_model=List[GrantResponse])
 async def list_grants(
     db: Session = Depends(get_db),

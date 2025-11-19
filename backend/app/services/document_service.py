@@ -22,7 +22,8 @@ class DocumentProcessingService:
     """Advanced document processing with full production features"""
     
     def __init__(self):
-        self.output_dir = Path("/home/ubuntu/GovSure/data/documents")
+        # Use relative path for portability
+        self.output_dir = Path("./data/documents").resolve()
         self.output_dir.mkdir(parents=True, exist_ok=True)
     
     # ==================== TEXT EXTRACTION ====================

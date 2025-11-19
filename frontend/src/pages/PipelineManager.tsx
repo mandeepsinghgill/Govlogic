@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { 
   fetchPipelineItems, 
@@ -19,8 +20,11 @@ import {
   Search,
   Eye,
   CheckCircle,
-  XCircle
+  XCircle,
+  FileText,
+  Sparkles
 } from 'lucide-react';
+import OpportunityBriefDrawer from '../components/OpportunityBriefDrawer';
 
 interface FilterState {
   status: string;
@@ -44,7 +48,8 @@ const PipelineManager: React.FC = () => {
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [shareEmail, setShareEmail] = useState<string>('');
   const [shareItemId, setShareItemId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid'); // Default to grid view
+  const [selectedOppForBrief, setSelectedOppForBrief] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchPipelineItems({}));
@@ -326,9 +331,12 @@ const PipelineManager: React.FC = () => {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <Link
+                        to={`/proposal-generator/${item.opportunity_id || item.id}`}
+                        className="text-lg font-semibold text-gray-900 mb-1 hover:text-blue-600 transition-colors cursor-pointer block"
+                      >
                         {item.title}
-                      </h3>
+                      </Link>
                       <p className="text-sm text-gray-600">{item.agency}</p>
                     </div>
                     <div className="flex gap-2">
@@ -404,21 +412,42 @@ const PipelineManager: React.FC = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2 pt-4 border-t border-gray-100">
-                    <button
-                      onClick={() => handleUpdateStatus(item.id, 'in_progress')}
-                      disabled={item.status === 'in_progress'}
-                      className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Start Work
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(item.id, 'submitted')}
-                      disabled={item.status === 'submitted'}
-                      className="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Mark Submitted
-                    </button>
+                  <div className="flex flex-col gap-2 pt-4 border-t border-gray-100">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedOppForBrief(item.opportunity_id || item.id);
+                        }}
+                        className="flex-1 px-3 py-2 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center gap-2"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Get Brief
+                      </button>
+                      <Link
+                        to={`/proposal-generator/${item.opportunity_id || item.id}`}
+                        className="flex-1 px-3 py-2 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded hover:from-purple-700 hover:to-indigo-700 flex items-center justify-center gap-2"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        Generate Proposal
+                      </Link>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUpdateStatus(item.id, 'in_progress')}
+                        disabled={item.status === 'in_progress'}
+                        className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Start Work
+                      </button>
+                      <button
+                        onClick={() => handleUpdateStatus(item.id, 'submitted')}
+                        disabled={item.status === 'submitted'}
+                        className="flex-1 px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Mark Submitted
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -459,6 +488,21 @@ const PipelineManager: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Opportunity Brief Drawer */}
+      <OpportunityBriefDrawer 
+        isOpen={!!selectedOppForBrief}
+        onClose={() => setSelectedOppForBrief(null)}
+        opportunity={filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief) ? {
+          id: selectedOppForBrief || '',
+          title: filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief)?.title || '',
+          synopsis: filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief)?.description || '',
+          agency: filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief)?.agency || '',
+          value: filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief)?.contract_value || undefined,
+          dueDate: filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief)?.due_date || undefined,
+          pwin_score: filteredItems.find(item => (item.opportunity_id || item.id) === selectedOppForBrief)?.pwin_score || undefined,
+        } : null}
+      />
     </div>
   );
 };

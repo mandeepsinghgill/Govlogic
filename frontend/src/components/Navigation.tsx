@@ -169,9 +169,9 @@ export default function Navigation({ onBookDemoClick, variant = 'sticky' }: Navi
               {navLinks.map((link) => (
                 <div key={link.label}>{renderNavLink(link.label, link.hash)}</div>
               ))}
-              <Link to="/case-studies" className="text-gray-600 hover:text-gray-900 transition-colors">
+              {/* <Link to="/case-studies" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Case Studies
-              </Link>
+              </Link> */}
               <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Log in
               </Link>
@@ -211,13 +211,13 @@ export default function Navigation({ onBookDemoClick, variant = 'sticky' }: Navi
                   )}
                 </div>
               ))}
-              <Link
+              {/* <Link
                 to="/case-studies"
                 className="block text-gray-900 font-semibold"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Case Studies
-              </Link>
+              </Link> */}
               <Link
                 to="/login"
                 className="block text-gray-900 font-semibold"

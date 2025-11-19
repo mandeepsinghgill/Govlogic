@@ -20,6 +20,7 @@ class SAMGovService:
     
     def __init__(self):
         self.api_key = os.getenv("SAM_GOV_API_KEY", settings.SAM_GOV_API_KEY)
+        print(f"SAM_GOV_API_KEY: {self.api_key}")
         # SAM.gov Opportunities API v2 (Updated endpoint as per user requirement)
         # Use GET with query params; API key provided via 'api_key' parameter
         self.base_url = "https://api.sam.gov/opportunities/v2/search"

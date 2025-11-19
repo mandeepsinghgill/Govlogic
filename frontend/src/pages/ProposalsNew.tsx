@@ -11,7 +11,7 @@ import {
   FileText, Plus, Search, Loader2, Eye, Edit, 
   Calendar, CheckCircle, TrendingUp, Upload, Target,
   BookOpen, Award, Shield, Sparkles, Download, BarChart3,
-  AlertCircle, Clock, FileCheck, Zap, Users, Brain
+  AlertCircle, Clock, FileCheck, Zap, Users, Brain, Trash2
 } from 'lucide-react';
 
 interface Proposal {
@@ -83,7 +83,8 @@ export default function ProposalsNew() {
         ...(statusFilter && { status: statusFilter }),
       });
 
-      const response = await fetch(
+      // Try /mine endpoint first, fallback to / if it doesn't exist
+      let response = await fetch(
         `${API_URL}/api/v1/proposals/mine?${params}`,
         {
           headers: {
@@ -92,15 +93,30 @@ export default function ProposalsNew() {
         }
       );
 
+      // If /mine doesn't exist, try the standard endpoint
+      if (!response.ok && response.status === 404) {
+        response = await fetch(
+          `${API_URL}/api/v1/proposals?${params}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            },
+          }
+        );
+      }
+
       if (!response.ok) {
         throw new Error('Failed to fetch proposals');
       }
 
       const data = await response.json();
-      setProposals(data.items || []);
-      setTotal(data.total || 0);
+      // Handle both array and paginated response formats
+      const proposalsList = Array.isArray(data) ? data : (data.items || data.proposals || []);
+      setProposals(proposalsList);
+      setTotal(data.total || proposalsList.length);
     } catch (err) {
       console.error('Error fetching proposals:', err);
+      // Show error toast
     } finally {
       setLoading(false);
     }
@@ -396,6 +412,66 @@ export default function ProposalsNew() {
                       >
                         <Edit className="h-5 w-5 text-blue-600" />
                       </Link>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const token = localStorage.getItem('access_token');
+                            const response = await fetch(`${API_URL}/api/v1/proposals/${proposal.id}/export?format=docx`, {
+                              method: 'POST',
+                              headers: {
+                                'Authorization': `Bearer ${token}`,
+                              },
+                            });
+                            if (response.ok) {
+                              const blob = await response.blob();
+                              const url = window.URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `${proposal.title.replace(/[^a-z0-9]/gi, '_')}.docx`;
+                              document.body.appendChild(a);
+                              a.click();
+                              window.URL.revokeObjectURL(url);
+                              document.body.removeChild(a);
+                            } else {
+                              alert('Failed to download proposal');
+                            }
+                          } catch (err) {
+                            console.error('Download error:', err);
+                            alert('Failed to download proposal');
+                          }
+                        }}
+                        className="p-3 border border-gray-300 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors"
+                        title="Download proposal"
+                      >
+                        <Download className="h-5 w-5 text-green-600" />
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (confirm(`Are you sure you want to delete "${proposal.title}"?`)) {
+                            try {
+                              const token = localStorage.getItem('access_token');
+                              const response = await fetch(`${API_URL}/api/v1/proposals/${proposal.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                  'Authorization': `Bearer ${token}`,
+                                },
+                              });
+                              if (response.ok) {
+                                fetchProposals();
+                              } else {
+                                alert('Failed to delete proposal');
+                              }
+                            } catch (err) {
+                              console.error('Delete error:', err);
+                              alert('Failed to delete proposal');
+                            }
+                          }
+                        }}
+                        className="p-3 border border-gray-300 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
+                        title="Delete proposal"
+                      >
+                        <Trash2 className="h-5 w-5 text-red-600" />
+                      </button>
                     </div>
                   </div>
                 </div>

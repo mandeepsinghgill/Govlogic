@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GovSure AI Assistant</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="taskpane.css" />
+</head>
+<body>
+    <div id="content-header">
+        <div class="ms-Grid ms-Grid--12">
+            <div class="ms-Grid-row">
+                <div class="ms-Grid-col ms-Grid-col--12 ms-md12">
+                    <h1 class="ms-font-xl ms-fontWeight-light ms-fontColor-neutralPrimary ms-u-slideUpIn20">
+                        GovSure AI Assistant
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="content-main" class="ms-Grid ms-Grid--12">
+        <!-- Login Section -->
+        <div id="login-section" class="section">
+            <div class="ms-Grid-row">
+                <div class="ms-Grid-col ms-Grid-col--12">
+                    <h3>Sign In to GovSure AI</h3>
+                    <p>Connect your GovSure AI account to access AI-powered features.</p>
+                    <button id="login-btn" class="ms-Button ms-Button--primary">
+                        <span class="ms-Button-label">Sign In</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Panel -->
+        <div id="main-section" class="section" style="display: none;">
+            <!-- Generate Content -->
+            <div class="feature-card">
+                <h3>Generate Content</h3>
+                <div class="input-group">
+                    <label>Section Type:</label>
+                    <select id="section-type" class="ms-TextField-field">
+                        <option value="technical">Technical Approach</option>
+                        <option value="management">Management Approach</option>
+                        <option value="past-performance">Past Performance</option>
+                        <option value="staffing">Staffing Plan</option>
+                        <option value="executive">Executive Summary</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Word Count:</label>
+                    <input type="number" id="word-count" class="ms-TextField-field" value="500" min="100" max="5000">
+                </div>
+                <button id="generate-btn" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Generate & Insert</span>
+                </button>
+            </div>
+
+            <!-- Check Compliance -->
+            <div class="feature-card">
+                <h3>Check Compliance</h3>
+                <p>Analyze your document for FAR/DFARS compliance</p>
+                <button id="compliance-btn" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Check Compliance</span>
+                </button>
+            </div>
+
+            <!-- Analyze Document -->
+            <div class="feature-card">
+                <h3>Analyze Document</h3>
+                <p>Get AI-powered analysis and suggestions</p>
+                <button id="analyze-btn" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Analyze Document</span>
+                </button>
+            </div>
+
+            <!-- Get Suggestions -->
+            <div class="feature-card">
+                <h3>Improve Selected Text</h3>
+                <p>Select text in Word and get AI suggestions</p>
+                <button id="suggest-btn" class="ms-Button ms-Button--primary">
+                    <span class="ms-Button-label">Get Suggestions</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="section" style="display: none;">
+            <h3>Results</h3>
+            <div id="results-content"></div>
+            <button id="close-results" class="ms-Button">
+                <span class="ms-Button-label">Close</span>
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="taskpane.js"></script>
+</body>
+</html>
+

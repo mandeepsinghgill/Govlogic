@@ -150,11 +150,14 @@ class LLMService:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
         
+        # Enforce maximum token limit for safety (capped at 10,000 tokens)
+        safe_max_tokens = min(max_tokens, 10000)
+        
         kwargs = {
             "model": model,
             "messages": messages,
             "temperature": temperature,
-            "max_tokens": max_tokens,
+            "max_tokens": safe_max_tokens,  # Enforce limit here as well
             "stream": stream
         }
         

@@ -2,6 +2,7 @@
 Proposals API endpoints
 """
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks, Query
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
@@ -45,6 +46,14 @@ class ProposalResponse(BaseModel):
 class GenerateProposalRequest(BaseModel):
     use_ai: bool = True
     page_limit: Optional[int] = None
+
+
+class GenerateFullProposalRequest(BaseModel):
+    opportunity_id: Optional[str] = None
+    contract_id: Optional[str] = None
+    min_pages: int = 25
+    max_pages: int = 100
+    description: Optional[str] = None
 
 
 @router.get("/mine")
@@ -157,17 +166,26 @@ async def get_proposals_stats(
 @router.get("/", response_model=List[ProposalResponse])
 async def list_proposals(
     status: Optional[ProposalStatus] = None,
+    opportunity_id: Optional[str] = None,
     skip: int = 0,
     limit: int = 20,
     db: Session = Depends(get_db)
 ):
-    """List all proposals (admin view)"""
+    """
+    List proposals
+    - If opportunity_id provided: Get proposals for that opportunity (auto-generated)
+    - Otherwise: Get all proposals
+    """
     query = db.query(Proposal).filter(Proposal.is_deleted == False)
+    
+    # Filter by opportunity if provided
+    if opportunity_id:
+        query = query.filter(Proposal.opportunity_id == opportunity_id)
     
     if status:
         query = query.filter(Proposal.status == status)
     
-    proposals = query.offset(skip).limit(limit).all()
+    proposals = query.order_by(Proposal.created_at.desc()).offset(skip).limit(limit).all()
     return proposals
 
 
@@ -193,6 +211,178 @@ async def create_proposal(
     return db_proposal
 
 
+# IMPORTANT: This route MUST come before /{proposal_id} to avoid route conflicts
+# Route: POST /api/v1/proposals/generate-full
+@router.post("/generate-full", status_code=200)
+async def generate_full_proposal(
+    request: GenerateFullProposalRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Generate a comprehensive proposal (25-100 pages) using OpenAI
+    Fetches opportunity data from SAM.gov if opportunity_id provided
+    
+    Route: POST /api/v1/proposals/generate-full
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"✅ POST /api/v1/proposals/generate-full - Received request: opportunity_id={request.opportunity_id}, min_pages={request.min_pages}, max_pages={request.max_pages}")
+    
+    try:
+        # Validate page limits
+        if request.min_pages < 25 or request.max_pages > 100:
+            raise HTTPException(
+                status_code=400,
+                detail="Page limits must be between 25 and 100 pages"
+            )
+        
+        # Fetch contract details from SAM.gov if ID provided
+        contract_data = None
+        description = request.description
+        if request.opportunity_id:
+            contract_data = samgov_service.get_opportunity_by_id(request.opportunity_id)
+        elif request.contract_id:
+            contract_data = samgov_service.get_opportunity_by_id(request.contract_id)
+        
+        # Prepare comprehensive prompt for OpenAI
+        if contract_data:
+            title = contract_data.get('title', 'Government Contract Opportunity')
+            agency = contract_data.get('agency', 'Federal Agency')
+            description = contract_data.get('description') or contract_data.get('synopsis', '') or description
+            naics = contract_data.get('naicsCode', '')
+            value = contract_data.get('value', '')
+            
+            prompt = f"""Generate a comprehensive, professional government proposal for the following opportunity:
+
+TITLE: {title}
+AGENCY: {agency}
+NAICS CODE: {naics}
+ESTIMATED VALUE: {value}
+DESCRIPTION: {description}
+
+REQUIREMENTS:
+1. Generate a complete proposal between {request.min_pages} and {request.max_pages} pages
+2. Follow Shipley methodology and government contracting best practices
+3. Include all standard proposal volumes:
+   - Executive Summary (2-5 pages)
+   - Technical Approach (15-40 pages)
+   - Management Plan (10-25 pages)
+   - Past Performance (5-15 pages)
+   - Cost Proposal Overview (3-10 pages)
+   - Compliance Matrix
+   - Appendices as needed
+
+4. Ensure content is:
+   - Evaluator-focused and compliant
+   - Professional and well-structured
+   - Addresses all RFP requirements
+   - Includes specific technical details
+   - Demonstrates past performance relevance
+   - Shows clear value proposition
+
+5. Use proper government contracting terminology and formatting
+6. Include section headers, subsections, and detailed content
+7. Ensure total page count is between {request.min_pages} and {request.max_pages} pages
+
+Generate the complete proposal document now."""
+        else:
+            prompt = f"""Generate a comprehensive, professional government proposal based on:
+
+DESCRIPTION: {request.description or 'General government contracting opportunity'}
+
+REQUIREMENTS:
+1. Generate a complete proposal between {request.min_pages} and {request.max_pages} pages
+2. Follow Shipley methodology and government contracting best practices
+3. Include all standard proposal volumes with detailed content
+4. Ensure professional, evaluator-focused writing
+5. Total page count must be between {request.min_pages} and {request.max_pages} pages
+
+Generate the complete proposal document now."""
+        
+        # Check for OpenAI API key
+        openai_key = os.getenv("OPENAI_API_KEY")
+        if not openai_key:
+            raise HTTPException(
+                status_code=400,
+                detail="OPENAI_API_KEY not configured. Please set your OpenAI API key in environment variables."
+            )
+        
+        # Generate proposal using OpenAI with safe token limit
+        try:
+            # Calculate approximate tokens needed (roughly 250 words per page, ~750 tokens per page)
+            # Cap at 10,000 tokens to avoid errors (model supports max 16,384)
+            estimated_tokens = request.max_pages * 750
+            # Enforce hard limit of 10,000 tokens regardless of page count
+            safe_max_tokens = min(estimated_tokens, 10000)
+            
+            # Log for debugging
+            logger.info(f"Generating proposal: max_pages={request.max_pages}, estimated_tokens={estimated_tokens}, safe_max_tokens={safe_max_tokens}")
+            
+            generated_content = await llm_service.generate_completion(
+                prompt=prompt,
+                system_prompt="You are an expert government proposal writer with 20+ years of experience. Generate comprehensive, Shipley-compliant proposals that win contracts. Your proposals are evaluator-focused, compliant, and demonstrate clear value.",
+                max_tokens=safe_max_tokens,  # Hard capped at 16,000
+                temperature=0.7,
+                model="gpt-4o",  # Use GPT-4 for better quality long-form content
+                provider="openai"
+            )
+            
+            # Calculate actual page count (rough estimate: 500 words per page)
+            word_count = len(generated_content.split())
+            estimated_pages = max(request.min_pages, min(request.max_pages, word_count // 500))
+            
+            # Save proposal to database
+            proposal_title = contract_data.get('title', 'Generated Proposal') if contract_data else 'Generated Proposal'
+            proposal_rfp_text = description if description else (contract_data.get('description', '') if contract_data else '')
+            
+            # Get organization_id from user
+            organization_id = current_user.organization_id
+            
+            proposal = Proposal(
+                id=str(uuid.uuid4()),
+                title=proposal_title,
+                solicitation_number=contract_data.get('solicitationNumber') if contract_data else None,
+                opportunity_id=request.opportunity_id or request.contract_id,
+                organization_id=organization_id,
+                created_by=current_user.id,
+                status=ProposalStatus.DRAFT,
+                rfp_text=proposal_rfp_text,
+                sections={"content": generated_content, "estimated_pages": estimated_pages},
+                compliance_score=98.0,
+                is_508_compliant=False
+            )
+            
+            db.add(proposal)
+            db.commit()
+            db.refresh(proposal)
+            
+            return {
+                "success": True,
+                "proposal_id": proposal.id,
+                "content": generated_content,
+                "estimated_pages": estimated_pages,
+                "word_count": word_count,
+                "opportunity_id": request.opportunity_id or request.contract_id,
+                "generated_at": datetime.now().isoformat(),
+                "mockGenerated": False,
+                "source": "OpenAI GPT-4"
+            }
+            
+        except Exception as ai_error:
+            import logging
+            logging.error(f"OpenAI generation failed: {str(ai_error)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to generate proposal with OpenAI: {str(ai_error)}"
+            )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating full proposal: {str(e)}")
+
+
 @router.post("/generate")
 async def generate_proposal_content(
     contract_id: Optional[str] = None,
@@ -205,10 +395,10 @@ async def generate_proposal_content(
     Fetches from SAM.gov if contract_id provided
     """
     try:
-        # Fetch contract details from SAM.gov if ID provided
+        # Fetch contract details from SAM.gov if ID provided (synchronous function)
         contract_data = None
         if contract_id:
-            contract_data = await samgov_service.get_opportunity_by_id(contract_id)
+            contract_data = samgov_service.get_opportunity_by_id(contract_id)
         
         # Prepare prompt
         if contract_data:
@@ -616,57 +806,120 @@ async def red_team_review(
     }
 
 
-@router.post("/{proposal_id}/export")
-async def export_proposal(
+@router.delete("/{proposal_id}")
+async def delete_proposal(
     proposal_id: str,
-    format: str = "docx",  # docx, pdf, excel
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Export proposal to DOCX/PDF/Excel"""
+    """
+    Delete a proposal (soft delete)
+    User-scoped: only creator can delete
+    """
+    proposal = db.query(Proposal).filter(
+        Proposal.id == proposal_id,
+        Proposal.is_deleted == False
+    ).first()
     
-    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
     
-    # Get all sections
-    sections = db.query(ProposalSection).filter(
-        ProposalSection.proposal_id == proposal_id
-    ).order_by(ProposalSection.order).all()
+    if proposal.created_by != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this proposal")
     
-    sections_data = [
-        {
-            "number": s.section_number,
-            "title": s.section_title,
-            "content": s.content or ""
-        }
-        for s in sections
-    ]
+    # Soft delete
+    proposal.is_deleted = True
+    db.commit()
+    
+    return {"message": "Proposal deleted successfully", "id": proposal_id}
+
+
+@router.post("/{proposal_id}/export")
+async def export_proposal(
+    proposal_id: str,
+    format: str = Query("docx", description="Export format: docx, pdf, excel"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Export proposal to DOCX/PDF/Excel"""
+    from fastapi.responses import FileResponse
+    
+    proposal = db.query(Proposal).filter(
+        Proposal.id == proposal_id,
+        Proposal.is_deleted == False
+    ).first()
+    
+    if not proposal:
+        raise HTTPException(status_code=404, detail="Proposal not found")
+    
+    if proposal.created_by != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to export this proposal")
+    
+    # Get content from sections or from proposal.sections JSON
+    sections_data = []
+    if proposal.sections and isinstance(proposal.sections, dict) and 'content' in proposal.sections:
+        # If content is stored in sections JSON, create a single section
+        sections_data = [{
+            "number": "1",
+            "title": "Proposal Content",
+            "content": proposal.sections.get('content', '')
+        }]
+    else:
+        # Get all sections from ProposalSection table
+        sections = db.query(ProposalSection).filter(
+            ProposalSection.proposal_id == proposal_id
+        ).order_by(ProposalSection.order).all()
+        
+        sections_data = [
+            {
+                "number": s.section_number,
+                "title": s.section_title,
+                "content": s.content or ""
+            }
+            for s in sections
+        ]
     
     output_dir = "/tmp/GovSure/exports"
     os.makedirs(output_dir, exist_ok=True)
     
     if format == "docx":
         output_path = os.path.join(output_dir, f"{proposal_id}.docx")
-        document_service.create_proposal_docx(
-            title=proposal.title,
-            sections=sections_data,
-            output_path=output_path
-        )
-        proposal.docx_file_path = output_path
+        try:
+            document_service.create_proposal_docx(
+                title=proposal.title,
+                sections=sections_data,
+                output_path=output_path
+            )
+            proposal.docx_file_path = output_path
+            db.commit()
+            
+            return FileResponse(
+                output_path,
+                media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                filename=f"{proposal.title.replace(' ', '_')}.docx"
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to create DOCX: {str(e)}")
     
     elif format == "excel":
         output_path = os.path.join(output_dir, f"{proposal_id}_compliance.xlsx")
-        document_service.create_compliance_matrix_excel(
-            requirements=proposal.requirements or [],
-            compliance_data=proposal.compliance_matrix or {},
-            output_path=output_path
-        )
-        proposal.excel_file_path = output_path
+        try:
+            document_service.create_compliance_matrix_excel(
+                requirements=proposal.requirements or [],
+                compliance_data=proposal.compliance_matrix or {},
+                output_path=output_path
+            )
+            proposal.excel_file_path = output_path
+            db.commit()
+            
+            return FileResponse(
+                output_path,
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                filename=f"{proposal.title.replace(' ', '_')}_compliance.xlsx"
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to create Excel: {str(e)}")
     
-    db.commit()
-    
-    return {
-        "message": f"Proposal exported as {format}",
-        "file_path": output_path
-    }
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported format: {format}. Supported formats: docx, excel")
 

@@ -49,14 +49,19 @@ services:
       dockerfile: ../docker/Dockerfile.backend
     ports:
       - "8000:8000" # expose to host machine for development
+    env_file:
+      - ./backend/.env  # Load environment variables from backend/.env
     environment:
       DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       DEBUG: "true" # Enable DEBUG for local development (CORS enabled in FastAPI)
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # API keys will be loaded from backend/.env via env_file above
+      # You can override them here if needed:
+      # OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # SAM_GOV_API_KEY: ${SAM_GOV_API_KEY:-}
     volumes:
       - ./backend:/app
       - uploads:/tmp/GovSure/uploads
@@ -72,13 +77,18 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/Dockerfile.backend
+    env_file:
+      - ./backend/.env  # Load environment variables from backend/.env
     environment:
       DATABASE_URL: postgresql://GovSure:GovSure@postgres:5432/GovSure
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # API keys will be loaded from backend/.env via env_file above
+      # You can override them here if needed:
+      # OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # SAM_GOV_API_KEY: ${SAM_GOV_API_KEY:-}
     volumes:
       - ./backend:/app
       - uploads:/tmp/GovSure/uploads

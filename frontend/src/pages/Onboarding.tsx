@@ -296,7 +296,34 @@ export default function Onboarding() {
                 />
               </div>
 
-              <div className="flex gap-3">
+              {/* Expert Onboarding Option */}
+              <div className="mt-8 p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-200">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                      <Star className="text-white" size={24} />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">Get Expert Guidance</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Schedule a free 1-on-1 session with a GovCon expert to help you get started. Learn best practices, ask questions, and accelerate your success.
+                    </p>
+                    <button
+                      onClick={() => {
+                        localStorage.setItem('onboarding_completed', 'true');
+                        localStorage.setItem('onboarding_data', JSON.stringify(data));
+                        navigate('/onboarding/expert');
+                      }}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors text-sm"
+                    >
+                      Schedule Expert Session (Free)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setStep(3)}
                   className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center"

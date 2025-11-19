@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import SharePointSyncButton from '../components/SharePointSyncButton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const WS_URL = API_URL.replace('http', 'ws');
@@ -402,6 +403,15 @@ const ProposalEditor: React.FC = () => {
                     <span>📕</span>
                     <span>Export to PDF</span>
                   </button>
+                  <div className="border-t border-gray-200 my-1"></div>
+                  {proposalId && (
+                    <div className="px-4 py-2">
+                      <SharePointSyncButton 
+                        proposalId={proposalId}
+                        className="w-full"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

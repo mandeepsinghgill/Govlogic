@@ -3,13 +3,21 @@ Test configuration and fixtures
 """
 import pytest
 import asyncio
+from unittest.mock import MagicMock, patch
+import sys
+
+# Mock sqlalchemy create_engine globally
+mock_engine = MagicMock()
+mock_engine.connect.return_value.__enter__.return_value = MagicMock()
+with patch('sqlalchemy.create_engine', return_value=mock_engine):
+    from app.main import app
+    from app.core.database import get_db, Base
+    from app.models.organization import Organization, User, UserRole
+    from app.services.auth_service import AuthService
+
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.main import app
-from app.core.database import get_db, Base
-from app.models.organization import Organization, User, UserRole
-from app.services.auth_service import AuthService
 
 # Test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"

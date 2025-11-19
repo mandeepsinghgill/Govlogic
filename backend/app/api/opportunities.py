@@ -1,7 +1,7 @@
 """
 Opportunities API endpoints
 """
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
@@ -9,9 +9,18 @@ from datetime import datetime
 from pydantic import BaseModel
 from datetime import date
 from app.core.database import get_db
+from app.core.auth import get_current_user
 from app.models.opportunity import Opportunity, OpportunityStage, OpportunityType, SetAsideType
+from app.models.proposal import Proposal, ProposalStatus
+from app.models.organization import User
 from app.services.llm_service import llm_service
 from app.services.samgov_service import samgov_service
+from app.services.brief_service import BriefService
+from app.services.gov_supreme_overlord_service import GovSupremeOverlordService
+import logging
+
+logger = logging.getLogger(__name__)
+brief_service = BriefService()
 
 router = APIRouter()
 
@@ -183,17 +192,152 @@ async def list_opportunities(
     return opportunities
 
 
+async def _auto_generate_brief_and_proposal(
+    opportunity_id: str,
+    opportunity_data: dict,
+    organization_id: str,
+    user_id: Optional[str] = None
+):
+    """
+    Background task to automatically generate brief and proposal for a new opportunity
+    """
+    from app.core.database import SessionLocal
+    
+    db = SessionLocal()
+    try:
+        logger.info(f"🤖 Auto-generating brief and proposal for opportunity: {opportunity_id}")
+        
+        # Generate Brief
+        try:
+            brief = await brief_service.generate_brief(opportunity_id, opportunity_data)
+            logger.info(f"✅ Brief generated successfully for {opportunity_id}")
+            
+            # Store brief data in opportunity (or could create separate Brief table)
+            opp = db.query(Opportunity).filter(Opportunity.id == opportunity_id).first()
+            if opp:
+                # Store brief as JSON in description or create a field for it
+                # For now, we'll store a reference that brief was generated
+                logger.info(f"Brief generated: {brief.get('overview', {}).get('fitScore', 0)}% fit score")
+        except Exception as e:
+            logger.error(f"❌ Error auto-generating brief: {str(e)}")
+        
+        # Generate Proposal
+        try:
+            gov_supreme = GovSupremeOverlordService(db)
+            
+            # Prepare company knowledge base
+            company_kb = {
+                "organization_id": organization_id,
+                "capabilities": [],
+                "past_performance": [],
+                "certifications": []
+            }
+            
+            # Get RFP text from opportunity
+            rfp_text = opportunity_data.get('description') or opportunity_data.get('synopsis', '') or f"""
+Title: {opportunity_data.get('title', '')}
+Agency: {opportunity_data.get('agency', '')}
+NAICS: {opportunity_data.get('naicsCode', '')}
+Description: {opportunity_data.get('description', '')}
+"""
+            
+            # Generate full proposal
+            proposal_package = await gov_supreme.generate_full_proposal(
+                rfp_id=opportunity_id,
+                rfp_text=rfp_text,
+                company_kb=company_kb,
+                user_preferences={
+                    "page_limits": {"technical": 30, "management": 20, "past_performance": 15},
+                    "style_guide": "booz_allen",
+                    "include_color_teams": True
+                }
+            )
+            
+            # Create Proposal record in database
+            proposal = Proposal(
+                title=opportunity_data.get('title', 'Proposal'),
+                solicitation_number=opportunity_data.get('solicitation_number'),
+                opportunity_id=opportunity_id,
+                organization_id=organization_id,
+                created_by=user_id,
+                status=ProposalStatus.DRAFT,
+                rfp_text=rfp_text,
+                requirements=proposal_package.get('rfp_analysis', {}),
+                compliance_matrix=proposal_package.get('compliance_matrix', {}),
+                outline=proposal_package.get('outline', {}),
+                sections=proposal_package.get('proposal_sections', {}),
+                red_team_report=proposal_package.get('red_team_review', {}),
+                red_team_score=proposal_package.get('red_team_review', {}).get('overall_score', 0)
+            )
+            
+            db.add(proposal)
+            db.commit()
+            db.refresh(proposal)
+            
+            logger.info(f"✅ Proposal generated and saved: {proposal.id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error auto-generating proposal: {str(e)}")
+            db.rollback()
+        
+    except Exception as e:
+        logger.error(f"❌ Error in auto-generation task: {str(e)}")
+        db.rollback()
+    finally:
+        db.close()
+
+
 @router.post("/", response_model=OpportunityResponse)
 async def create_opportunity(
     opportunity: OpportunityCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
-    """Create a new opportunity"""
+    """
+    Create a new opportunity
     
+    Automatically generates:
+    - Brief (Shipley-compliant opportunity analysis)
+    - Proposal (Full Shipley proposal with all sections)
+    
+    Generation runs in background so API returns immediately.
+    
+    For each opportunity created, the system will:
+    1. Generate a comprehensive Shipley-compliant brief with fit score, win strategy, etc.
+    2. Generate a complete proposal with all sections, compliance matrix, and red team review
+    3. Store both in the database for the user/organization
+    """
+    
+    # Create opportunity
     db_opportunity = Opportunity(**opportunity.dict())
     db.add(db_opportunity)
     db.commit()
     db.refresh(db_opportunity)
+    
+    # Prepare opportunity data for auto-generation
+    opportunity_data = {
+        "id": db_opportunity.id,
+        "title": db_opportunity.title,
+        "agency": db_opportunity.agency or "Federal Agency",
+        "description": db_opportunity.description or "",
+        "synopsis": db_opportunity.description or "",
+        "value": db_opportunity.contract_value or 5000000,
+        "dueDate": db_opportunity.due_date.strftime("%Y-%m-%d") if db_opportunity.due_date else "45 days",
+        "naicsCode": db_opportunity.naics_code or "541511",
+        "setAside": db_opportunity.set_aside.value if db_opportunity.set_aside else "Small Business Set-Aside",
+        "solicitation_number": db_opportunity.solicitation_number
+    }
+    
+    # Schedule automatic brief and proposal generation in background
+    background_tasks.add_task(
+        _auto_generate_brief_and_proposal,
+        opportunity_id=str(db_opportunity.id),
+        opportunity_data=opportunity_data,
+        organization_id=opportunity.organization_id,
+        user_id=None  # Will be set when user authentication is available
+    )
+    
+    logger.info(f"✅ Opportunity created: {db_opportunity.id}. Brief and proposal generation started in background.")
     
     return db_opportunity
 
@@ -219,6 +363,7 @@ async def get_opportunity(
 @router.get("/{opportunity_id}/details")
 async def get_opportunity_details(
     opportunity_id: str,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -280,27 +425,32 @@ async def calculate_pwin(
     if not opportunity:
         raise HTTPException(status_code=404, detail="Opportunity not found")
     
-    # Prepare opportunity data for AI
-    opp_data = {
-        "title": opportunity.title,
-        "agency": opportunity.agency,
-        "contract_value": opportunity.contract_value,
-        "set_aside": opportunity.set_aside,
-        "description": opportunity.description
-    }
+    # Get organization for enhanced 10-factor PWin calculation
+    from app.models.organization import Organization
+    from app.services.enhanced_pwin_service import get_enhanced_pwin_service
     
-    # Calculate PWin using AI
-    result = await llm_service.calculate_pwin(opp_data)
+    organization = db.query(Organization).filter(
+        Organization.id == opportunity.organization_id
+    ).first()
     
-    # Update opportunity
-    opportunity.pwin_score = result.get("pwin", 0)
-    opportunity.qualification_scores = result.get("factors", {})
+    if not organization:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    # Use enhanced 10-factor PWin service
+    pwin_service = get_enhanced_pwin_service(db)
+    result = pwin_service.calculate_10_factor_pwin(opportunity, organization)
+    
+    # Update opportunity with PWin score
+    opportunity.pwin_score = int(result["pwin_score"])
+    opportunity.qualification_scores = result["factors"]
     db.commit()
     
     return {
-        "pwin_score": result.get("pwin", 0),
-        "factors": result.get("factors", {}),
-        "recommendation": result.get("recommendation", "")
+        "pwin_score": int(result["pwin_score"]),
+        "factors": result["factors"],
+        "recommendation": result["recommendation"],
+        "confidence": result["confidence"],
+        "weighted_scores": result["weighted_scores"]
     }
 
 

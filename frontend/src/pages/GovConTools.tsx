@@ -3,7 +3,6 @@ import { ArrowRight, BarChart3, CheckCircle2, Download, FolderKanban, Layers, Se
 import Navigation from '../components/Navigation';
 import ChatWidget from '../components/ChatWidget';
 
-const toolsUrl = '#';
 
 const kits = [
   {
@@ -57,13 +56,12 @@ function Hero() {
             Templates, scorecards, and automations built by GovSure strategists to accelerate every phase of your GovCon lifecycle. No credit card. No trial. Just plug-and-play leverage.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <a
-              href={toolsUrl}
-              rel="noreferrer noopener"
+            <Link
+              to="/toolkit-assessment"
               className="inline-flex items-center gap-2 rounded-full bg-white text-blue-900 px-8 py-3 font-semibold shadow-lg hover:bg-blue-50 transition-all"
             >
-              Access Toolkit <ArrowRight size={18} />
-            </a>
+              Assess Toolkit <ArrowRight size={18} />
+            </Link>
             <Link
               to="/signup"
               className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3 font-semibold hover:bg-white/10 transition-all"
@@ -196,13 +194,12 @@ function CTA() {
           Instant access, no gated sales call. Use them as-is or load them into GovSure to power your automation layer.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <a
-            href={toolsUrl}
-            rel="noreferrer noopener"
+          <Link
+            to="/toolkit-assessment"
             className="inline-flex items-center gap-2 rounded-full bg-white text-blue-900 px-8 py-3 font-semibold shadow-xl hover:bg-blue-50 transition-all"
           >
-            Download Toolkit <ArrowRight size={18} />
-          </a>
+            Assess Toolkit <ArrowRight size={18} />
+          </Link>
           <Link
             to="/case-studies"
             className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3 font-semibold hover:bg-white/10 transition-all"

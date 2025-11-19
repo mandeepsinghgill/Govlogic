@@ -46,7 +46,8 @@ class DocumentResponse(BaseModel):
 
 
 # Ensure upload directory exists
-UPLOAD_DIR = "/app/uploads/knowledge"
+# Ensure upload directory exists
+UPLOAD_DIR = "./uploads/knowledge"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 

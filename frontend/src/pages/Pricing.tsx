@@ -223,7 +223,7 @@ export default function Pricing() {
             Ready to Get Started?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Try GovSure free for 14 days. No credit card required.
+            Try GovSure free for 7 days. No credit card required.
           </p>
           <Link
             to="/signup"

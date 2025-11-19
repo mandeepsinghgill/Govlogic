@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TopOpportunities from '../components/TopOpportunities';
+import ActiveProposalsSection from '../components/ActiveProposalsSection';
 
 export default function DashboardModern() {
   const [timeRange, setTimeRange] = useState('30d');
@@ -128,38 +129,8 @@ export default function DashboardModern() {
           {/* Top Opportunities - Now using real data from SAM.gov */}
           <TopOpportunities />
 
-          {/* Active Proposals */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Active Proposals</h2>
-              <Link to="/proposals" className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center">
-                View All <ChevronRight size={16} />
-              </Link>
-            </div>
-            <div className="space-y-4">
-              <ProposalCard
-                title="Network Security Enhancement"
-                status="In Progress"
-                progress={75}
-                deadline="3 days"
-                team={["JD", "SK", "MP"]}
-              />
-              <ProposalCard
-                title="Data Center Operations"
-                status="Review"
-                progress={95}
-                deadline="1 day"
-                team={["AB", "CD"]}
-              />
-              <ProposalCard
-                title="Help Desk Support Services"
-                status="Draft"
-                progress={45}
-                deadline="7 days"
-                team={["EF", "GH", "IJ", "KL"]}
-              />
-            </div>
-          </div>
+          {/* Active Proposals - Now showing real auto-generated proposals */}
+          <ActiveProposalsSection />
         </div>
 
         {/* Alerts/Notifications */}

@@ -48,6 +48,7 @@ class Organization(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     opportunities = relationship("Opportunity", back_populates="organization")
     proposals = relationship("Proposal", back_populates="organization")
     pipeline_items = relationship("PipelineItem", back_populates="organization")
+    briefs = relationship("Brief", back_populates="organization")
 
 
 class User(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):

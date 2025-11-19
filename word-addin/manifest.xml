@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  
+  <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
+  
+  <!-- IMPORTANT! Id must be unique for your add-in. -->
+  <Id>GOVSURE-AI-WORD-ADDIN-2024</Id>
+  
+  <!--Version. Updates from the store only get triggered if there is a version change. -->
+  <Version>1.0.0.0</Version>
+  <ProviderName>GovSure AI</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  
+  <!-- The display name of your add-in. Used on the store and various places of the Office UI such as the add-ins dialog. -->
+  <DisplayName DefaultValue="GovSure AI Assistant" />
+  <Description DefaultValue="AI-powered proposal writing and compliance checking for government contracting. Generate content, check compliance, and enhance your proposals directly in Word." />
+  
+  <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
+  <IconUrl DefaultValue="https://app.govsureai.com/word-addin/assets/icon-64.png"/>
+  
+  <!--HighResolutionIconUrl. Required if you are supporting add-in for high resolution screens. -->
+  <HighResolutionIconUrl DefaultValue="https://app.govsureai.com/word-addin/assets/icon-128.png"/>
+  
+  <!--SupportUrl. Specifies the URL where users can get support for the add-in. -->
+  <SupportUrl DefaultValue="https://govsureai.com/support" />
+  
+  <!-- AppDomains: Restricts the add-in to specific domains. -->
+  <AppDomains>
+    <AppDomain>app.govsureai.com</AppDomain>
+    <AppDomain>govsureai.com</AppDomain>
+  </AppDomains>
+  
+  <!--End Basic Settings. -->
+  
+  <!--Begin TaskPane Mode integration. This section is used if there are no VersionOverrides or if the Office client version does not support add-in commands. -->
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://app.govsureai.com/word-addin/taskpane.html"/>
+  </DefaultSettings>
+  <!-- End TaskPane Mode integration.  -->
+  
+  <Permissions>ReadWriteDocument</Permissions>
+  
+  <!-- Begin Add-in Commands Mode integration. -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    
+    <!-- The Hosts node is required. -->
+    <Hosts>
+      <!-- Each host can have a different set of commands. -->
+      <!-- Office.Word.exe and Word.WordWWA.exe need to be replaced with Office.Word.Win32.exe and Word.WordWWA.exe, respectively. -->
+      <Host xsi:type="Document">
+        <!-- Form factor. Currently only DesktopFormFactor is supported. -->
+        <DesktopFormFactor>
+          <!--"This code enables a customizable message to be displayed when the add-in is loaded successfully upon individual install."-->
+          <GetStarted>
+            <!-- Title of the Getting Started callout. resid points to a ShortString resource -->
+            <Title resid="GetStarted.Title"/>
+            <!-- Description of the Getting Started callout. resid points to a LongString resource -->
+            <Description resid="GetStarted.Description"/>
+            <!-- Point to a url resource which details how the add-in should be used. -->
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          <!-- Function file is a pointer to a JavaScript file that includes the code for functions used by UI-less commands. 
+           Think of the FunctionFile as the code behind ExecuteFunction calls. -->
+          <FunctionFile resid="Commands.Url" />
+          
+          <!-- PrimaryCommandSurface is the main Office Ribbon. -->
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <!-- Use OfficeTab to extend an existing Tab. Use CustomTab to create a new tab. -->
+            <OfficeTab id="TabHome">
+              <!-- Ensure you provide a unique id for the group. Recommendation for any IDs is to namespace using your company name. -->
+              <Group id="GovSureAI.Group">
+                <!-- Label for your group. resid must point to a ShortString resource. -->
+                <Label resid="GroupLabel" />
+                <!-- Icons. Required sizes: 16, 32, 80; optional: 20, 24, 40, 48, 64. -->
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16"/>
+                  <bt:Image size="32" resid="Icon.32x32"/>
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
+                
+                <!-- Control. It can be of type "Button" or "Menu". -->
+                <Control xsi:type="Button" id="GovSureAI.TaskpaneButton">
+                  <Label resid="TaskpaneButton.Label" />
+                  <Supertip>
+                    <!-- ToolTip title. resid must point to a ShortString resource. -->
+                    <Title resid="TaskpaneButton.Label" />
+                    <!-- ToolTip description. resid must point to a LongString resource. -->
+                    <Description resid="TaskpaneButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  
+                  <!-- This is what happens when the command is triggered (E.g. click on the Ribbon). Supported actions are ExecuteFunction or ShowTaskpane. -->
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>ButtonId1</TaskpaneId>
+                    <!-- Provide a url resource id for the location that will be opened on command invocation. -->
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+                
+                <!-- Menu example -->
+                <Control xsi:type="Menu" id="GovSureAI.Menu">
+                  <Label resid="MenuLabel"/>
+                  <Supertip>
+                    <Title resid="MenuLabel"/>
+                    <Description resid="MenuTooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  
+                  <Items>
+                    <Item id="GovSureAI.Menu.Generate">
+                      <Label resid="MenuItem.Generate.Label"/>
+                      <Supertip>
+                        <Title resid="MenuItem.Generate.Label"/>
+                        <Description resid="MenuItem.Generate.Supertip"/>
+                      </Supertip>
+                      <Icon>
+                        <bt:Image size="16" resid="Icon.16x16"/>
+                        <bt:Image size="32" resid="Icon.32x32"/>
+                      </Icon>
+                      <Action xsi:type="ExecuteFunction">
+                        <FunctionName>generateContent</FunctionName>
+                      </Action>
+                    </Item>
+                    
+                    <Item id="GovSureAI.Menu.Compliance">
+                      <Label resid="MenuItem.Compliance.Label"/>
+                      <Supertip>
+                        <Title resid="MenuItem.Compliance.Label"/>
+                        <Description resid="MenuItem.Compliance.Supertip"/>
+                      </Supertip>
+                      <Icon>
+                        <bt:Image size="16" resid="Icon.16x16"/>
+                        <bt:Image size="32" resid="Icon.32x32"/>
+                      </Icon>
+                      <Action xsi:type="ExecuteFunction">
+                        <FunctionName>checkCompliance</FunctionName>
+                      </Action>
+                    </Item>
+                  </Items>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    
+    <!-- You can use resources across hosts and form factors. -->
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="https://app.govsureai.com/word-addin/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://app.govsureai.com/word-addin/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://app.govsureai.com/word-addin/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://govsureai.com/docs/word-addin"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://app.govsureai.com/word-addin/commands.js"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://app.govsureai.com/word-addin/taskpane.html"/>
+      </bt:Urls>
+      <!-- ShortStrings max characters==125. -->
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Get started with GovSure AI!"/>
+        <bt:String id="GroupLabel" DefaultValue="GovSure AI"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="GovSure AI"/>
+        <bt:String id="MenuLabel" DefaultValue="AI Tools"/>
+        <bt:String id="MenuItem.Generate.Label" DefaultValue="Generate Content"/>
+        <bt:String id="MenuItem.Compliance.Label" DefaultValue="Check Compliance"/>
+      </bt:ShortStrings>
+      <!-- LongStrings max characters==250. -->
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Generate winning proposals, check compliance, and enhance your documents with AI-powered tools."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Open GovSure AI Assistant to generate content, check compliance, and enhance your proposal."/>
+        <bt:String id="MenuTooltip" DefaultValue="Access AI-powered tools for government contracting."/>
+        <bt:String id="MenuItem.Generate.Supertip" DefaultValue="Generate proposal content using AI based on selected text or context."/>
+        <bt:String id="MenuItem.Compliance.Supertip" DefaultValue="Check your document for FAR/DFARS compliance and get recommendations."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>
+

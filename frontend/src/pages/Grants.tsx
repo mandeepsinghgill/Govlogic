@@ -7,13 +7,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FileText, Upload, TrendingUp, DollarSign, Calendar,
+  FileText, Upload, DollarSign, Calendar,
   CheckCircle, Clock, AlertCircle, Download, Plus, Search,
-  Filter, Award, Users, BarChart3
+  Award, Users, BarChart3
 } from 'lucide-react';
 
 interface Grant {
-  id: number;
+  id: string;
   title: string;
   agency: string;
   funding_opportunity_number: string;
@@ -24,18 +24,29 @@ interface Grant {
   last_updated: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Fix for ImportMeta type error
+const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
-const Grants: React.FC = () => {
-  const [grants, setGrants] = useState<Grant[]>([]);
-  const [filterStatus, setFilterStatus] = useState('all');
+export default function Grants() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [grants, setGrants] = useState<Grant[]>([]);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
+
+  const [stats, setStats] = useState({
+    total: 0,
+    draft: 0,
+    submitted: 0,
+    awarded: 0,
+    total_value: 0
+  });
 
   // Fetch grants from API
   useEffect(() => {
     fetchGrants();
+    fetchStats();
   }, []);
 
   const fetchGrants = async () => {
@@ -95,6 +106,24 @@ const Grants: React.FC = () => {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      if (!token) return;
+
+      const response = await fetch(`${API_URL}/api/v1/grants/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
+  };
+
   const filteredGrants = grants.filter(grant => {
     const matchesStatus = filterStatus === 'all' || grant.status === filterStatus;
     const matchesSearch = 
@@ -103,14 +132,6 @@ const Grants: React.FC = () => {
       grant.funding_opportunity_number.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
-
-  const stats = {
-    total: grants.length,
-    draft: grants.filter(g => g.status.toLowerCase() === 'draft').length,
-    submitted: grants.filter(g => g.status.toLowerCase() === 'submitted').length,
-    awarded: grants.filter(g => g.status.toLowerCase() === 'awarded').length,
-    total_value: grants.reduce((sum, g) => sum + g.award_ceiling, 0)
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -373,7 +394,4 @@ const Grants: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Grants;
-
+}

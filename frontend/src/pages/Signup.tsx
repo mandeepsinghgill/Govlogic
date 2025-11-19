@@ -101,7 +101,7 @@ export default function Signup() {
         {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {/* Social Auth Buttons */}
-          <div className="space-y-3 mb-6">
+          {/* <div className="space-y-3 mb-6">
             <button
               onClick={() => handleSocialAuth('Google')}
               className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -134,7 +134,7 @@ export default function Signup() {
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">Or sign up with email</span>
             </div>
-          </div>
+          </div> */}
 
           {/* Error Message */}
           {error && (

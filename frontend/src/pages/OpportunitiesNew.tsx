@@ -3,12 +3,15 @@ import { Card } from '@/components/ui/card';
 import { 
   Search, Filter, Building2, DollarSign, Calendar, 
   ExternalLink, TrendingUp, Loader2, RefreshCw, Grid3x3, List, 
-  FileText, Plus, CalendarPlus, X, Check 
+  FileText, Plus, CalendarPlus, X, Check, Eye, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { useAppDispatch } from '../store/hooks';
 import { addToPipeline } from '../store/pipelineSlice';
 import { addToCalendar, getCalendarColor } from '../utils/calendarUtils';
 import toast, { Toaster } from 'react-hot-toast';
+import { briefService, Brief } from '../services/briefService';
+import { proposalService, Proposal } from '../services/proposalService';
+import { Link } from 'react-router-dom';
 
 interface Opportunity {
   id: string;
@@ -40,8 +43,12 @@ export default function OpportunitiesNew() {
     keyword: '',
   });
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [addingToPipeline, setAddingToPipeline] = useState<string | null>(null);
+  const [addingToPipeline, setAddingToPipeline] = useState<Record<string, boolean>>({});
   const [showBrief, setShowBrief] = useState<string | null>(null);
+  const [briefs, setBriefs] = useState<Record<string, Brief>>({});
+  const [briefsLoading, setBriefsLoading] = useState<Set<string>>(new Set());
+  const [proposals, setProposals] = useState<Record<string, Proposal>>({});
+  const [proposalsLoading, setProposalsLoading] = useState<Set<string>>(new Set());
   const [pipelineItemIds, setPipelineItemIds] = useState<Set<string>>(new Set());
   const [searchRequestId, setSearchRequestId] = useState<string | null>(null);
 
@@ -51,6 +58,16 @@ export default function OpportunitiesNew() {
     // Fetch initial data or when page/filters change, but not on searchTerm change
     fetchOpportunities();
   }, [page, filters]);
+
+  // Check for auto-generated briefs and proposals when opportunities load
+  useEffect(() => {
+    if (opportunities.length > 0) {
+      opportunities.forEach(opp => {
+        checkBriefStatus(opp.id);
+        checkProposalStatus(opp.id);
+      });
+    }
+  }, [opportunities]);
 
   // Clear search when input is empty
   useEffect(() => {
@@ -224,28 +241,79 @@ export default function OpportunitiesNew() {
     fetchOpportunities();
   };
 
-  const handleGetBrief = (opp: Opportunity, e: React.MouseEvent) => {
+  const checkBriefStatus = async (opportunityId: string) => {
+    try {
+      const exists = await briefService.briefExists(opportunityId);
+      if (exists) {
+        const brief = await briefService.getBrief(opportunityId);
+        setBriefs(prev => ({ ...prev, [opportunityId]: brief }));
+      }
+    } catch (error) {
+      // Brief doesn't exist yet - that's okay, it might be generating
+      console.log(`Brief for ${opportunityId} not ready yet`);
+    }
+  };
+
+  const checkProposalStatus = async (opportunityId: string) => {
+    try {
+      const proposal = await proposalService.getPrimaryProposal(opportunityId);
+      if (proposal) {
+        setProposals(prev => ({ ...prev, [opportunityId]: proposal }));
+      }
+    } catch (error) {
+      // Proposal doesn't exist yet - that's okay
+      console.log(`Proposal for ${opportunityId} not ready yet`);
+    }
+  };
+
+  const handleGetBrief = async (opp: Opportunity, e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Close any currently open brief first
-    if (showBrief) {
-      setShowBrief(null);
-    }
-    
-    // Then show the new brief after a tiny delay to ensure state update
-    setTimeout(() => {
+    // If brief already exists, show it
+    if (briefs[opp.id]) {
       setShowBrief(opp.id);
-      toast.success('Brief generated successfully!', {
+      return;
+    }
+
+    // Otherwise, try to fetch it or generate it
+    setBriefsLoading(prev => new Set(prev).add(opp.id));
+    
+    try {
+      // First try to get existing brief (this will auto-generate if not found)
+      const brief = await briefService.getBrief(opp.id);
+      setBriefs(prev => ({ ...prev, [opp.id]: brief }));
+      setShowBrief(opp.id);
+      toast.success('Brief loaded!', {
         id: `brief-${opp.id}`,
-        duration: 3000,
+        duration: 2000,
         icon: '📄',
       });
-      
-      // Auto-close after 5 seconds
-      setTimeout(() => {
-        setShowBrief(prev => prev === opp.id ? null : prev);
-      }, 5000);
-    }, 10);
+    } catch (error: any) {
+      console.error('Error getting brief:', error);
+      // If getBrief fails, try to generate it explicitly
+      try {
+        const brief = await briefService.generateBrief(opp.id);
+        setBriefs(prev => ({ ...prev, [opp.id]: brief }));
+        setShowBrief(opp.id);
+        toast.success('Brief generated!', {
+          id: `brief-${opp.id}`,
+          duration: 3000,
+          icon: '✨',
+        });
+      } catch (genError: any) {
+        console.error('Error generating brief:', genError);
+        toast.error(genError.message || 'Failed to get or generate brief. Please check your OpenAI API key configuration.', {
+          id: `brief-error-${opp.id}`,
+          duration: 5000,
+        });
+      }
+    } finally {
+      setBriefsLoading(prev => {
+        const next = new Set(prev);
+        next.delete(opp.id);
+        return next;
+      });
+    }
   };
 
   const handleAddToPipeline = async (opp: Opportunity, e: React.MouseEvent) => {
@@ -256,7 +324,7 @@ export default function OpportunitiesNew() {
     });
     
     try {
-      setAddingToPipeline(opp.id);
+      setAddingToPipeline(prev => ({ ...prev, [opp.id]: true }));
       await dispatch(addToPipeline({
         opportunity_id: opp.id,
         title: opp.title,
@@ -280,7 +348,7 @@ export default function OpportunitiesNew() {
         duration: 4000,
       });
     } finally {
-      setAddingToPipeline(null);
+      setAddingToPipeline(prev => ({ ...prev, [opp.id]: false }));
     }
   };
 
@@ -531,12 +599,12 @@ export default function OpportunitiesNew() {
               return (
                 <Card key={opp.id} className="p-6 hover:shadow-lg transition-shadow">
                   <div className="flex items-start justify-between mb-3">
-                    <h3 
+                    <Link
+                      to={`/opportunities/${opp.id}`}
                       className="text-lg font-semibold text-gray-900 hover:text-blue-600 cursor-pointer flex-1"
-                      onClick={() => window.location.href = `/opportunities/${opp.id}`}
                     >
                       {opp.title}
-                    </h3>
+                    </Link>
                     <a
                       href={getSamGovUrl(opp)}
                       target="_blank"
@@ -595,9 +663,31 @@ export default function OpportunitiesNew() {
                     )}
                   </div>
 
+                  {/* Auto-Generated Status Indicators */}
+                  {(briefs[opp.id] || proposals[opp.id]) && (
+                    <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center gap-2 text-sm text-green-800">
+                        <Sparkles className="h-4 w-4" />
+                        <span className="font-semibold">Auto-Generated:</span>
+                        {briefs[opp.id] && (
+                          <span className="flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Brief Ready
+                          </span>
+                        )}
+                        {proposals[opp.id] && (
+                          <span className="flex items-center gap-1 ml-2">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Proposal Ready
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Brief Popup */}
-                  {showBrief === opp.id && (
-                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg relative">
+                  {showBrief === opp.id && briefs[opp.id] && (
+                    <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg relative">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -607,25 +697,70 @@ export default function OpportunitiesNew() {
                       >
                         <X className="h-4 w-4" />
                       </button>
-                      <h4 className="font-semibold text-blue-900 mb-2">Proposal Brief</h4>
-                      <p className="text-sm text-blue-800">
-                        <strong>Opportunity:</strong> {opp.title}<br />
-                        <strong>Agency:</strong> {opp.agency}<br />
-                        <strong>Value:</strong> {formatCurrency(opp.value)}<br />
-                        <strong>Status:</strong> AI-generated brief ready for review
-                      </p>
+                      <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Shipley-Compliant Brief
+                      </h4>
+                      <div className="text-sm text-blue-800 space-y-1">
+                        <p><strong>Fit Score:</strong> {briefs[opp.id].overview.fitScore}%</p>
+                        <p><strong>PWin:</strong> {briefs[opp.id].bidDecisionMatrix.overallScore}%</p>
+                        <p><strong>Gate:</strong> 
+                          <span className={`ml-1 px-2 py-0.5 rounded text-xs font-semibold ${
+                            briefs[opp.id].bidDecisionMatrix.gate === 'GREEN' ? 'bg-green-500 text-white' :
+                            briefs[opp.id].bidDecisionMatrix.gate === 'YELLOW' ? 'bg-yellow-500 text-white' :
+                            'bg-red-500 text-white'
+                          }`}>
+                            {briefs[opp.id].bidDecisionMatrix.gate}
+                          </span>
+                        </p>
+                      </div>
+                      <Link
+                        to={`/opportunities/${opp.id}?showBrief=true`}
+                        className="mt-2 inline-flex items-center gap-1 text-sm text-blue-700 hover:text-blue-900 font-medium"
+                      >
+                        View Full Brief <Eye className="h-3 w-3" />
+                      </Link>
                     </div>
                   )}
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-gray-100">
                     <button
                       onClick={(e) => handleGetBrief(opp, e)}
-                      className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      disabled={briefsLoading.has(opp.id)}
+                      className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded transition-colors ${
+                        briefs[opp.id]
+                          ? 'bg-green-600 text-white hover:bg-green-700'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      <FileText className="h-4 w-4" />
-                      Get Brief
+                      {briefsLoading.has(opp.id) ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading...
+                        </>
+                      ) : briefs[opp.id] ? (
+                        <>
+                          <CheckCircle2 className="h-4 w-4" />
+                          View Brief
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-4 w-4" />
+                          Get Brief
+                        </>
+                      )}
                     </button>
+
+                    {proposals[opp.id] && (
+                      <Link
+                        to={`/proposals/${proposals[opp.id].id}`}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+                      >
+                        <FileText className="h-4 w-4" />
+                        View Proposal
+                      </Link>
+                    )}
                     
                     {pipelineItemIds.has(opp.id) ? (
                       <button
@@ -638,10 +773,10 @@ export default function OpportunitiesNew() {
                     ) : (
                       <button
                         onClick={(e) => handleAddToPipeline(opp, e)}
-                        disabled={addingToPipeline === opp.id}
+                        disabled={addingToPipeline[opp.id] === true}
                         className="flex items-center gap-1 px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
                       >
-                        {addingToPipeline === opp.id ? (
+                        {addingToPipeline[opp.id] === true ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin" />
                             <span className="animate-pulse">Adding...</span>

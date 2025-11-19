@@ -150,6 +150,9 @@ from app.api.enhanced_export import router as enhanced_export_router
 from app.api.contact import router as contact_router
 from app.api.briefs import router as briefs_router
 from app.api.pipeline import router as pipeline_router
+from app.api.sharepoint import router as sharepoint_router
+from app.api.word_addin import router as word_addin_router
+from app.api.expert_onboarding import router as expert_onboarding_router
 
 # Auth routes (no prefix, already in router)
 app.include_router(auth_router)
@@ -329,6 +332,24 @@ app.include_router(
 app.include_router(
     pipeline_router,
     tags=["pipeline"]
+)
+
+# SharePoint API
+app.include_router(
+    sharepoint_router,
+    tags=["sharepoint"]
+)
+
+# Word Add-In API
+app.include_router(
+    word_addin_router,
+    tags=["word-addin"]
+)
+
+# Expert Onboarding API
+app.include_router(
+    expert_onboarding_router,
+    tags=["expert-onboarding"]
 )
 
 

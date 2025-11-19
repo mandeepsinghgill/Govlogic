@@ -260,7 +260,7 @@ export const supportingContent = {
       { label: 'Schedule Live Demo', href: 'https://calendly.com/govsure/demo', external: true },
       { label: 'Talk to Our Team', href: '/contact' },
     ],
-    finePrint: 'No credit card. Full platform access. 14 days.',
+    finePrint: 'No credit card. Full platform access. 7 days.',
   },
   resources: [
     { label: '📚 Case Study Library', description: 'Deep dives on customer transformations' },

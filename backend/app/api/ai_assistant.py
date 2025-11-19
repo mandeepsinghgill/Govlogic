@@ -1,5 +1,5 @@
 """
-AI Assistant API - Ollama Integration
+AI Assistant API - OpenAI Integration
 Provides AI chat capabilities for proposal writing assistance
 """
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,13 +9,10 @@ from typing import List, Optional
 from app.core.database import get_db
 from app.core.auth import get_current_user
 from app.models.organization import User
-import httpx
+from app.services.llm_service import llm_service
 import os
 
 router = APIRouter()
-
-# Ollama API configuration
-OLLAMA_API_URL = os.getenv('OLLAMA_API_URL', 'http://localhost:11434')
 
 
 class ChatMessage(BaseModel):
@@ -44,110 +41,109 @@ async def chat_with_ai(
     db: Session = Depends(get_db)
 ):
     """
-    Chat with AI assistant using Ollama
+    Chat with AI assistant using OpenAI
     Optimized for proposal writing and government contracting
+    Returns formatted responses with markdown support
     """
-    print(f"🤖 AI Assistant: Received chat request for model: {request.model}")
+    print(f"🤖 AI Assistant: Received chat request")
     print(f"📝 Number of messages: {len(request.messages)}")
     
     try:
-        # Prepare the request for Ollama
-        ollama_request = {
-            "model": request.model,
-            "messages": [{"role": msg.role, "content": msg.content} for msg in request.messages],
-            "stream": False,
-            "options": {
-                "temperature": request.temperature or 0.7,
-                "num_predict": request.max_tokens or 2000,
-            }
-        }
-
-        print(f"🌐 Calling Ollama API at: {OLLAMA_API_URL}/api/chat")
-        print(f"📤 Request payload: model={request.model}, messages={len(ollama_request['messages'])}")
+        # Check for OpenAI API key
+        openai_key = os.getenv("OPENAI_API_KEY")
+        if not openai_key:
+            raise HTTPException(
+                status_code=400,
+                detail="OPENAI_API_KEY not configured. Please set your OpenAI API key in environment variables."
+            )
         
-        # Call Ollama API
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            try:
-                response = await client.post(
-                    f"{OLLAMA_API_URL}/api/chat",
-                    json=ollama_request
-                )
+        # Extract system prompt and conversation messages
+        system_prompt = None
+        conversation_messages = []
+        
+        for msg in request.messages:
+            if msg.role == 'system':
+                system_prompt = msg.content
+            else:
+                # Ensure role is valid (user or assistant)
+                role = msg.role if msg.role in ['user', 'assistant'] else 'user'
+                conversation_messages.append({
+                    "role": role,
+                    "content": msg.content
+                })
+        
+        print(f"🌐 Calling OpenAI API")
+        print(f"📤 Messages: {len(conversation_messages)}, temperature={request.temperature or 0.7}")
+        
+        # Use OpenAI Chat Completions API directly for proper conversation handling
+        from openai import OpenAI
+        openai_key = os.getenv("OPENAI_API_KEY")
+        if not openai_key:
+            raise HTTPException(
+                status_code=400,
+                detail="OPENAI_API_KEY not configured"
+            )
+        
+        client = OpenAI(api_key=openai_key)
+        
+        # Prepare messages for OpenAI (include system prompt if provided)
+        openai_messages = []
+        if system_prompt:
+            openai_messages.append({"role": "system", "content": system_prompt})
+        openai_messages.extend(conversation_messages)
+        
+        # Use the model from request or default to gpt-4o
+        model = request.model if request.model in ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'] else 'gpt-4o'
+        
+        # Call OpenAI Chat Completions API
+        completion = client.chat.completions.create(
+            model=model,
+            messages=openai_messages,
+            temperature=request.temperature or 0.7,
+            max_tokens=request.max_tokens or 2000,
+        )
+        
+        response = completion.choices[0].message.content
+        
+        if not response:
+            response = "I apologize, but I received an empty response. Please try again."
+        
+        print(f"✅ OpenAI response received: {len(response)} characters")
+        print(f"📝 First 200 chars: {response[:200]}...")
+        
+        return ChatResponse(
+            response=response,
+            model=model,
+            done=True
+        )
                 
-                print(f"📡 Ollama response status: {response.status_code}")
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    print(f"✅ Ollama response received successfully")
-                    
-                    # Extract the assistant's message content
-                    assistant_message = data.get("message", {}).get("content", "")
-                    
-                    if not assistant_message:
-                        print(f"⚠️ Warning: Empty response from Ollama. Full data: {data}")
-                        assistant_message = "I apologize, but I received an empty response. Please try again."
-                    else:
-                        print(f"✅ Response length: {len(assistant_message)} characters")
-                        print(f"📝 First 100 chars: {assistant_message[:100]}...")
-                    
-                    return ChatResponse(
-                        response=assistant_message,
-                        model=request.model,
-                        done=data.get("done", True)
-                    )
-                else:
-                    error_text = response.text
-                    print(f"❌ Ollama API error (status {response.status_code}): {error_text}")
-                    
-                    # Try to parse error message
-                    try:
-                        error_data = response.json()
-                        error_message = error_data.get("error", error_text)
-                    except:
-                        error_message = error_text
-                    
-                    # Return user-friendly error
-                    return ChatResponse(
-                        response=f"I encountered an error: {error_message}. Please check if the model '{request.model}' is available. Try running: ollama list",
-                        model=request.model,
-                        done=True
-                    )
-                    
-            except httpx.ConnectError as e:
-                print(f"❌ Connection Error: Cannot connect to Ollama at {OLLAMA_API_URL}")
-                print(f"   Make sure Ollama is running: ollama serve")
-                
-                # Fallback response if Ollama is not available
-                fallback_response = generate_fallback_response(request.messages)
-                return ChatResponse(
-                    response=fallback_response,
-                    model=request.model,
-                    done=True
-                )
-            
-            except httpx.TimeoutException as e:
-                print(f"⏱️ Timeout Error: Ollama took too long to respond")
-                return ChatResponse(
-                    response="The AI is taking longer than expected. This might be a complex request. Please try with a shorter message or try again.",
-                    model=request.model,
-                    done=True
-                )
-                
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"❌ AI Assistant Error: {str(e)}")
         import traceback
         traceback.print_exc()
         
         # Return a helpful error message
+        error_msg = f"I apologize, but I encountered an error: {str(e)}. "
+        if "OPENAI_API_KEY" in str(e):
+            error_msg += "Please ensure your OpenAI API key is configured."
+        else:
+            error_msg += "Please try again or contact support."
+        
+        # Use requested model or default
+        model = request.model if request.model in ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'] else 'gpt-4o'
+        
         return ChatResponse(
-            response=f"I apologize, but I encountered an error: {str(e)}. Please ensure Ollama is running with 'ollama serve' and try again.",
-            model=request.model,
+            response=error_msg,
+            model=model,
             done=True
         )
 
 
 def generate_fallback_response(messages: List[ChatMessage]) -> str:
     """
-    Generate a helpful fallback response when Ollama is not available
+    Generate a helpful fallback response when OpenAI is not available
     """
     last_message = messages[-1].content.lower() if messages else ""
     
@@ -172,7 +168,7 @@ def generate_fallback_response(messages: List[ChatMessage]) -> str:
 
 Would you like me to draft a specific section?
 
-*Note: For full AI-powered assistance, please ensure Ollama is running.*"""
+*Note: For full AI-powered assistance, please ensure OpenAI API key is configured.*"""
     
     elif "win theme" in last_message or "discriminator" in last_message:
         return """Let me help you develop winning themes and discriminators!
@@ -200,7 +196,7 @@ Would you like me to draft a specific section?
 
 Would you like help developing specific themes for your opportunity?
 
-*Note: For full AI-powered assistance, please ensure Ollama is running.*"""
+*Note: For full AI-powered assistance, please ensure OpenAI API key is configured.*"""
     
     elif "rfp" in last_message or "requirement" in last_message or "compliance" in last_message:
         return """I can help you analyze RFP requirements and ensure compliance!
@@ -236,7 +232,7 @@ Would you like help developing specific themes for your opportunity?
 
 Would you like me to analyze a specific RFP section?
 
-*Note: For full AI-powered assistance, please ensure Ollama is running.*"""
+*Note: For full AI-powered assistance, please ensure OpenAI API key is configured.*"""
     
     elif "improve" in last_message or "edit" in last_message or "review" in last_message:
         return """I can help improve your proposal content! Here's what to check:
@@ -273,7 +269,7 @@ Would you like me to analyze a specific RFP section?
 
 Paste your section and I'll provide specific feedback!
 
-*Note: For full AI-powered assistance, please ensure Ollama is running.*"""
+*Note: For full AI-powered assistance, please ensure OpenAI API key is configured.*"""
     
     else:
         return """I'm your AI Assistant for proposal writing! I can help you with:
@@ -308,10 +304,10 @@ Paste your section and I'll provide specific feedback!
 3. Share proposal text for improvement
 4. Request templates and examples
 
-**Note**: For full AI-powered responses with Ollama, please ensure:
-- Ollama is installed and running
-- Model is downloaded: `ollama pull llama2`
-- API is accessible at http://localhost:11434
+**Note**: For full AI-powered responses with OpenAI, please ensure:
+- OpenAI API key is set in backend environment variables (OPENAI_API_KEY)
+- Backend server has been restarted after setting the key
+- You have sufficient OpenAI API credits
 
 How can I help with your proposal today?"""
     
@@ -323,56 +319,42 @@ async def list_available_models(
     current_user: User = Depends(get_current_user)
 ):
     """
-    List available Ollama models
+    List available OpenAI models
     """
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(f"{OLLAMA_API_URL}/api/tags")
-            if response.status_code == 200:
-                data = response.json()
-                return {"models": data.get("models", [])}
-            else:
-                return {"models": []}
-    except:
-        # Return default models if Ollama is not available
-        return {
-            "models": [
-                {"name": "llama2", "size": "3.8GB"},
-                {"name": "mistral", "size": "4.1GB"},
-                {"name": "codellama", "size": "3.8GB"},
-                {"name": "neural-chat", "size": "4.1GB"},
-            ]
-        }
+    return {
+        "models": [
+            {"name": "gpt-4o", "description": "GPT-4o (Recommended - Best quality)"},
+            {"name": "gpt-4o-mini", "description": "GPT-4o Mini (Faster, cost-effective)"},
+            {"name": "gpt-4-turbo", "description": "GPT-4 Turbo (High quality)"},
+        ]
+    }
 
 
 @router.get("/status")
-async def check_ollama_status(
+async def check_ai_status(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Check if Ollama is running and available
+    Check if OpenAI is configured and available
     """
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(f"{OLLAMA_API_URL}/api/tags")
-            if response.status_code == 200:
-                return {
-                    "status": "online",
-                    "message": "Ollama is running and available",
-                    "api_url": OLLAMA_API_URL
-                }
-    except:
-        pass
+    openai_key = os.getenv("OPENAI_API_KEY")
     
-    return {
-        "status": "offline",
-        "message": "Ollama is not running. Please start Ollama to use AI features.",
-        "api_url": OLLAMA_API_URL,
-        "setup_instructions": [
-            "1. Install Ollama: https://ollama.ai/download",
-            "2. Pull a model: ollama pull llama2",
-            "3. Start Ollama: ollama serve",
-            "4. Verify: curl http://localhost:11434/api/tags"
-        ]
-    }
+    if openai_key:
+        return {
+            "status": "online",
+            "message": "OpenAI is configured and available",
+            "provider": "openai",
+            "model": "gpt-4o"
+        }
+    else:
+        return {
+            "status": "offline",
+            "message": "OpenAI API key is not configured. Please set OPENAI_API_KEY environment variable.",
+            "provider": "openai",
+            "setup_instructions": [
+                "1. Get your OpenAI API key from https://platform.openai.com/api-keys",
+                "2. Set environment variable: export OPENAI_API_KEY='your-key-here'",
+                "3. Restart the backend server"
+            ]
+        }
 

@@ -50,8 +50,11 @@ import ProgramsEnhanced from './pages/ProgramsEnhanced';
 import ProgramDetail from './pages/ProgramDetail';
 import GovConWebinar from './pages/GovConWebinar';
 import GovConTools from './pages/GovConTools';
+import ToolkitAssessment from './pages/ToolkitAssessment';
+import FARNavigator from './pages/FARNavigator';
 import Careers from './pages/Careers';
 import FractionalBD from './pages/FractionalBD';
+import ExpertOnboarding from './pages/ExpertOnboarding';
 import { Menu, X, Target, FileText, Briefcase, Database, FolderKanban, LogOut, Upload, Users, CheckSquare, DollarSign, ThumbsUp, Zap, BarChart3, GitBranch, Search, Bell, Settings, User, ChevronDown, HelpCircle, UserCircle, MessageSquare, Sparkles } from 'lucide-react';
 import PipelineManager from './pages/PipelineManager';
 import AIAssistant from './pages/AIAssistant';
@@ -419,10 +422,14 @@ function AppContent() {
         <Route path="/case-studies/:slug" element={<CaseStudyDetail />} />
         <Route path="/resources/ai-govcon-webinar" element={<GovConWebinar />} />
         <Route path="/resources/free-govcon-tools" element={<GovConTools />} />
+        <Route path="/toolkit-assessment" element={<ToolkitAssessment />} />
+        <Route path="/far-navigator" element={<FARNavigator />} />
+        <Route path="/far-navigator/:partId" element={<FARNavigator />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/fractional-bd" element={<FractionalBD />} />
+        <Route path="/onboarding/expert" element={<ExpertOnboarding />} />
         <Route path="/terms" element={<TermsAndConditions />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />

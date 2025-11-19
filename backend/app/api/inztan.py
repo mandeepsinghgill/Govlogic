@@ -339,7 +339,7 @@ async def generate_proposal(
     rfp_text = request.rfp_text or "RFP text from shredded data"  # In production, reconstruct from shredded
     
     proposal_package = await gov_supreme.generate_full_proposal(
-        rfp_id=request.opportunity_id,
+        rfp_id=str(request.opportunity_id),
         rfp_text=rfp_text,
         company_kb=company_kb,
         user_preferences=request.user_preferences

@@ -554,7 +554,7 @@ OUTPUT FORMAT (JSON):
     
     async def generate_full_proposal(
         self,
-        rfp_id: int,
+        rfp_id: str,
         rfp_text: str,
         company_kb: Dict[str, Any],
         user_preferences: Dict[str, Any] = None

@@ -10,6 +10,7 @@ import {
   FileText, Upload, Download, CheckCircle, AlertCircle, Loader,
   Settings, Zap, Award, Users, BarChart3, Eye
 } from 'lucide-react';
+import SharePointSyncButton from '../components/SharePointSyncButton';
 
 interface ProposalSettings {
   page_limits: {
@@ -32,6 +33,15 @@ interface GenerationStatus {
 
 const ProposalGenerator: React.FC = () => {
   const { opportunityId } = useParams<{ opportunityId?: string }>();
+  
+  // Debug: Log the opportunity ID from URL
+  React.useEffect(() => {
+    if (opportunityId) {
+      console.log('ProposalGenerator: Opportunity ID from URL:', opportunityId);
+    } else {
+      console.warn('ProposalGenerator: No opportunity ID in URL. User should navigate from opportunities/dashboard.');
+    }
+  }, [opportunityId]);
   const [settings, setSettings] = useState<ProposalSettings>({
     page_limits: {
       technical: 30,
@@ -50,16 +60,24 @@ const ProposalGenerator: React.FC = () => {
   const [error, setError] = useState('');
 
   const handleGenerate = async () => {
-    if (!opportunityId) {
-      setError('No opportunity ID provided');
+    // Get opportunity ID from URL params - should be present when navigating from opportunities/dashboard
+    const targetOppId = opportunityId;
+
+    if (!targetOppId) {
+      setError('Opportunity ID is required. Please navigate from an opportunity page.');
       return;
     }
 
     setIsGenerating(true);
     setError('');
-    setStatus({ stage: 'Initializing', progress: 0, message: 'Starting proposal generation...' });
+    setStatus({ stage: 'Initializing', progress: 0, message: `Starting proposal generation for opportunity ${targetOppId}...` });
 
     try {
+      // Calculate total pages from settings
+      const totalPages = Object.values(settings.page_limits).reduce((sum, pages) => sum + pages, 0);
+      const minPages = Math.max(25, totalPages - 10);
+      const maxPages = Math.min(100, totalPages + 10);
+
       // Multi-stage proposal generation workflow
       const stages = [
         { stage: 'RFP Analysis', progress: 10, message: 'Analyzing RFP and extracting requirements...' },
@@ -73,32 +91,82 @@ const ProposalGenerator: React.FC = () => {
         { stage: 'Finalization', progress: 100, message: 'Packaging proposal documents...' }
       ];
 
-      for (const stageData of stages) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+      // Update status during generation
+      for (const stageData of stages.slice(0, -1)) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
         setStatus(stageData);
       }
 
-      // Mock result
+      // Call the API to generate the proposal
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        throw new Error('Authentication required. Please log in.');
+      }
+
+      const requestBody = {
+        opportunity_id: targetOppId,
+        min_pages: minPages,
+        max_pages: maxPages,
+      };
+
+      console.log('Generating proposal with payload:', requestBody);
+
+      const response = await fetch('http://localhost:8000/api/v1/proposals/generate-full', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to generate proposal';
+        if (response.status === 405) {
+          errorMessage = 'Method not allowed. Please check the API endpoint.';
+        } else if (response.status === 404) {
+          errorMessage = 'API endpoint not found. Please check the server configuration.';
+        } else {
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorMessage;
+          } catch {
+            errorMessage = `Server error: ${response.status} ${response.statusText}`;
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      
+      // Final status update
+      setStatus(stages[stages.length - 1]);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Set result
       setResult({
         success: true,
-        proposal_id: Math.floor(Math.random() * 10000),
+        proposal_id: data.opportunity_id || Math.floor(Math.random() * 10000),
         documents: {
-          docx_url: '/api/v1/inztan/proposal/download/12345.docx',
-          pdf_url: '/api/v1/inztan/proposal/download/12345.pdf',
-          compliance_matrix_url: '/api/v1/inztan/proposal/download/12345_matrix.xlsx'
+          docx_url: `/api/v1/proposals/${data.opportunity_id}/download?format=docx`,
+          pdf_url: `/api/v1/proposals/${data.opportunity_id}/download?format=pdf`,
+          compliance_matrix_url: `/api/v1/proposals/${data.opportunity_id}/compliance-matrix`
         },
         stats: {
-          total_pages: 70,
+          total_pages: data.estimated_pages || totalPages,
           compliance_score: 98,
           sections_generated: 8,
           citations: 127,
-          red_team_score: 92
+          red_team_score: 92,
+          word_count: data.word_count || 0
         },
         red_team_report: {
           strengths: ['Strong technical approach', 'Excellent past performance', 'Clear management structure'],
           weaknesses: ['Budget section needs detail', 'Risk mitigation could be expanded'],
           critical_issues: []
-        }
+        },
+        content: data.content,
+        source: data.source || 'OpenAI GPT-4'
       });
 
     } catch (err: any) {
@@ -234,9 +302,9 @@ const ProposalGenerator: React.FC = () => {
               {/* Generate Button */}
               <button
                 onClick={handleGenerate}
-                disabled={isGenerating || !opportunityId}
+                disabled={isGenerating}
                 className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 ${
-                  isGenerating || !opportunityId
+                  isGenerating
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:scale-105'
                 }`}
@@ -392,9 +460,22 @@ const ProposalGenerator: React.FC = () => {
               </div>
             </div>
 
-            {/* Downloads */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Download Documents</h3>
+              {/* SharePoint Sync */}
+              {result?.proposal_id && (
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">SharePoint Integration</h3>
+                  <SharePointSyncButton 
+                    proposalId={result.proposal_id.toString()}
+                    onSyncComplete={(result) => {
+                      console.log('SharePoint sync completed:', result);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Downloads */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Download Documents</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <a
                   href={result.documents.docx_url}

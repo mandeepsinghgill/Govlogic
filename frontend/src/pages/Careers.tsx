@@ -158,7 +158,7 @@ const openPositions = [
   },
   {
     id: 3,
-    title: 'Sales Development Representative',
+    title: 'Business Development Representative',
     department: 'Sales',
     location: 'Remote / Hybrid',
     type: 'Full-time',
@@ -316,53 +316,7 @@ export default function Careers() {
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're a diverse team of 10 professionals working together to revolutionize government contracting
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {teamMembers.map((member) => (
-              <div
-                key={member.id}
-                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 text-white mb-4 mx-auto">
-                  {member.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 text-center mb-1">{member.name}</h3>
-                <p className="text-purple-600 font-semibold text-center mb-2">{member.role}</p>
-                <p className="text-sm text-gray-500 text-center mb-4">{member.department}</p>
-                <p className="text-sm text-gray-600 text-center leading-relaxed">{member.description}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Team Stats */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">10</div>
-              <div className="text-gray-600">Team Members</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-indigo-600 mb-2">3</div>
-              <div className="text-gray-600">Backend Developers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">2</div>
-              <div className="text-gray-600">Frontend Developers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">2</div>
-              <div className="text-gray-600">Marketing Experts</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Open Positions Section */}
       <section className="py-20 bg-white">
